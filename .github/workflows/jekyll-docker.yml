@@ -39,7 +39,7 @@ jobs:
       id: aws_creds
       with:
         aws-region: ${{ env.S3_BUCKET_REGION }}
-        role-to-assume: ${{ secrets.GHACTIONS_AWS_ROLE_ARN }} 
+        role-to-assume: arn:aws:iam::590183693323:role/GitHubActionsRole
         role-session-name: GHActions-anthony_cloud_resume
         retry-max-attempts: 3
         output-credentials: true
