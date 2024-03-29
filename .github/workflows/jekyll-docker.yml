@@ -1,4 +1,4 @@
-name: Jekyll site CI to AWS
+name: Deploy static site to AWS S3
 
 on:
   push:
@@ -23,18 +23,15 @@ env:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v3
-      name: check out this repo
-      
-    - name: Build the site in the jekyll/builder container
+      name: checks out this repo
+
+    - name: get caller identity 1
       run: |
-        docker run \
-        -v ${{ github.workspace }}:/srv/jekyll -v ${{ github.workspace }}/_site:/srv/jekyll/_site \
-        jekyll/builder:latest /bin/bash -c "chmod -R 777 /srv/jekyll && jekyll build --future"
+        aws sts get-caller-identity
 
     - name: get temporary AWS credentials
       uses: aws-actions/configure-aws-credentials@v4
@@ -45,13 +42,17 @@ jobs:
         role-session-name: GHASession-anthony_cloud_resume
         retry-max-attempts: 3
         output-credentials: true
+        
+    - name: get caller identity 2
+      run: |
+        aws sts get-caller-identity
 
     - name: S3 sync
       uses: jakejarvis/s3-sync-action@v0.5.1
       with:
         args: --follow-symlinks --exclude '.git/*' --exclude '.github/*' --exclude 'README.md'
       env:
+        AWS_S3_BUCKET: ${{ env.S3_BUCKET_NAME }}
         AWS_ACCESS_KEY_ID: ${{ steps.step_aws_creds.outputs.aws-access-key-id }}
         AWS_SECRET_ACCESS_KEY: ${{ steps.step_aws_creds.outputs.aws-secret-access-key }}
-        AWS_S3_BUCKET: ${{ env.S3_BUCKET_NAME }}
         AWS_REGION:  ${{ env.S3_BUCKET_REGION }}
