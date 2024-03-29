@@ -34,7 +34,7 @@ jobs:
       uses: aws-actions/configure-aws-credentials@v4
       id: aws_creds
       with:
-        aws-region: ${{ vars.S3_BUCKET_REGION }}
+        aws-region: ${{ env.S3_BUCKET_REGION }}
         role-to-assume: ${{ secrets.GHACTIONS_AWS_ROLE_ARN }} 
         role-session-name: GHActions-anthony_cloud_resume
         retry-max-attempts: 3
@@ -48,4 +48,4 @@ jobs:
         AWS_ACCESS_KEY_ID: ${{ steps.aws_creds.outputs.aws-access-key-id }}
         AWS_SECRET_ACCESS_KEY: ${{ steps.creds.outputs.aws-secret-access-key }}
         AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET_NAME }}
-        AWS_REGION:  ${{ vars.S3_BUCKET_REGION }}
+        AWS_REGION:  ${{ env.S3_BUCKET_REGION }}
