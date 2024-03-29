@@ -36,17 +36,13 @@ jobs:
         aws-region: ${{ env.S3_BUCKET_REGION }}
         role-to-assume: ${{ env.AWS_ROLE_ARN }} 
         role-session-name: GHASession-anthony_cloud_resume
+        unset-current-credentials:: true
         retry-max-attempts: 3
         output-credentials: true
         
     - name: get caller identity 1
       run: |
         aws sts get-caller-identity
-
-    - name: view
-      run: |
-        echo $AWS_SECRET_ACCESS_KEY
-        echo $AWS_ACCESS_KEY_ID
 
     - name: S3 sync
       uses: jakejarvis/s3-sync-action@v0.5.1
