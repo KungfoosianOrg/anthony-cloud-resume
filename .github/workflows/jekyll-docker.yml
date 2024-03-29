@@ -1,4 +1,4 @@
-etname: Jekyll site CI to AWS
+name: Jekyll site CI to AWS
 
 on:
   push:
