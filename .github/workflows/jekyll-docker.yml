@@ -20,8 +20,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
-      name: checks out this repo
+    - name: checks out this repo 
+      uses: actions/checkout@v3
+      with:
+        repository: 'KungfoosianOrg/anthony-cloud-resume'
+        path: './checkout-repo'
 
 
     - name: get temporary AWS credentials
@@ -51,6 +54,7 @@ jobs:
     #     AWS_SECRET_ACCESS_KEY: ${{ steps.step_aws_creds.outputs.aws-secret-access-key }}
     #     AWS_REGION:  ${{ secrets.S3_BUCKET_REGION }}
     #     SOURCE_DIR: 'site'
+    
     - name: Set up S3cmd cli tool
       uses: s3-actions/s3cmd@v1.5.0
       with:
@@ -58,3 +62,7 @@ jobs:
         region: 'eu-central-1'
         access_key: ${{ env.S3_ACCESS_KEY }}
         secret_key: ${{ env.S3_SECRET_KEY }}
+    
+    - name: Interact with object storage
+      run: |
+        s3cmd put ./checkout-repo/site/* s3://demo-stack-for-github-actions-productionbucket-ytmddwdfennm/
