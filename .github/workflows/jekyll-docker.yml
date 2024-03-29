@@ -15,10 +15,10 @@ permissions:
   contents: read
 
 
-env:
-  AWS_ROLE_ARN: arn:aws:iam::590183693323:role/GHARole
-  S3_BUCKET_REGION: us-east-1
-  S3_BUCKET_NAME: demo-stack-for-github-actions-productionbucket-ytmddwdfennm
+# env:
+#   AWS_ROLE_ARN: arn:aws:iam::590183693323:role/GHARole
+#   S3_BUCKET_REGION: us-east-1
+#   S3_BUCKET_NAME: demo-stack-for-github-actions-productionbucket-ytmddwdfennm
 
 
 jobs:
