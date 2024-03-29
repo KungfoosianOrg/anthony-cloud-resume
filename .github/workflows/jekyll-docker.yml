@@ -15,12 +15,6 @@ permissions:
   contents: read
 
 
-# secrets:
-#   AWS_ROLE_ARN: arn:aws:iam::590183693323:role/GHARole
-#   S3_BUCKET_REGION: us-east-1
-#   S3_BUCKET_NAME: demo-stack-for-github-actions-productionbucket-ytmddwdfennm
-
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -50,6 +44,8 @@ jobs:
         args: --follow-symlinks --exclude '.git/*' --exclude '.github/*' --exclude 'README.md'
       env:
         AWS_S3_BUCKET: ${{ secrets.S3_BUCKET_NAME }}
-        AWS_ACCESS_KEY_ID: ${{ steps.step_aws_creds.outputs.aws-access-key-id }}
-        AWS_SECRET_ACCESS_KEY: ${{ steps.step_aws_creds.outputs.aws-secret-access-key }}
+        # AWS_ACCESS_KEY_ID: ${{ steps.step_aws_creds.outputs.aws-access-key-id }}
+        # AWS_SECRET_ACCESS_KEY: ${{ steps.step_aws_creds.outputs.aws-secret-access-key }}
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         AWS_REGION:  ${{ secrets.S3_BUCKET_REGION }}
