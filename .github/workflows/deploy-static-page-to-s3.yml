@@ -29,7 +29,7 @@ jobs:
 
     - name: get temporary AWS credentials
       uses: aws-actions/configure-aws-credentials@v4
-      id: step_aws_creds
+      # id: step_aws_creds
       with:
         aws-region: ${{ secrets.S3_BUCKET_REGION }}
         role-to-assume: ${{ secrets.AWS_ROLE_ARN }} 
@@ -64,7 +64,7 @@ jobs:
       uses: s3-actions/s3cmd@v1.5.0
       with:
         provider: aws # default is linode
-        region: 'eu-central-1'
+        region: ${{ secrets.S3_BUCKET_REGION }}
         access_key: ${{ env.S3_ACCESS_KEY }}
         secret_key: ${{ env.S3_SECRET_KEY }}
     
