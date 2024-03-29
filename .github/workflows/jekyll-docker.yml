@@ -33,12 +33,16 @@ jobs:
         role-session-name: GHASession-anthony_cloud_resume
         unset-current-credentials: true
         retry-max-attempts: 3
-        # output-credentials: true
+        output-credentials: true
 
         
     - name: get caller identity 1
       run: |
         aws sts get-caller-identity
+
+    - name: try listing bucket
+      run: |
+        aws s3 ls
 
 
     - name: S3 sync
