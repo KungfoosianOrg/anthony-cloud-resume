@@ -16,8 +16,9 @@ permissions:
 
 
 env:
+  AWS_ROLE_ARM: arn:aws:iam::590183693323:role/GitHubActionsRole
   S3_BUCKET_REGION: us-east-1
-  S3_BUCKET_NAME: ${{ secrets.AWS_S3_BUCKET_NAME }}
+  S3_BUCKET_NAME: demo-stack-for-github-actions-productionbucket-ytmddwdfennm
 
 
 jobs:
@@ -37,10 +38,10 @@ jobs:
 
     - name: get temporary AWS credentials
       uses: aws-actions/configure-aws-credentials@v4
-      id: aws_creds
+      id: step_aws_creds
       with:
         aws-region: ${{ env.S3_BUCKET_REGION }}
-        role-to-assume: arn:aws:iam::590183693323:role/GitHubActionsRole
+        role-to-assume: ${{ env.AWS_ROLE_ARN }} 
         role-session-name: GHActions-anthony_cloud_resume
         retry-max-attempts: 3
         output-credentials: true
@@ -50,7 +51,7 @@ jobs:
       with:
         args: --follow-symlinks --exclude '.git/*' --exclude '.github/*' --exclude 'README.md'
       env:
-        AWS_ACCESS_KEY_ID: ${{ steps.aws_creds.outputs.aws-access-key-id }}
-        AWS_SECRET_ACCESS_KEY: ${{ steps.creds.outputs.aws-secret-access-key }}
+        AWS_ACCESS_KEY_ID: ${{ steps.step_aws_creds.outputs.aws-access-key-id }}
+        AWS_SECRET_ACCESS_KEY: ${{ steps.step_aws_creds.outputs.aws-secret-access-key }}
         AWS_S3_BUCKET: ${{ env.AWS_S3_BUCKET_NAME }}
         AWS_REGION:  ${{ env.S3_BUCKET_REGION }}
