@@ -48,7 +48,7 @@ jobs:
 
     - name: get caller identity 1
       run: |
-        aws sts get-caller-identity
+        echo "access key id ${{ steps.step_aws_creds.outputs.aws-access-key-id }}"
 
     - name: S3 sync
       uses: jakejarvis/s3-sync-action@v0.5.1
