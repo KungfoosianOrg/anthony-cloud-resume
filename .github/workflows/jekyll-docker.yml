@@ -16,7 +16,7 @@ permissions:
 
 
 env:
-  AWS_ROLE_ARN: arn:aws:iam::590183693323:role/GitHubActionsRole
+  AWS_ROLE_ARN: arn:aws:iam::590183693323:role/GHARole
   S3_BUCKET_REGION: us-east-1
   S3_BUCKET_NAME: demo-stack-for-github-actions-productionbucket-ytmddwdfennm
 
@@ -42,7 +42,7 @@ jobs:
       with:
         aws-region: ${{ env.S3_BUCKET_REGION }}
         role-to-assume: ${{ env.AWS_ROLE_ARN }} 
-        role-session-name: GHActions-anthony_cloud_resume
+        role-session-name: GHASession-anthony_cloud_resume
         retry-max-attempts: 3
         output-credentials: true
 
