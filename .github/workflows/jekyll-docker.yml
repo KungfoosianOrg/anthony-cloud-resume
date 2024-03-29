@@ -42,8 +42,10 @@ jobs:
 
     - uses: shallwefootball/s3-upload-action@master
       with:
-        aws_key_id: ${{ steps.step_aws_creds.outputs.aws-access-key-id }}
-        aws_secret_access_key: ${{ steps.step_aws_creds.outputs.aws-secret-access-key }}
+        # aws_key_id: ${{ steps.step_aws_creds.outputs.aws-access-key-id }}
+        aws_key_id: ${{ env.AWS_ACCESS_KEY_ID }}
+        # aws_secret_access_key: ${{ steps.step_aws_creds.outputs.aws-secret-access-key }}
+        aws_secret_access_key: ${{ env.AWS_SECRET_ACCESS_KEY }}
         aws_bucket: ${{ secrets.S3_BUCKET_NAME }}
         source_dir: 'site'
         destination_dir: ''
