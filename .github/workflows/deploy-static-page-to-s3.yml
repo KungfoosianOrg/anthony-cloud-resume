@@ -22,9 +22,9 @@ jobs:
     steps:
     - name: checks out this repo 
       uses: actions/checkout@v3
-      # with:
-      #   repository: 'KungfoosianOrg/anthony-cloud-resume'
-      #   path: './checkout-repo'
+      with:
+        repository: 'KungfoosianOrg/anthony-cloud-resume'
+        path: './chkdout-repo'
 
 
     - name: get temporary AWS credentials
@@ -43,11 +43,6 @@ jobs:
       run: |
         aws sts get-caller-identity
 
-    # - name: pwd and ls current directory
-    #   run: |
-    #     pwd
-    #     ls
-
 
     # - name: S3 sync
     #   uses: jakejarvis/s3-sync-action@v0.5.1
@@ -58,7 +53,7 @@ jobs:
     #     AWS_ACCESS_KEY_ID: ${{ steps.step_aws_creds.outputs.aws-access-key-id }}
     #     AWS_SECRET_ACCESS_KEY: ${{ steps.step_aws_creds.outputs.aws-secret-access-key }}
     #     AWS_REGION:  ${{ secrets.S3_BUCKET_REGION }}
-    #     SOURCE_DIR: './checkout-repo/site'
+    #     SOURCE_DIR: './chkdout-repo/site'
     
     - name: Set up S3cmd cli tool
       uses: s3-actions/s3cmd@v1.5.0
@@ -70,4 +65,4 @@ jobs:
     
     - name: Interact with object storage
       run: |
-        s3cmd put ./site/* s3://demo-stack-for-github-actions-productionbucket-ytmddwdfennm/
+        s3cmd put ./chkdout-repo/site/* s3://demo-stack-for-github-actions-productionbucket-ytmddwdfennm/
