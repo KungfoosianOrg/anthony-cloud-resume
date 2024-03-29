@@ -36,7 +36,7 @@ jobs:
         aws-region: ${{ env.S3_BUCKET_REGION }}
         role-to-assume: ${{ env.AWS_ROLE_ARN }} 
         role-session-name: GHASession-anthony_cloud_resume
-        unset-current-credentials:: true
+        unset-current-credentials: true
         retry-max-attempts: 3
         output-credentials: true
         
