@@ -45,7 +45,7 @@ jobs:
 
     - name: pwd and ls current directory
       run: |
-        pwd \
+        pwd
         ls
 
 
