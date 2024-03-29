@@ -38,6 +38,10 @@ jobs:
       run: |
         aws sts get-caller-identity
 
+    - name: set aws signature version
+      run: |
+        aws configure set default.s3.signature_version s3v4
+
     - name: S3 sync
       uses: jakejarvis/s3-sync-action@v0.5.1
       with:
