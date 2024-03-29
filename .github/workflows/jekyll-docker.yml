@@ -43,6 +43,11 @@ jobs:
       run: |
         aws sts get-caller-identity
 
+    - name: view
+      run: |
+        echo $AWS_SECRET_ACCESS_KEY
+        echo $AWS_ACCESS_KEY_ID
+
     - name: S3 sync
       uses: jakejarvis/s3-sync-action@v0.5.1
       with:
