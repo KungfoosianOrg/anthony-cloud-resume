@@ -46,16 +46,14 @@ jobs:
         retry-max-attempts: 3
         output-credentials: true
 
-    - name: get caller identity 1
-      run: |
-        echo "access key id ${{ steps.step_aws_creds.outputs.aws-access-key-id }}"
-
     - name: S3 sync
       uses: jakejarvis/s3-sync-action@v0.5.1
       with:
         args: --follow-symlinks --exclude '.git/*' --exclude '.github/*' --exclude 'README.md'
       env:
-        AWS_ACCESS_KEY_ID: ${{ steps.step_aws_creds.outputs.aws-access-key-id }}
-        AWS_SECRET_ACCESS_KEY: ${{ steps.step_aws_creds.outputs.aws-secret-access-key }}
+        # AWS_ACCESS_KEY_ID: ${{ steps.step_aws_creds.outputs.aws-access-key-id }}
+        # AWS_SECRET_ACCESS_KEY: ${{ steps.step_aws_creds.outputs.aws-secret-access-key }}
+        AWS_ACCESS_KEY_ID: ${{ env.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ env.AWS_SECRET_ACCESS_KEY }}
         AWS_S3_BUCKET: ${{ env.S3_BUCKET_NAME }}
         AWS_REGION:  ${{ env.S3_BUCKET_REGION }}
