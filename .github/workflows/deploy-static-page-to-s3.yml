@@ -16,7 +16,7 @@ permissions:
 
 
 env:
-  GITHUB_SRC_FOLDER: '' # GitHub folder to sync to AWS ( e.g: prod/ ), if sync from root folder, enter ''
+  GITHUB_SRC_FOLDER: 'site/' # GitHub folder to sync to AWS ending with '/', e.g: 'prod/'. If sync from root folder, leave as ''
 
 
 jobs:
