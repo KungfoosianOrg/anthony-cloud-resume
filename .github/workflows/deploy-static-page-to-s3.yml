@@ -56,8 +56,10 @@ jobs:
       with:
         provider: aws # default is linode
         region: ${{ secrets.S3_BUCKET_REGION }}
-        access_key: ${{ env.S3_ACCESS_KEY }}
-        secret_key: ${{ env.S3_SECRET_KEY }}
+        # access_key: ${{ env.S3_ACCESS_KEY }}
+        access_key: ${{ env.AWS_ACCESS_KEY_ID }}
+        # secret_key: ${{ env.S3_SECRET_KEY }}
+        secret_key: ${{ env.AWS_SECRET_ACCESS_KEY }}
     
     - name: Interact with object storage via s3cmd
       run: |
