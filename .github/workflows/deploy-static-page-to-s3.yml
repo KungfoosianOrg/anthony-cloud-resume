@@ -15,8 +15,12 @@ permissions:
   contents: read
 
 
+env:
+  GITHUB_SRC_FOLDER: '' # GitHub folder to sync to AWS ( e.g: prod/ ), if sync from root folder, enter ''
+
+
 jobs:
-  build:
+  deploy-to-aws:
     runs-on: ubuntu-latest
 
     steps:
@@ -42,30 +46,9 @@ jobs:
 
     - name: sync files to aws s3
       shell: bash
+      # run: |
+        # aws s3 sync ./site/ s3://${{ secrets.S3_BUCKET_NAME }} --follow-symlinks
       run: |
-        aws s3 sync ./site/ s3://${{ secrets.S3_BUCKET_NAME }} --follow-symlinks
-      
+        aws s3 sync ./${{ env.GITHUB_SRC_FOLDER }} s3://${{ secrets.S3_BUCKET_NAME }} --follow-symlinks
 
-    # - name: S3 sync
-    #   uses: jakejarvis/s3-sync-action@v0.5.1
-    #   with:
-    #     args: --follow-symlinks --exclude '.git/*' --exclude '.github/*' --exclude 'README.md'
-    #   env:
-    #     AWS_S3_BUCKET: ${{ secrets.S3_BUCKET_NAME }}
-    #     AWS_ACCESS_KEY_ID: ${{ env.AWS_ACCESS_KEY_ID }}
-    #     AWS_SECRET_ACCESS_KEY: ${{ env.AWS_SECRET_ACCESS_KEY }}
-    #     AWS_REGION:  ${{ secrets.S3_BUCKET_REGION }}
-    #     SOURCE_DIR: 'site'
-    
-    # - name: Set up S3cmd cli tool
-    #   uses: s3-actions/s3cmd@v1.5.0
-    #   with:
-    #     provider: aws # default is linode
-    #     region: ${{ secrets.S3_BUCKET_REGION }}
-    #     access_key: ${{ env.S3_ACCESS_KEY }}
-    #     secret_key: ${{ env.S3_SECRET_KEY }}
         
-    
-    # - name: Interact with object storage via s3cmd
-    #   run: |
-    #     s3cmd put ./site/* s3://demo-stack-for-github-actions-productionbucket-ytmddwdfennm/
