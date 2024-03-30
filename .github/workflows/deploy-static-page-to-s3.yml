@@ -46,9 +46,7 @@ jobs:
 
     - name: sync files to aws s3
       shell: bash
-      # run: |
-        # aws s3 sync ./site/ s3://${{ secrets.S3_BUCKET_NAME }} --follow-symlinks
       run: |
-        aws s3 sync ./${{ env.GITHUB_SRC_FOLDER }} s3://${{ secrets.S3_BUCKET_NAME }} --follow-symlinks
+        aws s3 sync ./${{ env.GITHUB_SRC_FOLDER }} s3://${{ secrets.S3_BUCKET_NAME }} --follow-symlinks --delete
 
         
