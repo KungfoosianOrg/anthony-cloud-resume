@@ -35,21 +35,27 @@ jobs:
         output-credentials: true
 
         
-    - name: get caller identity 1
+    - name: verify temp credentials validity
       run: |
         aws sts get-caller-identity
 
 
-    - name: S3 sync
-      uses: jakejarvis/s3-sync-action@v0.5.1
-      with:
-        args: --follow-symlinks --exclude '.git/*' --exclude '.github/*' --exclude 'README.md'
-      env:
-        AWS_S3_BUCKET: ${{ secrets.S3_BUCKET_NAME }}
-        AWS_ACCESS_KEY_ID: ${{ env.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ env.AWS_SECRET_ACCESS_KEY }}
-        AWS_REGION:  ${{ secrets.S3_BUCKET_REGION }}
-        SOURCE_DIR: 'site'
+    - name: sync files to aws s3
+      shell: bash
+      run: |
+        aws s3 sync ./site/ s3://${{ secrets.S3_BUCKET_NAME }} --follow-symlinks
+      
+
+    # - name: S3 sync
+    #   uses: jakejarvis/s3-sync-action@v0.5.1
+    #   with:
+    #     args: --follow-symlinks --exclude '.git/*' --exclude '.github/*' --exclude 'README.md'
+    #   env:
+    #     AWS_S3_BUCKET: ${{ secrets.S3_BUCKET_NAME }}
+    #     AWS_ACCESS_KEY_ID: ${{ env.AWS_ACCESS_KEY_ID }}
+    #     AWS_SECRET_ACCESS_KEY: ${{ env.AWS_SECRET_ACCESS_KEY }}
+    #     AWS_REGION:  ${{ secrets.S3_BUCKET_REGION }}
+    #     SOURCE_DIR: 'site'
     
     # - name: Set up S3cmd cli tool
     #   uses: s3-actions/s3cmd@v1.5.0
