@@ -50,8 +50,8 @@ jobs:
         aws s3 sync ./${{ env.GITHUB_SRC_FOLDER }} s3://${{ secrets.S3_BUCKET_NAME }} \
                                                    --follow-symlinks \
                                                    --delete \
-                                                   --exclude '.git/*'
-                                                   --exclude 'README.md'
+                                                   --exclude '.git/*' \
+                                                   --exclude 'README.md' \
                                                    --exclude '.github/*'
                                                   
 
