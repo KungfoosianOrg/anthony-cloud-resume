@@ -1,0 +1,11 @@
+#btn-backToTop {
+    right: 1.15rem;
+    bottom: .5rem;
+}
+
+.sticky {
+    position: fixed;
+    top: 0;
+    right:0;
+    width: 100%;
+}
