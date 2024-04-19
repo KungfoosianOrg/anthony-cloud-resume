@@ -35,34 +35,35 @@ backToTopBtn.addEventListener('click', () => {
 // Sticky page nav when scrolled past
 const pageNav = document.getElementById('pageNav');
 
-const pageNavBounds = pageNav.getBoundingClientRect();
+const pageNavHeight = pageNav.getBoundingClientRect().y;
 
-const pageNavHeight = pageNavBounds.y;
-
-console.log(pageNavBounds);
 
 const contentContainer = document.getElementById('content-container');
 
-// console.log(window.getComputedStyle(contentContainer, null).getPropertyValue('padding-top'));
+let currentContentContainerPaddingTop = window.getComputedStyle(contentContainer, null).getPropertyValue('padding-top');
+
 
 document.addEventListener('scroll', () => {
-    let currentContentContainerPaddingTop = window.getComputedStyle(contentContainer, null).getPropertyValue('padding-top');
-
     if (typeof(currentContentContainerPaddingTop) !== 'number') {
         currentContentContainerPaddingTop = 0;
     }
 
-    if ( window.scrollY >= pageNavHeight ) {
+    let mainNavbarBounds = document.getElementById('main-nav').getBoundingClientRect();
+
+    let mainNavbarHeight = mainNavbarBounds.bottom - mainNavbarBounds.y;
+
+    // if user scrolled past main navbar height, set padding of content container to height of page navbar and set sticky on the page navbar
+    if ( window.scrollY >= mainNavbarHeight ) {
         pageNav.classList.add('sticky');
 
         // add top padding to content-container when sticky is enabled
         contentContainer.setAttribute('style', `padding-top: ${currentContentContainerPaddingTop + pageNavHeight}px !important`)
+    } else {
+        contentContainer.setAttribute('style', `padding-top: ${currentContentContainerPaddingTop - pageNavHeight}px !important`)
 
-        return;
+        pageNav.classList.remove('sticky');
     }
 
-
-    contentContainer.setAttribute('style', `padding-top: ${currentContentContainerPaddingTop - pageNavHeight}px !important`)
-    pageNav.classList.remove('sticky');
-    return;
+    
+    return
 })
