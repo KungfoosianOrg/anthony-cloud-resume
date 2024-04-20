@@ -10,7 +10,7 @@
 <body>
     <div id="main-container">
         <!-- Main nav -->
-        <nav id="main-nav" class="navbar navbar-expand-sm bg-body-tertiary" data-bs-theme="dark">
+        <nav id="main-nav" class="navbar navbar-expand-sm bg-body-tertiary no-print" data-bs-theme="dark">
             <div class="container-fluid justify-content-center">
                 <button id="navbar-toggler" class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -41,10 +41,10 @@
             <!-- End section -->
 
             <!-- Page nav -->
-            <div class="row">
+            <div id="pageNav-container" class="row">
                 <!-- Page nav -->
-                <nav id="pageNav" class="bg-secondary-subtle col-sm-2">
-                    <ul class="nav nav-tabs justify-content-center" role="tablist">
+                <nav id="pageNav" class="bg-secondary-subtle col-sm-2 no-print">
+                    <ul id="pageNavList" class="nav nav-tabs justify-content-center text-center" role="tablist">
                         <li class="nav-item">
                             <a href="#accomplishments"
                                 class="nav-link"
@@ -89,6 +89,9 @@
                         <p>anthonyvovo123@gmail.com</p>
                     </div>
                 </div>
+
+                <br>
+                <br>    
         
                 <div id="accomplishment-container">
                     <a id="accomplishments">
@@ -105,6 +108,10 @@
                     </ul>
                 </div>
         
+
+                <br>
+                <br>
+
                 <div id="work-history-container" class="mb-4">
                     <a id="work-history">
                         <h3>Work History</h3>
@@ -132,7 +139,7 @@
                             <li>Monitored the Alertus emergency and mass notification system.</li>
         
                             <li>Coordinated and documented the company's Multi-Factor Authentication (MFA) rollout process.</li>
-        
+                                
                             <li>Utilized Microsoft Active Directory to troubleshoot user issues.</li>
         
                             <li>Assisted in troubleshooting and resolved server issues, such as rebuilding a failed Domain Controller, server backup issues,...</li>
@@ -155,30 +162,34 @@
                     </div>
                 </div>
         
+                <br>
+                <br>
+
                 <div id="certifications-container" class="mb-4">
                     <a id="certifications">
                         <h3>Certifications</h3>
                     </a>
         
-                    <ul>
+                    <ul id="badge-container">
                         <li>
-                            <p>Microsoft Azure Fundamentals (AZ-900)</p>
-                            <p>1/2023</p>
+                            <img class="img-fluid badge-icon"  src="./img/aws_saa.png" alt="AWS Certified Solutions Architect - Associate" >
                         </li>
-        
+
                         <li>
-                            <p>CompTIA Security+</p>
-                            <p>12/2021</p>
+                            <img src="./img/az900.png" alt="Microsoft Azure Fundamentals (AZ-900)" class="img-fluid badge-icon">
                         </li>
-        
+
+                        
                         <li>
-                            <p>Cisco Certified Network Associate (CCNA)</p>
-                            <p>2/2021</p>
+                            <img src="./img/secplus.png" alt="CompTIA Security+" class="img-fluid badge-icon">
                         </li>
-        
+                        
                         <li>
-                            <p>CompTIA A+</p>
-                            <p>10/2020</p>
+                            <img src="./img/ccna_600.png" alt="Cisco Certified Network Associate" class="img-fluid badge-icon">
+                        </li>
+
+                        <li>
+                            <img src="./img/aplus.jpg" alt="CompTIA A+" class="img-fluid badge-icon">
                         </li>
                     </ul>
                 </div>
