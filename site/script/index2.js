@@ -1,5 +1,7 @@
 console.log('hi')
 
+const VIEWPORT_SM_BREAKPOINT = 576; // pixels
+
 const backToTopBtn = document.getElementById('btn-backToTop');
 
 
@@ -52,18 +54,29 @@ document.addEventListener('scroll', () => {
 
     let mainNavbarHeight = mainNavbarBounds.bottom - mainNavbarBounds.y;
 
-    // if user scrolled past main navbar height, set padding of content container to height of page navbar and set sticky on the page navbar
-    if ( window.scrollY >= mainNavbarHeight ) {
-        pageNav.classList.add('sticky');
+    // if user on small screen and if user scrolled past main navbar height, set padding of content container to height of page navbar and set sticky on the page navbar
+    if (window.innerWidth < VIEWPORT_SM_BREAKPOINT) {
+        if ( window.scrollY >= mainNavbarHeight ) {
+            pageNav.classList.add('sticky');
+    
+            // add top padding to content-container when sticky is enabled
+            contentContainer.setAttribute('style', `padding-top: ${currentContentContainerPaddingTop + pageNavHeight}px !important`)
+        }
+         else {
+            unstickPageNav();
+        }
 
-        // add top padding to content-container when sticky is enabled
-        contentContainer.setAttribute('style', `padding-top: ${currentContentContainerPaddingTop + pageNavHeight}px !important`)
-    } else {
-        contentContainer.setAttribute('style', `padding-top: ${currentContentContainerPaddingTop - pageNavHeight}px !important`)
-
-        pageNav.classList.remove('sticky');
+        return
     }
+
+    unstickPageNav();
 
     
     return
 })
+
+function unstickPageNav() {
+    contentContainer.setAttribute('style', `padding-top: ${currentContentContainerPaddingTop === 0 ? 0 : currentContentContainerPaddingTop - pageNavHeight}px !important`)
+
+    pageNav.classList.remove('sticky');
+}

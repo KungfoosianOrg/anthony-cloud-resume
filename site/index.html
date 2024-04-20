@@ -10,9 +10,9 @@
 <body>
     <div id="main-container">
         <!-- Main nav -->
-        <nav class="navbar navbar-expand-md bg-body-tertiary" data-bs-theme="dark">
+        <nav id="main-nav" class="navbar navbar-expand-sm bg-body-tertiary" data-bs-theme="dark">
             <div class="container-fluid justify-content-center">
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+                <button id="navbar-toggler" class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 
@@ -41,35 +41,37 @@
             <!-- End section -->
 
             <!-- Page nav -->
-            <nav>
-                <ul class="nav nav-tabs justify-content-center" id="pageNav" role="tablist">
-                    <li class="nav-item">
-                        <a href="#accomplishments"
-                            class="nav-link"
-                            >Accomplisments</a
-                        >
-                    </li>
-        
-                    <li class="nav-item" role="presentation">
-                        <a 
-                            href="#work-history" 
-                            class="nav-link" 
-                            >Work History</a
-                        >
-                    </li>
-        
-                    <li class="nav-item" role="presentation">
-                        <a 
-                            href="#certifications" 
-                            class="nav-link" 
-                            >Certifications</a
-                        >
-                    </li>
-                </ul>
-            </nav>
+            <div class="row">
+                <!-- Page nav -->
+                <nav id="pageNav" class="bg-secondary-subtle col-sm-2">
+                    <ul class="nav nav-tabs justify-content-center" role="tablist">
+                        <li class="nav-item">
+                            <a href="#accomplishments"
+                                class="nav-link"
+                                >Accomplisments</a
+                            >
+                        </li>
+            
+                        <li class="nav-item" role="presentation">
+                            <a 
+                                href="#work-history" 
+                                class="nav-link" 
+                                >Work History</a
+                            >
+                        </li>
+            
+                        <li class="nav-item" role="presentation">
+                            <a 
+                                href="#certifications" 
+                                class="nav-link" 
+                                >Certifications</a
+                            >
+                        </li>
+                    </ul>
+                </nav>
             <!-- End section -->
 
-            <div id="content-container" class="p-2 px-3">
+            <div id="content-container" class="p-2 px-3 col-sm">
                 <div id="contacts-container" class="mb-4 text-center">
                     <h1>Anthony Vo</h1>
         
