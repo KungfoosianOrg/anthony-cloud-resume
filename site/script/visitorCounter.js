@@ -72,15 +72,14 @@ if (!dataIsLoaded) {
   myElementText.appendChild(spinnerElement);
 }
 
-// if (response.statusCode === 200) {
-//       myElementText.removeChild(spinnerElement);
-
-//       myElementText.innerText = response.body.timesVisited
-//     }
 
 fetch('https://izsr45o8g5.execute-api.us-west-1.amazonaws.com/default/visitor-count', { method: 'POST' })
   .then(response => response.json())
-  .then(data => console.log(data))
+  .then(data => {
+    myElementText.removeChild(spinnerElement);
+
+    myElementText.innerText = data.timesVisited;
+  })
   .catch(err => console.error(`Couldn't fetch data: ${err}`))
 
 
