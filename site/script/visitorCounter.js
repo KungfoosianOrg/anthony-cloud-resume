@@ -22,8 +22,7 @@ myElementSvg.classList.add('bi', 'bi-geo-alt-fill', 'flex-shrink-0', 'me-2');
 myElementSvg.setAttribute('viewBox', '0 0 16 16');
 myElementSvg.role = 'img';
 myElementSvg.setAttribute('aria-label', 'Times visited:');
-myElementSvg.style.width = '25px';
-myElementSvg.style.height = 'auto';
+myElementSvg.classList.add('icon');
 
 let svgPath1 = document.createElementNS("http://www.w3.org/2000/svg", 'path');
 svgPath1.setAttribute('d', 'M12.166 8.94c-.524 1.062-1.234 2.12-1.96 3.07A32 32 0 0 1 8 14.58a32 32 0 0 1-2.206-2.57c-.726-.95-1.436-2.008-1.96-3.07C3.304 7.867 3 6.862 3 6a5 5 0 0 1 10 0c0 .862-.305 1.867-.834 2.94M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10');
@@ -39,7 +38,7 @@ myElementSvg.appendChild(svgPath2);
 
 // SECTION - Text
 let myElementText = document.createElement('div');
-myElementText.style.color = 'white';
+myElementText.classList.add('text-white');
 // END SECTION
 
 
