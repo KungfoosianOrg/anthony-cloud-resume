@@ -79,7 +79,7 @@ let response = new Promise((resolve, reject) => {
     method: 'POST'
   });
 
-  api_response = api_response.json();
+  // api_response = api_response.json();
 
   // console.log(api_response.json())
   if (api_response.statusCode === 200) {
