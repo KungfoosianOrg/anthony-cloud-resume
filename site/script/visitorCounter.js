@@ -72,39 +72,15 @@ if (!dataIsLoaded) {
   myElementText.appendChild(spinnerElement);
 }
 
-
-// let response = new Promise((resolve, reject) => {
-//   let api_response = fetch('https://izsr45o8g5.execute-api.us-west-1.amazonaws.com/default/visitor-count', {
-//     method: 'POST'
-//   });
-
-//   // api_response = api_response.json();
-
-//   // console.log(api_response.json())
-//   if (api_response.statusCode === 200) {
-//     resolve(api_response.body.timesVisited);
-//   }
-// })
-
-
-// response
-//   .then(value => {
-//     if (value) {
+// if (response.statusCode === 200) {
 //       myElementText.removeChild(spinnerElement);
-//       // display data
-//       myElementText.innerText = value;
+
+//       myElementText.innerText = response.body.timesVisited
 //     }
-//   })
-//   .catch(error => console.error(`Error occured: ${error}`))
 
 fetch('https://izsr45o8g5.execute-api.us-west-1.amazonaws.com/default/visitor-count', { method: 'POST' })
-  .then(response => {
-    if (response.statusCode === 200) {
-      myElementText.removeChild(spinnerElement);
-
-      myElementText.innerText = response.body.timesVisited
-    }
-  })
+  .then(response => response.json())
+  .then(data => console.log(data))
   .catch(err => console.error(`Couldn't fetch data: ${err}`))
 
 
