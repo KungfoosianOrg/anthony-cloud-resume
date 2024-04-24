@@ -1,5 +1,3 @@
-console.log('hi')
-
 const VIEWPORT_SM_BREAKPOINT = 576; // pixels
 
 // SECTION - "Back to Top" button
