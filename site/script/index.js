@@ -9,7 +9,7 @@ document.addEventListener('scroll', () => {
         backToTopBtn.classList.remove('d-none');
         backToTopBtn.classList.add('d-block');
 
-        return
+        return;
     }
 
 
@@ -17,7 +17,7 @@ document.addEventListener('scroll', () => {
     // hides the "back to top" button
     backToTopBtn.classList.remove('d-block');
     backToTopBtn.classList.add('d-none');
-    return
+    return;
 })
 
 // scroll to top when click button
@@ -33,63 +33,70 @@ backToTopBtn.addEventListener('click', () => {
 
 
 // SECTION - Sticky page nav when scroll
-const pageNav = document.getElementById('pageNav');
+const pageNavList = document.getElementById('pageNavList');
 
+
+const pageNav = document.getElementById('pageNav');
 const pageNavHeight = pageNav.getBoundingClientRect().y;
 
 
 const contentContainer = document.getElementById('content-container');
-
 let currentContentContainerPaddingTop = window.getComputedStyle(contentContainer, null).getPropertyValue('padding-top');
 
-const pageNavList = document.getElementById('pageNavList');
 
+
+// Get main navbar height
+const mainNavbarBounds = document.getElementById('main-nav').getBoundingClientRect();
+const mainNavbarHeight = mainNavbarBounds.bottom - mainNavbarBounds.y;
+
+// section - create dynamic padding style
+let cssDynamicPadding = `dynamicPadding { padding-left: 0px !important }`,
+    head = document.head || document.getElementsByTagName('head')[0],
+    styleDynamicPadding = document.createElement('style');
+
+head.appendChild(styleDynamicPadding);
+
+styleDynamicPadding.setAttribute('type', 'text/css')
+if (styleDynamicPadding.styleSheet) {
+    // This is required for IE8 and below.
+    styleDynamicPadding.styleSheet.cssText = css;
+} else {
+    styleDynamicPadding.appendChild(document.createTextNode(css));
+}
+// END section
 
 document.addEventListener('scroll', () => {
-    if (typeof(currentContentContainerPaddingTop) !== 'number') {
-        currentContentContainerPaddingTop = 0;
+    isNaN(currentContentContainerPaddingTop) ? currentContentContainerPaddingTop = 0 : '';
+
+    // unstick navbar if scroll height is less than main navbar height
+    if (window.scrollY < mainNavbarHeight) {
+        unstickPageNav();
+        
+        return;
     }
 
-    let mainNavbarBounds = document.getElementById('main-nav').getBoundingClientRect();
+    
 
-    let mainNavbarHeight = mainNavbarBounds.bottom - mainNavbarBounds.y;
-
-    // if user on small screen and if user scrolled past main navbar height, 
+    // for users on small screen
     // set padding of content container to height of page navbar and set sticky on the page navbar
     if (window.innerWidth < VIEWPORT_SM_BREAKPOINT) {
-        if ( window.scrollY >= mainNavbarHeight ) {
-            pageNav.classList.add('sticky');
-    
-            // add top padding to content-container when sticky is enabled
-            contentContainer.setAttribute('style', `padding-top: ${currentContentContainerPaddingTop + pageNavHeight}px !important`)
-        }
-         else {
-            unstickPageNav();
-        }
+        pageNav.classList.add('sticky');
 
-        return
+        return;
     }
-
-    unstickPageNav();
 
     // for users on big screen, make page navbar stick to top of screen when scroll past main navbar height
-    if ( window.scrollY >= mainNavbarHeight ) {
-        // pageNav.classList.add('sticky');
-        pageNavList.classList.add('sticky');    
+    // add pageNavList width to left padding of content-container when sticky is enabled
+    pageNavList.classList.add('sticky');    
 
-        // add pageNav width to left padding of content-container when sticky is enabled
-        let pageNavWidth = pageNav.getBoundingClientRect().right;
+    // add pageNav width to left padding of content-container when sticky is enabled
+    let pageNavWidth = pageNav.getBoundingClientRect().right;
 
-        let currentContentContainerPaddingLeft = window.getComputedStyle(contentContainer, null).getPropertyValue('padding-left');
+    let currentContentContainerPaddingLeft = window.getComputedStyle(contentContainer, null).getPropertyValue('padding-left');
 
-        contentContainer.setAttribute('style', `padding-left: ${currentContentContainerPaddingLeft + pageNavWidth}px !important`)
-    }
-     else {
-        unstickPageNav();
-    }
+    contentContainer.setAttribute('style', `padding-left: ${currentContentContainerPaddingLeft + pageNavWidth}px !important`)
 
-
-    return
+    return;
 })
 
 function unstickPageNav() {
