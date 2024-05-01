@@ -3,196 +3,201 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Site</title>
+    <title>Resume</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
     <link rel="stylesheet" href="index.css">
     <link rel="stylesheet" href="visitorCounter.css">
 </head>
-<body class="">
-    <div id="main-container" class="">
+<body>
+    <div id="main-container">
         <!-- Main nav -->
-        <nav id="main-nav" class="navbar navbar-expand-sm bg-body-tertiary" data-bs-theme="dark">
+        <nav id="main-nav" class="navbar navbar-expand-sm bg-body-tertiary no-print" data-bs-theme="dark">
             <div class="container-fluid justify-content-space-around">
                 <div id="visitorCounter-container">
                 </div>
-
+                
                 <button id="navbar-toggler" class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 
-
                 <div class="collapse navbar-collapse justify-content-center" id="navbarNavDropdown">
-                    <ul id="mainNavList" class="navbar-nav">
+                    <ul class="navbar-nav">
                         <li class="nav-item text-center">
-                            <a class="nav-link active" aria-current="page" href="#">Main Tab 1</a>
+                            <a class="nav-link active" aria-current="page" href="#">Home</a>
                         </li>
 
                         <li class="nav-item text-center">
-                            <a class="nav-link" href="#">Main Tab 2</a>
+                            <a class="nav-link" href="#">Projects</a>
                         </li>
 
                         <li class="nav-item text-center">
-                            <a class="nav-link" href="#">Main Tab 3</a>
+                            <a class="nav-link" href="#">Contact Me</a>
                         </li>
                     </ul>
-                </div> 
-                
-                
+                </div>            
             </div>
         </nav>
         <!-- End section -->
 
- 
-    
-        <div id="page-container" class="">
+        <div id="page-container">
             <!-- "Go to top" button -->
             <button id='btn-backToTop' class="btn btn-secondary position-fixed d-none">Back to top</button>
             <!-- End section -->
 
-            
+
             <div class="row">
                 <!-- Page nav -->
-                <nav id="pageNav" class="bg-secondary-subtle col-sm-2">
+                <nav id="pageNav" class="bg-secondary-subtle col-sm-2 no-print">
                     <ul id="pageNavList" class="nav nav-tabs justify-content-center" role="tablist">
                         <li class="nav-item">
-                            <a href="#sectionA"
+                            <a href="#accomplishments"
                                 class="nav-link"
-                                >Section A</a
+                                >Accomplisments</a
                             >
                         </li>
             
                         <li class="nav-item" role="presentation">
                             <a 
-                                href="#sectionB" 
+                                href="#work-history" 
                                 class="nav-link" 
-                                >Section B</a
+                                >Work History</a
                             >
                         </li>
             
                         <li class="nav-item" role="presentation">
                             <a 
-                                href="#sectionC" 
+                                href="#certifications" 
                                 class="nav-link" 
-                                >Section C</a
+                                >Certifications</a
                             >
                         </li>
                     </ul>
                 </nav>
-                <!-- End section -->
-                
-                <div id="content-container" class="p-2 px-3 col-sm">
-                    <div id="contacts-container" class="">
-                        <h1>Page Name</h1>
-                
-                        <h4>Page Property A</h3>
-                
-                        <div>
-                            <!-- add location icon -->
-                            
-                            <p>Page Property B</p>
-                        </div>
+            <!-- End section -->
+
+            <div id="content-container" class="p-2 px-3 col-sm">
+                <div id="contacts-container" class="mb-4 text-center">
+                    <h1>Anthony Vo</h1>
+        
+                    <h4>Junior Network Administrator</h3>
+        
+                    <div>
+                        <!-- add location icon -->
                         
-                        <div>
-                            <!-- add email icon -->
-                            
-                            <p>Page Property C</p>
-                        </div>
+                        <p>Los Angeles, CA 90003</p>
                     </div>
-                
-                    <div id="sectionA" class="">
-                        <a id="sectionA">
-                            <h3>Section A</h3>
-                        </a>
-                
+                    
+                    <div>
+                        <!-- add email icon -->
+                        
+                        <p>anthonyvovo123@gmail.com</p>
+                    </div>
+                </div>
+
+                <br>
+                <br>    
+        
+                <div id="accomplishment-container">
+                    <a id="accomplishments">
+                        <h3>Accomplisments</h3>
+                    </a>
+                    
+        
+                    <ul>
+                        <li>Automated Google Forms to email alerts, updates, and populate a Google Sheet with the entry for members to review submitted change management requests.</li>
+            
+                        <li>Wrote a Python program to gather toner supply from networked printers, allow users to update toner inventory, and generate an order email with low-inventory toners</li>
+        
+                        <li>Coordinated deployments of over 1000 computers before students and faculty returned</li>
+                    </ul>
+                </div>
+        
+
+                <br>
+                <br>
+
+                <div id="work-history-container" class="mb-4">
+                    <a id="work-history">
+                        <h3>Work History</h3>
+                    </a>
+        
+                    <div>
+                        <h4>Desktop Support/Junior Network Administrator</h4>
+                        <p>Wildwood School, Los Angeles, CA</p>
+                        <p>10/2021 - Current</p>
+        
                         <ul>
-                            <li>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Reiciendis laudantium dolor maxime repudiandae doloremque iure hic porro, quo nobis id quaerat similique ipsa voluptatibus? Sunt earum reprehenderit placeat autem culpa?</li>
-                
-                            <li>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Quod odit eius hic et! Labore ullam nulla ab eveniet corporis asperiores. Tenetur, reprehenderit officia. Odit architecto sed, sequi recusandae corporis magni!</li>
-                
-                            <li>Lorem ipsum dolor sit amet consectetur adipisicing elit. Libero cupiditate iure repellat ex aut ea eius doloremque nemo sed quaerat aperiam nulla neque dolore perferendis earum, corporis hic, error laudantium.</li>
+                            <li>Provided on-call support for network engineering duties.</li>
+                            <li>Performed network segmentation and appropriate routing for IoT and printer devices.</li>
+                            <li>Oversaw project to repair and upgrade network bandwidth.</li>
+                            <li>Implemented DMARC, DKIM, SPF, and email rules to protect organization from malicious and spoofed emails.</li>
                         </ul>
                     </div>
-                
-                    <div id="work-history-container" class="">
-                        <a id="sectionB">
-                            <h3>Section B</h3>
-                        </a>
-                
-                        <div>
-                            <h4>Sec. B - title 1</h4>
-                            <p>property 1</p>
-                            <p>from - to</p>
-                
-                            <ul>
-                                <li>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Quia excepturi nemo sunt nesciunt nisi quis quae officiis error debitis officia doloremque perferendis, distinctio eum dolorum harum quos rerum nihil in!</li>
-                                <li>Lorem ipsum dolor sit amet consectetur adipisicing elit. Beatae repellat quisquam voluptate quod. Repudiandae magnam iste minus facilis illum totam mollitia pariatur quibusdam saepe velit! Dolorem cum sit maxime autem?</li>
-                                <li>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Dignissimos deserunt, molestiae fugiat possimus neque ad facilis? Iste sint dicta doloribus repudiandae reprehenderit, beatae accusantium quisquam aperiam id quaerat. Aspernatur, molestiae!</li>
-                                <li>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Voluptas iste officiis, iure consequuntur ut facere autem tempore, cupiditate sapiente quos labore dolorum asperiores natus alias ipsa similique voluptatibus! Distinctio, veritatis.</li>
-                            </ul>
-                        </div>
-                
-                        <div>
-                            <h4>Sec. B - title 2</h4>
-                            <p>Property 1</p>
-                            <p>from - to</p>
-                
-                            <ul>
-                                <li>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quae in officiis ea soluta aperiam. Iste ipsa harum magni architecto aperiam nisi odio dolore velit commodi incidunt. Quas nihil neque asperiores?</li>
-                
-                                <li>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Maxime aspernatur ducimus porro debitis dolorum, laborum voluptate aliquid blanditiis placeat, quam magni aliquam vel modi adipisci corporis quae repellendus eaque. Recusandae!</li>
-                
-                                <li>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Iusto quod maiores accusamus doloribus consequatur animi, repudiandae accusantium, sint minus commodi ratione. Maiores aliquid dignissimos doloribus autem! Nam velit alias perspiciatis?</li>
-                
-                                <li>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quae reprehenderit cumque at explicabo voluptas aliquid tempora assumenda. Dicta consequatur suscipit culpa ipsam, voluptate, dolores debitis voluptatem perspiciatis ducimus pariatur harum.</li>
-                            </ul>
-                        </div>
-                
-                        <div>
-                            <h4>Sec. B - title 3</h4>
-                            <p>Property 1</p>
-                            <p>from - to</p>
-                            <ul>
-                                <li>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Veniam necessitatibus, blanditiis adipisci illo praesentium nulla sint provident enim, tempore, quae explicabo nam. Iste error omnis obcaecati ad aspernatur accusamus enim.</li>
-                
-                                <li>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Praesentium eveniet enim repudiandae doloremque ad ratione voluptatem sapiente explicabo ut quaerat ea, modi vero. Provident quo, alias impedit dolores qui possimus.</li>
-                
-                                <li>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Tenetur perferendis, accusamus veritatis ratione voluptatibus et blanditiis molestias incidunt, laboriosam porro eos ex distinctio. Amet accusantium obcaecati, cum optio inventore ab.</li>
-                
-                                <li>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Tempora sapiente, voluptate sit fugiat nemo vitae dolorum dolore consequuntur repellendus enim ullam natus nisi beatae distinctio vel? Amet numquam quasi id?</li>
-                            </ul>
-                        </div>
-                    </div>
-                
-                    <div id="sectionC" class="">
-                        <a id="sectionC">
-                            <h3>Section C</h3>
-                        </a>
-                
+        
+                    <div>
+                        <h4>Help Desk and Infrastructure Technician</h4>
+                        <p>Television City, Los Angeles, CA</p>
+                        <p>12/2020 - 10/2021</p>
+        
                         <ul>
-                            <li>
-                                <p>Sub A</p>
-                                <p>time</p>
-                            </li>
-                
-                            <li>
-                                <p>Sub B</p>
-                                <p>time</p>
-                            </li>
-                
-                            <li>
-                                <p>Sub C</p>
-                                <p>time</p>
-                            </li>
-                
-                            <li>
-                                <p>Sub D</p>
-                                <p>time</p>
-                            </li>
+                            <li>Monitored the Alertus emergency and mass notification system.</li>
+        
+                            <li>Coordinated and documented the company's Multi-Factor Authentication (MFA) rollout process.</li>
+                                
+                            <li>Utilized Microsoft Active Directory to troubleshoot user issues.</li>
+        
+                            <li>Assisted in troubleshooting and resolved server issues, such as rebuilding a failed Domain Controller, server backup issues,...</li>
+                        </ul>
+                    </div>
+        
+                    <div>
+                        <h4>IT Desktop Support</h4>
+                        <p>UCLA, Los Angeles, CA</p>
+                        <p>7/2020 - 12/2020</p>
+                        <ul>
+                            <li>Implemented SCCM/MDT to image and deploy PCs.</li>
+        
+                            <li>Established, configured, and supported VOIP phones, Macs, PCs, and printers.</li>
+        
+                            <li>Generated and resolved support tickets using Service Now.</li>
+        
+                            <li>Backup, recovered, and restored user data in the event of hardware failure.</li>
                         </ul>
                     </div>
                 </div>
+        
+                <br>
+                <br>
+
+                <div id="certifications-container" class="mb-4">
+                    <a id="certifications">
+                        <h3>Certifications</h3>
+                    </a>
+        
+                    <ul id="badge-container">
+                        <li>
+                            <img class="img-fluid badge-icon"  src="./img/aws_saa.png" alt="AWS Certified Solutions Architect - Associate" >
+                        </li>
+
+                        <li>
+                            <img src="./img/az900.png" alt="Microsoft Azure Fundamentals (AZ-900)" class="img-fluid badge-icon">
+                        </li>
+
+                        
+                        <li>
+                            <img src="./img/secplus.png" alt="CompTIA Security+" class="img-fluid badge-icon">
+                        </li>
+                        
+                        <li>
+                            <img src="./img/ccna_600.png" alt="Cisco Certified Network Associate" class="img-fluid badge-icon">
+                        </li>
+
+                        <li>
+                            <img src="./img/aplus.jpg" alt="CompTIA A+" class="img-fluid badge-icon">
+                        </li>
+                    </ul>
+                </div>
             </div>
-            
         </div>
     </div>
     
