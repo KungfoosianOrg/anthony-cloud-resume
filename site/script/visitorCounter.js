@@ -50,10 +50,7 @@ const createVisitorCounterWrapper = () => {
 
   const visitorIconSvg = createLocationIcon();
 
-  // const visitorCountText = createVisitorCountText();
-
   elementWrapper.appendChild(visitorIconSvg);
-  // elementWrapper.appendChild(visitorCountText);
 
   return elementWrapper
 }

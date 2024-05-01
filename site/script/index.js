@@ -37,7 +37,7 @@ const pageNavList = document.getElementById('pageNavList');
 
 
 const pageNav = document.getElementById('pageNav');
-const pageNavHeight = pageNav.getBoundingClientRect().y;
+// const pageNavHeight = pageNav.getBoundingClientRect().y;
 
 
 const contentContainer = document.getElementById('content-container');
@@ -49,64 +49,29 @@ let currentContentContainerPaddingTop = window.getComputedStyle(contentContainer
 const mainNavbarBounds = document.getElementById('main-nav').getBoundingClientRect();
 const mainNavbarHeight = mainNavbarBounds.bottom - mainNavbarBounds.y;
 
-// section - create dynamic padding style
-let cssDynamicPadding = `dynamicPadding { padding-left: 0px !important }`,
-    head = document.head || document.getElementsByTagName('head')[0],
-    styleDynamicPadding = document.createElement('style');
-
-head.appendChild(styleDynamicPadding);
-
-styleDynamicPadding.setAttribute('type', 'text/css')
-if (styleDynamicPadding.styleSheet) {
-    // This is required for IE8 and below.
-    styleDynamicPadding.styleSheet.cssText = css;
-} else {
-    styleDynamicPadding.appendChild(document.createTextNode(css));
-}
-// END section
 
 document.addEventListener('scroll', () => {
-    isNaN(currentContentContainerPaddingTop) ? currentContentContainerPaddingTop = 0 : '';
-
-    // unstick navbar if scroll height is less than main navbar height
+    // unstick navbar if current scroll position is less than main navbar height
     if (window.scrollY < mainNavbarHeight) {
-        unstickPageNav();
+        pageNav.classList.remove('sticky');
+        pageNavList.classList.remove('sticky');
         
         return;
     }
 
     
-
     // for users on small screen
-    // set padding of content container to height of page navbar and set sticky on the page navbar
     if (window.innerWidth < VIEWPORT_SM_BREAKPOINT) {
         pageNav.classList.add('sticky');
 
         return;
     }
 
-    // for users on big screen, make page navbar stick to top of screen when scroll past main navbar height
-    // add pageNavList width to left padding of content-container when sticky is enabled
+    // for users on big screen
     pageNavList.classList.add('sticky');    
-
-    // add pageNav width to left padding of content-container when sticky is enabled
-    let pageNavWidth = pageNav.getBoundingClientRect().right;
-
-    let currentContentContainerPaddingLeft = window.getComputedStyle(contentContainer, null).getPropertyValue('padding-left');
-
-    contentContainer.setAttribute('style', `padding-left: ${currentContentContainerPaddingLeft + pageNavWidth}px !important`)
 
     return;
 })
-
-function unstickPageNav() {
-    contentContainer.setAttribute('style', `padding-top: ${currentContentContainerPaddingTop === 0 ? '0 px;' : `${currentContentContainerPaddingTop - pageNavHeight} px !important;`}`)
-
-    pageNav.classList.remove('sticky');
-
-
-    pageNavList.classList.remove('sticky'); 
-}
 
 
 // END SECTION  
