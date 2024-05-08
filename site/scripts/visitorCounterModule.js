@@ -1,8 +1,8 @@
-// DISPLAY VISITOR COUNTER IN MAIN NAVBAR
 const enableBootstrapPopper = () => {
   const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
   const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
 }
+
 
 const createLoadingSpinner = () => {
   let spinnerElement = document.createElement('div');
@@ -17,6 +17,7 @@ const createLoadingSpinner = () => {
 
   return spinnerElement;
 }
+
 
 const createLocationIcon = () => {
   let myElementSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
@@ -40,6 +41,7 @@ const createLocationIcon = () => {
   return myElementSvg;
 }
 
+
 const createVisitorCounterWrapper = () => {
   let elementWrapper = document.getElementById('visitorCounter-container');
   elementWrapper.classList.add('d-flex', 'align-items-center')
@@ -55,33 +57,25 @@ const createVisitorCounterWrapper = () => {
   return elementWrapper
 }
 
-const createVisitorCountText = () => {
+
+const createVisitorCountTextElement = () => {
   let visitorCountText = document.createElement('div');
   visitorCountText.classList.add('text-white');
 
   return visitorCountText
 }
 
-const makeMockApiCall = () => {
-  return new Promise(resolve => {
-    setTimeout(() => {
-      resolve(Response.json({ "timesVisited": "42069" }))
-    }, 2000)
-  })
-}
 
-async function updateVisitorCounter() {
+async function makeApiCall(url=null, method='GET') {
+  if (url === null) return;
+  
   try {
-    // const response = await fetch('https://izsr45o8g5.execute-api.us-west-1.amazonaws.com/default/visitor-count', { method: 'POST' })
-    let response = await makeMockApiCall();
+    const response = await fetch(url, { method: method })
 
-    let updatedVisitorCount = await response.json();
+    let json = await response.json();
     
 
-    // trigger reloading for visitor counter
-    document.dispatchEvent(new Event('reload-visitor-counter'))
-    
-    return new Promise(resolve => resolve(updatedVisitorCount))
+    return json;
 
   } catch (error) {
     console.error('Something went wrong: ' + error);
@@ -90,34 +84,63 @@ async function updateVisitorCounter() {
   }
 }
 
-enableBootstrapPopper();
 
-const elementWrapper = createVisitorCounterWrapper();
+async function updateVisitorCounter() {
+  try {
+    let response = await makeApiCall(url='https://izsr45o8g5.execute-api.us-west-1.amazonaws.com/default/visitor-count', method='POST');
+    
+    return new Promise(resolve => resolve(response))
 
-const visitorCountText = createVisitorCountText();
+  } catch (error) {
+    console.error('Something went wrong: ' + error);
 
-elementWrapper.appendChild(visitorCountText);
-
-const spinnerElement = createLoadingSpinner();
-
-
-// SECTION - DATA SECTION
-let dataIsLoaded = false;
-
-
-// Asynchronously doing an API call 
-let visitorCount = updateVisitorCounter();
-
-if (!dataIsLoaded) visitorCountText.appendChild(spinnerElement);
+    return null;
+  }
+}
 
 
-document.addEventListener('reload-visitor-counter', () => {
+function main() {
+  enableBootstrapPopper();
+
+  const elementWrapper = createVisitorCounterWrapper();
+
+  const visitorCountTextElement = createVisitorCountTextElement();
+
+  elementWrapper.appendChild(visitorCountTextElement);
+
+  const spinnerElement = createLoadingSpinner();
+
+
+  // SECTION - DATA SECTION
+  let dataIsLoaded = false;
+
+
+  // Asynchronously doing an API call 
+  let visitorCount = updateVisitorCounter();
+
+  if (!dataIsLoaded) visitorCountTextElement.appendChild(spinnerElement);
+
   visitorCount
     .then(data => {
-      // display visitor count result after async call
-      visitorCountText.removeChild(spinnerElement);
-
-      visitorCountText.innerText = data.timesVisited;
+      // display visitor counter result after async call
+      document.dispatchEvent(new CustomEvent('reload-visitor-counter', { detail: data }));
     })
-})
-// END SECTION
+
+
+  document.addEventListener('reload-visitor-counter', event => {
+    console.log(event.detail)
+
+    visitorCountTextElement.removeChild(spinnerElement);
+
+    visitorCountTextElement.innerText = event.detail.timesVisited;
+  })
+}
+
+// main()
+
+var module = module || {};
+
+module.exports = {
+  main,
+  makeApiCall
+};
