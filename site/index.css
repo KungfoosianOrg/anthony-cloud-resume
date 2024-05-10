@@ -10,6 +10,16 @@
     /* width: 100%; */
 }
 
+#badge-container {
+    display: flex;
+    list-style: none;
+}
+
+.badge-icon {
+    width: 128px;
+    height: auto;
+}
+
 .row {
     --bs-gutter-x: 0 !important;
 }
