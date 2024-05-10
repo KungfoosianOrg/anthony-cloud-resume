@@ -42,8 +42,14 @@ const createLocationIcon = () => {
 }
 
 
-const createVisitorCounterWrapper = () => {
-  let elementWrapper = document.getElementById('visitorCounter-container');
+const createVisitorCounterWrapper = (appendToElementId=null) => {
+  if (appendToElementId === null) {
+    console.error('Must define id of element to add this module to');
+    
+    return null;
+  }
+
+  let elementWrapper = document.getElementById(appendToElementId);
   elementWrapper.classList.add('d-flex', 'align-items-center')
 
   // add message on hover
@@ -67,9 +73,9 @@ const createVisitorCountTextElement = () => {
 
 
 async function makeApiCall(url=null, method='GET') {
-  if (url === null) return;
-  
   try {
+    if (!url) throw new Error('must define url');
+
     const response = await fetch(url, { method: method })
 
     let json = await response.json();
@@ -85,9 +91,11 @@ async function makeApiCall(url=null, method='GET') {
 }
 
 
-async function updateVisitorCounter() {
+async function updateVisitorCounter(ApiUrl=null, method=null) {
   try {
-    let response = await makeApiCall(url='https://izsr45o8g5.execute-api.us-west-1.amazonaws.com/default/visitor-count', method='POST');
+    if (!ApiUrl || !method) throw new Error('must define API URL and method')
+
+    let response = await makeApiCall(url=ApiUrl, method);
     
     return new Promise(resolve => resolve(response))
 
@@ -98,11 +106,21 @@ async function updateVisitorCounter() {
   }
 }
 
+/**
+ * 
+ * @param {string} appendToElementId - ID of div element that you want to attach this module to
+ * @returns
+ */
 
-function createVisitorCounter() {
+function createVisitorCounter(appendToElementId=null, ApiUrl=null, ApiMethod=null) {
+  if (appendToElementId === null) return 'Must define id of element to add this module to';
+
+
+  if (!ApiUrl || !ApiMethod) return 'Must define API URL and method';
+
   enableBootstrapPopper();
 
-  const elementWrapper = createVisitorCounterWrapper();
+  const elementWrapper = createVisitorCounterWrapper(appendToElementId);
 
   const visitorCountTextElement = createVisitorCountTextElement();
 
@@ -116,7 +134,7 @@ function createVisitorCounter() {
 
 
   // Asynchronously doing an API call 
-  let visitorCount = updateVisitorCounter();
+  let visitorCount = updateVisitorCounter(ApiUrl, method=ApiMethod);
 
   if (!dataIsLoaded) visitorCountTextElement.appendChild(spinnerElement);
 
@@ -128,8 +146,6 @@ function createVisitorCounter() {
 
 
   document.addEventListener('reload-visitor-counter', event => {
-    console.log(event.detail)
-
     visitorCountTextElement.removeChild(spinnerElement);
 
     visitorCountTextElement.innerText = event.detail.timesVisited;
@@ -140,5 +156,6 @@ var module = module || {};
 
 module.exports = {
   createVisitorCounter,
+  createVisitorCounterWrapper,
   makeApiCall
 };
