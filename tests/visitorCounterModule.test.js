@@ -1,4 +1,4 @@
-const visitorCounterModule = require('./visitorCounterModule.js');
+const visitorCounterModule = require('../site/scripts/visitorCounterModule.js');
 const makeApiCall = visitorCounterModule.makeApiCall;
 const createVisitorCounter = visitorCounterModule.createVisitorCounter;
 const createVisitorCounterWrapper = visitorCounterModule.createVisitorCounterWrapper;
