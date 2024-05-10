@@ -99,7 +99,7 @@ async function updateVisitorCounter() {
 }
 
 
-function main() {
+function createVisitorCounter() {
   enableBootstrapPopper();
 
   const elementWrapper = createVisitorCounterWrapper();
@@ -136,11 +136,9 @@ function main() {
   })
 }
 
-// main()
-
 var module = module || {};
 
 module.exports = {
-  main,
+  createVisitorCounter,
   makeApiCall
 };
