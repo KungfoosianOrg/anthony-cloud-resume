@@ -13,6 +13,7 @@
 #badge-container {
     display: flex;
     list-style: none;
+    padding: 0 !important;
 }
 
 .badge-icon {
@@ -23,7 +24,7 @@
 
 @media (min-width: 578px) {
     #pageNav {
-        padding-top: 2rem;
+        /* padding-top: 2rem; */
         padding-right: 0;
         width: 25%;
     }

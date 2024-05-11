@@ -16,7 +16,7 @@ permissions:
 
 
 env:
-  GITHUB_SRC_FOLDER: 'site/' # GitHub folder to sync to AWS ending with '/', e.g: 'prod/'. If sync from root folder, leave as ''
+  GITHUB_SRC_FOLDER: 'site' # GitHub folder to sync to AWS ending with '/', e.g: 'prod/'. If sync from root folder, leave as ''
 
 
 jobs:
@@ -26,6 +26,16 @@ jobs:
     steps:
     - name: checks out this repo 
       uses: actions/checkout@v3
+
+    - name: validates HTML
+      uses: anishathalye/proof-html@v2
+      with:
+        directory: ./${{ env.GITHUB_SRC_FOLDER }}
+
+    - name: runs script tests
+      run: |
+        npm install
+        npm test
 
 
     - name: get temporary AWS credentials
@@ -47,7 +57,7 @@ jobs:
     - name: sync files to aws s3
       shell: bash
       run: |
-        aws s3 sync ./${{ env.GITHUB_SRC_FOLDER }} s3://${{ secrets.S3_BUCKET_NAME }} \
+        aws s3 sync ./${{ env.GITHUB_SRC_FOLDER }}/ s3://${{ secrets.S3_BUCKET_NAME }} \
                                                    --follow-symlinks \
                                                    --delete \
                                                    --exclude '.git/*' \
