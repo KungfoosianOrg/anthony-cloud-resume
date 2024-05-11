@@ -4,22 +4,56 @@
 }
 
 .sticky {
-    position: sticky;
+    position: fixed;
     top: 0;
-    /* right:0; */
-    /* width: 100%; */
+    left:0;
+    width: 100%;
 }
 
 #badge-container {
     display: flex;
     list-style: none;
+    padding: 0 !important;
 }
 
 .badge-icon {
     width: 128px;
+
     height: auto;
 }
 
-.row {
-    --bs-gutter-x: 0 !important;
+@media (min-width: 578px) {
+    #pageNav {
+        /* padding-top: 2rem; */
+        padding-right: 0;
+        width: 25%;
+    }
+
+    #pageNav ul {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    #pageNav ul li {
+        width: 100%;
+        word-wrap: break-word;
+    }
+
+    #pageNavList {
+        justify-content: start !important;
+    }
+
+    .sticky {
+        /* position: sticky !important; */
+        width: 24% !important;
+        height: 100%;
+        /* top: 0; */
+    }
+}
+
+@media print {
+    .no-print, .no-print * {
+        display: none !important;
+    }
 }

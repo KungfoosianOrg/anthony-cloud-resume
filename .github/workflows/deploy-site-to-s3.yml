@@ -2,7 +2,7 @@ name: Deploy static site to AWS S3
 
 on:
   push:
-    branches: [ "main", "visitor-counter" ]
+    branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
 
