@@ -68,6 +68,7 @@ document.addEventListener('scroll', () => {
     }
 
     // for users on big screen
+    pageNav.classList.add('sticky');    
     pageNavList.classList.add('sticky');    
 
     return;

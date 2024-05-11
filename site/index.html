@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vo Cloud Resume</title>
-    <link rel="icon" type="image/x-icon" href="/img/favicon.ico">
+    <link rel="icon" type="image/x-icon" href="./img/favicon.ico">
+    <link type="text/css" rel="stylesheet" href="index.css">
+    <link type="text/css" rel="stylesheet" href="visitorCounter.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
-    <link rel="stylesheet" href="index.css">
-    <link rel="stylesheet" href="visitorCounter.css">
 </head>
 <body>
     <div id="main-container">
@@ -39,164 +39,166 @@
         </nav>
         <!-- End section -->
 
-        <div id="page-container">
+        <div id="page-container" class="container">
             <!-- "Go to top" button -->
             <button id='btn-backToTop' class="btn btn-secondary position-fixed d-none">Back to top</button>
             <!-- End section -->
 
             <!-- Page nav -->
-            <div id="pageNav-container" class="row">
-                <!-- Page nav -->
-                <nav id="pageNav" class="bg-secondary-subtle col-sm-2 no-print">
-                    <ul id="pageNavList" class="nav nav-tabs justify-content-center text-center" role="tablist">
-                        <li class="nav-item">
-                            <a href="#accomplishments"
-                                class="nav-link"
-                                >Accomplisments</a
-                            >
-                        </li>
-            
-                        <li class="nav-item" role="presentation">
-                            <a 
-                                href="#work-history" 
-                                class="nav-link" 
-                                >Work History</a
-                            >
-                        </li>
-            
-                        <li class="nav-item" role="presentation">
-                            <a 
-                                href="#certifications" 
-                                class="nav-link" 
-                                >Certifications</a
-                            >
-                        </li>
-                    </ul>
-                </nav>
-            </div>
-            <!-- End section -->
-
-            <div id="content-container" class="p-2 px-3 col-sm">
-                <div id="contacts-container" class="mb-4 text-center">
-                    <h1>Anthony Vo</h1>
-        
-                    <h3>Junior Network Administrator</h3>
-        
-                    <div>
-                        <!-- add location icon -->
-                        
-                        <p>Los Angeles, CA 90003</p>
-                    </div>
-                    
-                    <div>
-                        <!-- add email icon -->
-                        
-                        <p>anthonyvovo123@gmail.com</p>
-                    </div>
+            <div class="row">
+                <div id="pageNav-container" class="row col-sm-4">
+                    <!-- Page nav -->
+                    <nav id="pageNav" class="bg-secondary-subtle col-sm-2 no-print full-width">
+                        <ul id="pageNavList" class="nav nav-tabs justify-content-center text-center" role="tablist">
+                            <li class="nav-item">
+                                <a href="#accomplishments"
+                                    class="nav-link"
+                                    >Accomplisments</a
+                                >
+                            </li>
+                
+                            <li class="nav-item" role="presentation">
+                                <a 
+                                    href="#work-history" 
+                                    class="nav-link" 
+                                    >Work History</a
+                                >
+                            </li>
+                
+                            <li class="nav-item" role="presentation">
+                                <a 
+                                    href="#certifications" 
+                                    class="nav-link" 
+                                    >Certifications</a
+                                >
+                            </li>
+                        </ul>
+                    </nav>
                 </div>
-
-                <br>
-                <br>    
-        
-                <div id="accomplishment-container">
-                    <a id="accomplishments" href="#">
-                        <h3>Accomplisments</h3>
-                    </a>
-                    
-        
-                    <ul>
-                        <li>Automated Google Forms to email alerts, updates, and populate a Google Sheet with the entry for members to review submitted change management requests.</li>
+                <!-- End section -->
+    
+                <div id="content-container" class="p-2 px-3 col-sm">
+                    <div id="contacts-container" class="mb-4 text-center">
+                        <h1>Anthony Vo</h1>
             
-                        <li>Wrote a Python program to gather toner supply from networked printers, allow users to update toner inventory, and generate an order email with low-inventory toners</li>
-        
-                        <li>Coordinated deployments of over 1000 computers before students and faculty returned</li>
-                    </ul>
-                </div>
-        
-
-                <br>
-                <br>
-
-                <div id="work-history-container" class="mb-4">
-                    <a id="work-history" href="#">
-                        <h3>Work History</h3>
-                    </a>
-        
-                    <div>
-                        <h4>Desktop Support/Junior Network Administrator</h4>
-                        <p>Wildwood School, Los Angeles, CA</p>
-                        <p>10/2021 - Current</p>
-        
+                        <h3>Junior Network Administrator</h3>
+            
+                        <div>
+                            <!-- add location icon -->
+                            
+                            <p>Los Angeles, CA 90003</p>
+                        </div>
+                        
+                        <div>
+                            <!-- add email icon -->
+                            
+                            <p>anthonyvovo123@gmail.com</p>
+                        </div>
+                    </div>
+    
+                    <br>
+                    <br>    
+            
+                    <div id="accomplishment-container">
+                        <a id="accomplishments" href="#">
+                            <h3>Accomplisments</h3>
+                        </a>
+                        
+            
                         <ul>
-                            <li>Provided on-call support for network engineering duties.</li>
-                            <li>Performed network segmentation and appropriate routing for IoT and printer devices.</li>
-                            <li>Oversaw project to repair and upgrade network bandwidth.</li>
-                            <li>Implemented DMARC, DKIM, SPF, and email rules to protect organization from malicious and spoofed emails.</li>
+                            <li>Automated Google Forms to email alerts, updates, and populate a Google Sheet with the entry for members to review submitted change management requests.</li>
+                
+                            <li>Wrote a Python program to gather toner supply from networked printers, allow users to update toner inventory, and generate an order email with low-inventory toners</li>
+            
+                            <li>Coordinated deployments of over 1000 computers before students and faculty returned</li>
                         </ul>
                     </div>
-        
-                    <div>
-                        <h4>Help Desk and Infrastructure Technician</h4>
-                        <p>Television City, Los Angeles, CA</p>
-                        <p>12/2020 - 10/2021</p>
-        
-                        <ul>
-                            <li>Monitored the Alertus emergency and mass notification system.</li>
-        
-                            <li>Coordinated and documented the company's Multi-Factor Authentication (MFA) rollout process.</li>
-                                
-                            <li>Utilized Microsoft Active Directory to troubleshoot user issues.</li>
-        
-                            <li>Assisted in troubleshooting and resolved server issues, such as rebuilding a failed Domain Controller, server backup issues,...</li>
+            
+    
+                    <br>
+                    <br>
+    
+                    <div id="work-history-container" class="mb-4">
+                        <a id="work-history" href="#">
+                            <h3>Work History</h3>
+                        </a>
+            
+                        <div>
+                            <h4>Desktop Support/Junior Network Administrator</h4>
+                            <p>Wildwood School, Los Angeles, CA</p>
+                            <p>10/2021 - Current</p>
+            
+                            <ul>
+                                <li>Provided on-call support for network engineering duties.</li>
+                                <li>Performed network segmentation and appropriate routing for IoT and printer devices.</li>
+                                <li>Oversaw project to repair and upgrade network bandwidth.</li>
+                                <li>Implemented DMARC, DKIM, SPF, and email rules to protect organization from malicious and spoofed emails.</li>
+                            </ul>
+                        </div>
+            
+                        <div>
+                            <h4>Help Desk and Infrastructure Technician</h4>
+                            <p>Television City, Los Angeles, CA</p>
+                            <p>12/2020 - 10/2021</p>
+            
+                            <ul>
+                                <li>Monitored the Alertus emergency and mass notification system.</li>
+            
+                                <li>Coordinated and documented the company's Multi-Factor Authentication (MFA) rollout process.</li>
+                                    
+                                <li>Utilized Microsoft Active Directory to troubleshoot user issues.</li>
+            
+                                <li>Assisted in troubleshooting and resolved server issues, such as rebuilding a failed Domain Controller, server backup issues,...</li>
+                            </ul>
+                        </div>
+            
+                        <div>
+                            <h4>IT Desktop Support</h4>
+                            <p>UCLA, Los Angeles, CA</p>
+                            <p>7/2020 - 12/2020</p>
+                            <ul>
+                                <li>Implemented SCCM/MDT to image and deploy PCs.</li>
+            
+                                <li>Established, configured, and supported VOIP phones, Macs, PCs, and printers.</li>
+            
+                                <li>Generated and resolved support tickets using Service Now.</li>
+            
+                                <li>Backup, recovered, and restored user data in the event of hardware failure.</li>
+                            </ul>
+                        </div>
+                    </div>
+            
+                    <br>
+                    <br>
+    
+                    <div id="certifications-container" class="mb-4">
+                        <a id="certifications" href="#">
+                            <h3>Certifications</h3>
+                        </a>
+            
+                        <ul id="badge-container">
+                            <li>
+                                <img class="img-fluid badge-icon"  src="./img/aws_saa.png" alt="AWS Certified Solutions Architect - Associate" >
+                            </li>
+    
+                            <li>
+                                <img src="./img/az900.png" alt="Microsoft Azure Fundamentals (AZ-900)" class="img-fluid badge-icon">
+                            </li>
+    
+                            
+                            <li>
+                                <img src="./img/secplus.png" alt="CompTIA Security+" class="img-fluid badge-icon">
+                            </li>
+                            
+                            <li>
+                                <img src="./img/ccna_600.png" alt="Cisco Certified Network Associate" class="img-fluid badge-icon">
+                            </li>
+    
+                            <li>
+                                <img src="./img/aplus.jpg" alt="CompTIA A+" class="img-fluid badge-icon">
+                            </li>
                         </ul>
                     </div>
-        
-                    <div>
-                        <h4>IT Desktop Support</h4>
-                        <p>UCLA, Los Angeles, CA</p>
-                        <p>7/2020 - 12/2020</p>
-                        <ul>
-                            <li>Implemented SCCM/MDT to image and deploy PCs.</li>
-        
-                            <li>Established, configured, and supported VOIP phones, Macs, PCs, and printers.</li>
-        
-                            <li>Generated and resolved support tickets using Service Now.</li>
-        
-                            <li>Backup, recovered, and restored user data in the event of hardware failure.</li>
-                        </ul>
-                    </div>
-                </div>
-        
-                <br>
-                <br>
-
-                <div id="certifications-container" class="mb-4">
-                    <a id="certifications" href="#">
-                        <h3>Certifications</h3>
-                    </a>
-        
-                    <ul id="badge-container">
-                        <li>
-                            <img class="img-fluid badge-icon"  src="./img/aws_saa.png" alt="AWS Certified Solutions Architect - Associate" >
-                        </li>
-
-                        <li>
-                            <img src="./img/az900.png" alt="Microsoft Azure Fundamentals (AZ-900)" class="img-fluid badge-icon">
-                        </li>
-
-                        
-                        <li>
-                            <img src="./img/secplus.png" alt="CompTIA Security+" class="img-fluid badge-icon">
-                        </li>
-                        
-                        <li>
-                            <img src="./img/ccna_600.png" alt="Cisco Certified Network Associate" class="img-fluid badge-icon">
-                        </li>
-
-                        <li>
-                            <img src="./img/aplus.jpg" alt="CompTIA A+" class="img-fluid badge-icon">
-                        </li>
-                    </ul>
                 </div>
             </div>
         </div>
@@ -207,9 +209,9 @@
     <script src="./scripts/index.js"></script>
     <script src="./scripts/visitorCounterModule.js"></script>
     <script>
-        createVisitorCounter(appendToElementId='visitorCounter-container', 
-                    ApiUrl='https://izsr45o8g5.execute-api.us-west-1.amazonaws.com/default/visitor-count', 
-                    ApiMethod='POST')
+        // createVisitorCounter(appendToElementId='visitorCounter-container', 
+                    // ApiUrl='https://izsr45o8g5.execute-api.us-west-1.amazonaws.com/default/visitor-count', 
+                    // ApiMethod='POST')
 
     </script>
 </body>

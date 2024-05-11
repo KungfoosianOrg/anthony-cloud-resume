@@ -22,7 +22,28 @@
     height: auto;
 }
 
+
+.full-width {
+    width: 100% !important;
+}
+
 @media (min-width: 578px) {
+    #page-container {
+        display: flex;
+
+        max-width: 100% !important;
+    }
+
+    #pageNav-container {
+        /* row */
+        /* --bs-gutter-x: 1.5rem;
+        --bs-gutter-y: 0;
+
+        /* col-sm-5 */
+        /* flex: 0 0 auto;
+        width: 41.66666667%; */
+    }
+
     #pageNav {
         /* padding-top: 2rem; */
         padding-right: 0;
@@ -45,10 +66,7 @@
     }
 
     .sticky {
-        /* position: sticky !important; */
-        width: 24% !important;
-        height: 100%;
-        /* top: 0; */
+        position: sticky !important;
     }
 }
 
