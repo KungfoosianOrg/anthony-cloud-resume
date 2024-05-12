@@ -95,7 +95,7 @@ async function updateVisitorCounter(ApiUrl=null, method=null) {
   try {
     if (!ApiUrl || !method) throw new Error('must define API URL and method')
 
-    let response = await makeApiCall(url=ApiUrl, method);
+    let response = await makeApiCall(ApiUrl, method);
     
     return new Promise(resolve => resolve(response))
 
@@ -134,7 +134,7 @@ function createVisitorCounter(appendToElementId=null, ApiUrl=null, ApiMethod=nul
 
 
   // Asynchronously doing an API call 
-  let visitorCount = updateVisitorCounter(ApiUrl, method=ApiMethod);
+  let visitorCount = updateVisitorCounter(ApiUrl, ApiMethod);
 
   if (!dataIsLoaded) visitorCountTextElement.appendChild(spinnerElement);
 
@@ -151,6 +151,12 @@ function createVisitorCounter(appendToElementId=null, ApiUrl=null, ApiMethod=nul
     visitorCountTextElement.innerText = event.detail.timesVisited;
   })
 }
+
+
+window.addEventListener('DOMContentLoaded', () => {
+  createVisitorCounter('visitorCounter-container','https://izsr45o8g5.execute-api.us-west-1.amazonaws.com/default/visitor-count','POST')
+})
+
 
 var module = module || {};
 
