@@ -6,7 +6,7 @@ class DDBVisitorCounter:
         self.counter = self.get_counter_entry() 
 
     
-    def get_counter_entry(self):
+    def get_counter_entry(self) -> int:
         """
             Gets visitor counter
 
@@ -27,21 +27,21 @@ class DDBVisitorCounter:
             raise e
         
 
-    def increase_counter(self):
+    def increase_counter(self) -> None:
         """
             Increase counter by 1
         """
         self.counter += 1
 
 
-    def reset_counter(self):
+    def reset_counter(self) -> None:
         """
             Reset counter to 1
         """
         self.counter = 1
 
 
-    def update_ddb(self):
+    def update_ddb(self) -> None:
         """
             Updates DDB entry visitorCounter to whichever number self.counter has
             @return int updated counter number
