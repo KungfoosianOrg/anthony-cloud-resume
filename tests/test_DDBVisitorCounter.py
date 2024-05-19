@@ -2,8 +2,6 @@ from unittest import TestCase
 from boto3 import client
 from moto import mock_aws
 from os import environ
-import json
-import sys
 
 from  back_end.DDBVisitorCounter import DDBVisitorCounter
 
@@ -75,5 +73,60 @@ class TestDDBVisitorCounter(TestCase):
 
 
     def test_increase_counter(self):
+        """ test counter increase by 1 correctly"""
+        mocked_ddbvisitorcounter_class = DDBVisitorCounter(DDBResource=self.mocked_visitorcounter_resource)
+
+        increased_counter_expected = mocked_ddbvisitorcounter_class.counter + 1
+
+        self.assertEqual(increased_counter_expected, mocked_ddbvisitorcounter_class.increase_counter())
+
+    def test_reset_counter(self):
+        """ test counter reset to 1"""
+        # set counter to a random number then verify
+        mocked_ddbvisitorcounter_class = DDBVisitorCounter(DDBResource=self.mocked_visitorcounter_resource)
+
+        random_counter_value = 20
+
+        mocked_ddbvisitorcounter_class.client.put_item(
+            TableName = mocked_ddbvisitorcounter_class.table_name,
+            Item = {
+                'id': {
+                    'S': mocked_ddbvisitorcounter_class.counter_table_entry['id']['S']
+                },
+                'timesVisited': {
+                    'N': str(random_counter_value)
+                }
+            }
+        )
+
+        mocked_ddbvisitorcounter_class.get_counter_entry()
+        
+        self.assertEqual(random_counter_value, mocked_ddbvisitorcounter_class.counter)
+
+        # reset and testt
+        mocked_ddbvisitorcounter_class.reset_counter()
+        self.assertEqual(1, mocked_ddbvisitorcounter_class.counter)
+
+
+    def test_update_ddb(self):
+        """ check value returned by database after updating is as expected"""
+        mocked_ddbvisitorcounter_class = DDBVisitorCounter(DDBResource=self.mocked_visitorcounter_resource)
+
+        random_counter_value = 20
+
+        counter_before_update = mocked_ddbvisitorcounter_class.counter
+
+        mocked_ddbvisitorcounter_class.counter = random_counter_value
+
+        mocked_new_counter_value = mocked_ddbvisitorcounter_class.update_ddb()
+
+        """ check for difference between counter value before and after updating"""
+        self.assertNotEqual(counter_before_update, mocked_new_counter_value)
+
+        """ check random counter value was set to is equals to value returned after updating"""
+        self.assertEqual(random_counter_value, mocked_new_counter_value)
+
+
+
 
 
