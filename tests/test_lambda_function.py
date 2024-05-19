@@ -2,7 +2,7 @@ from unittest import TestCase
 from boto3 import client
 from moto import mock_aws
 
-from back_end.lambda_function import lambda_handler
+# from back_end.lambda_function import lambda_handler
 
 
 class TestLambdaHandlerFunction(TestCase):
