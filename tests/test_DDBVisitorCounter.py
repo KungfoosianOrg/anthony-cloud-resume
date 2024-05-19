@@ -5,7 +5,7 @@ from os import environ
 
 from  back_end.DDBVisitorCounter import DDBVisitorCounter
 
-# @mock_aws
+
 class TestDDBVisitorCounter(TestCase):
     def setUp(self):
         self.mock_aws = mock_aws()
