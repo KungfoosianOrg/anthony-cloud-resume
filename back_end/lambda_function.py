@@ -1,8 +1,8 @@
 from boto3 import client
 from json import dumps
 from os import environ
-from LambdaResponse import LambdaResponse
-from DDBVisitorCounter import DDBVisitorCounter
+from back_end.LambdaResponse import LambdaResponse
+from back_end.DDBVisitorCounter import DDBVisitorCounter
 
 _RESPONSE_DEFAULT = {
     'statusCode': 200,
@@ -10,7 +10,7 @@ _RESPONSE_DEFAULT = {
 }
 
 _VISITORCOUNTER_RESOURCE = {
-    'client': client('dynamodb'),
+    'client': client('dynamodb', region_name=environ.get('DDB_TABLE_REGION') or 'us-west-1'),
     'table_name': environ.get('DDB_TABLE_ARN'),
     'counter_table_entry': {
         'id': { 'S': '0' }
@@ -19,7 +19,7 @@ _VISITORCOUNTER_RESOURCE = {
 
 
 
-def lambda_handler(event, context):
+def lambda_handler(event, context=None):
     # ignore requests that are not POST to /visitor-count
     if event['resource'] != '/visitor-count' or event['httpMethod'] != 'POST':
         return LambdaResponse(response=_RESPONSE_DEFAULT).json
