@@ -1,8 +1,10 @@
 from boto3 import client
 from json import dumps
-from os import environ
-from back_end.LambdaResponse import LambdaResponse
-from back_end.DDBVisitorCounter import DDBVisitorCounter
+import os 
+
+from LambdaResponse import LambdaResponse
+from DDBVisitorCounter import DDBVisitorCounter
+
 
 _RESPONSE_DEFAULT = {
     'statusCode': 200,
@@ -10,8 +12,8 @@ _RESPONSE_DEFAULT = {
 }
 
 _VISITORCOUNTER_RESOURCE = {
-    'client': client('dynamodb', region_name=environ.get('DDB_TABLE_REGION') or 'us-west-1'),
-    'table_name': environ.get('DDB_TABLE_ARN'),
+    'client': client('dynamodb', region_name=os.environ.get('DDB_TABLE_REGION') or 'us-west-1'),
+    'table_name': os.environ.get('DDB_TABLE_ARN'),
     'counter_table_entry': {
         'id': { 'S': '0' }
     }

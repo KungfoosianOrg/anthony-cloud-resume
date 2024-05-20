@@ -22,19 +22,19 @@ class TestDDBVisitorCounter(TestCase):
         # creating the table
         dynamodb.create_table(
             AttributeDefinitions = [
-                {
-                    'AttributeName': 'id',
-                    'AttributeType': 'S'
-                }
-            ],
+                                        {
+                                            'AttributeName': 'id',
+                                            'AttributeType': 'S'
+                                        }
+                                    ],
             TableName = self.mocked_ddb_table_name,
             BillingMode = 'PAY_PER_REQUEST',
             KeySchema = [
-                {
-                    'AttributeName': 'id',
-                    'KeyType': 'HASH'
-                }
-            ]
+                            {
+                                'AttributeName': 'id',
+                                'KeyType': 'HASH'
+                            }
+                        ]
         )
 
         # add entry of timesVisited (type N) to entry of id 0
