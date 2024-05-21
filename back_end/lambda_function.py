@@ -27,14 +27,8 @@ def lambda_handler(event, context):
         return LambdaResponse(response=_RESPONSE_DEFAULT).json
     
     try:
-        # print(f'in lambda_function, env variable DDB_TABLE_ARN: {os.environ.get('DDB_TABLE_ARN')}')
-
+        # need to set again bc unittest does not load first go
         _VISITORCOUNTER_RESOURCE['table_name'] = os.environ.get('DDB_TABLE_ARN')
-
-
-        # print(f'in lambda_function, access key and secret: {os.environ.get('AWS_ACCESS_KEY_ID')} {os.environ.get('AWS_SECRET_ACCESS_KEY')}')
-
-        # print(f'in lambda_function, resource: {_VISITORCOUNTER_RESOURCE}')
 
         myVisitorCounter = DDBVisitorCounter(DDBResource=_VISITORCOUNTER_RESOURCE)
 

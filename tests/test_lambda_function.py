@@ -5,7 +5,7 @@ import json
 from os import environ
 
 from back_end.lambda_function import lambda_handler
-from back_end.DDBVisitorCounter import DDBVisitorCounter
+
 
 class TestLambdaHandlerFunction(TestCase):
     def setUp(self):
@@ -22,9 +22,9 @@ class TestLambdaHandlerFunction(TestCase):
         environ['DDB_TABLE_ARN'] = self.mock_ddb_table_name
         
 
-        dynamodb = client('dynamodb', region_name='us-west-1')
+        self.dynamodb = client('dynamodb', region_name='us-west-1')
 
-        dynamodb.create_table(
+        self.dynamodb.create_table(
                                     AttributeDefinitions = [
                                                                 {
                                                                     'AttributeName': 'id',
@@ -41,7 +41,7 @@ class TestLambdaHandlerFunction(TestCase):
                                                 ]
                                 )
         # write first entry to table
-        dynamodb.put_item(
+        self.dynamodb.put_item(
                         TableName = self.mock_ddb_table_name,
                         Item = {
                             'id': {
@@ -52,6 +52,7 @@ class TestLambdaHandlerFunction(TestCase):
                             }
                         }
                     )
+        
         # prepare a resouce to manipulate
         self.my_mock_resource = {
             'client': client('dynamodb', region_name='us-west-1'),
@@ -60,6 +61,11 @@ class TestLambdaHandlerFunction(TestCase):
                 'id': { 'S': '0' }
             }
         }
+
+        self.mock_event = {
+                        "resource": "/visitor-count",
+                        "httpMethod": "POST"
+                    }
 
 
     def tearDown(self) -> None:
@@ -75,6 +81,7 @@ class TestLambdaHandlerFunction(TestCase):
         
         self.assertEqual(lambda_handler(event=mock_event, context=None), self.default_http_response)
         
+
     def test_lambda_handler_wrong_method(self):
         """test wrong method"""
         mock_event = {
@@ -85,31 +92,20 @@ class TestLambdaHandlerFunction(TestCase):
         self.assertEqual(lambda_handler(event=mock_event, context=None), self.default_http_response)
 
 
-    # @mock.patch('lambda_function._VISITORCOUNTER_RESOURCE', 'hi there')
     def test_lambda_handler_counter_less_than_100(self):
         """
             test correct path & method with  counter less than 100
             expected: counter increase by 1
         """        
-        override_counter_value = 50
-
-        mock_event = {
-                        "resource": "/visitor-count",
-                        "httpMethod": "POST"
-                    }
         
-        # test_response = lambda_handler(event=mock_event, context=None)
+        override_counter_value = 50
 
         expected_response = {
                                 'statusCode': 200,
-                                'body': json.dumps({
-                                                        'timesVisited': str(override_counter_value + 1)
-                                                    })
+                                'body': json.dumps({ 'timesVisited': str(override_counter_value + 1) })
                             }
-    
-        # print(f'Lambda function response {test_response}')
 
-        self.assertEqual(lambda_handler(event=mock_event, context=None), expected_response)
+        self.assertEqual(lambda_handler(event=self.mock_event, context=None), expected_response)
 
 
 
@@ -119,3 +115,24 @@ class TestLambdaHandlerFunction(TestCase):
         test corrrect path & method with counter over 100
         expected: counter reset to 1    
     """
+    def test_lambda_handler_counter_over_100(self):
+        # set counter in table to 100
+        self.dynamodb.put_item(
+                                TableName = self.mock_ddb_table_name,
+                                Item = {
+                                    'id': {
+                                        'S': '0'
+                                    },
+                                    'timesVisited': {
+                                        'N': '100'
+                                    }
+                                }
+                            )
+        
+        expected_response = {
+                                'statusCode': 200,
+                                'body': json.dumps({ 'timesVisited': '1' })
+                            }
+
+        # add 1 to counter verify counter reset to 1
+        self.assertEqual(lambda_handler(event=self.mock_event, context=None), expected_response)
