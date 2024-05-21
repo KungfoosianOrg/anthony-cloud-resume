@@ -18,7 +18,9 @@ jobs:
 
             - name: create default aws config for unittest
               run: |
-                echo "[default]\naws_access_key_id=test\naws_secret_access_key=test" > ~/.aws/config
+                echo "[default]" >> ~/.aws/config
+echo "aws_access_key_id=test" >> ~/.aws/config
+echo "aws_secret_access_key=test" >> ~/.aws/config
 
             - name: install python dependencies
               run: |
