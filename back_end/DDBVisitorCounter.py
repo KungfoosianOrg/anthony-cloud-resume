@@ -51,7 +51,7 @@ class DDBVisitorCounter:
         return self.counter
 
 
-    def update_ddb(self, overrideValue:int=None) -> int:
+    def update_ddb(self) -> int:
         """
             Updates DDB entry visitorCounter to whichever number self.counter has
             @return int updated counter number
@@ -62,9 +62,7 @@ class DDBVisitorCounter:
             response = self.client.update_item(
                          TableName = self.table_name,
                          Key = self.counter_table_entry,
-                        #  ExpressionAttributeValues={ ':newValue': { 'N': str(overrideValue) if overrideValue != None else str(self.counter)} },
-                        # TODO: Something wrong with value  passed in
-                         ExpressionAttributeValues={ ':newValue': { 'N': '42069'} },
+                ExpressionAttributeValues={ ':newValue': { 'N': str(self.counter)} },
                          UpdateExpression = 'SET timesVisited = :newValue',
                          ReturnValues = 'UPDATED_NEW'
                         )
