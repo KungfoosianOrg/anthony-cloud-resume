@@ -19,9 +19,6 @@ class DDBVisitorCounter:
                                     Key = self.counter_table_entry
                                     )
             
-            # print(f'table name: {self.table_name}, entry: {self.counter_table_entry}')
-            # print(response)
-            
             if 'Item' not in response.keys():
                 raise Exception(f'Table entry does not exist, received: {response}')
             
@@ -66,9 +63,6 @@ class DDBVisitorCounter:
                          UpdateExpression = 'SET timesVisited = :newValue',
                          ReturnValues = 'UPDATED_NEW'
                         )
-            
-            # print(response)
-            # print(f'passed in value is: {self.counter}')
 
             if response['ResponseMetadata']['HTTPStatusCode'] == 200:
                 new_counter_value = int(response['Attributes']['timesVisited']['N'])
