@@ -1,8 +1,10 @@
 from unittest import TestCase
 from boto3 import client
 from moto import mock_aws
+from os import environ
 
 from back_end.lambda_function import lambda_handler
+from back_end.DDBVisitorCounter import DDBVisitorCounter
 
 
 class TestLambdaHandlerFunction(TestCase):
@@ -16,7 +18,46 @@ class TestLambdaHandlerFunction(TestCase):
         
         # sets up a mock dynamoDB table to test API calls to AWS
         self.mock_ddb_table_name = 'mock-ddb-table'
-        self.dynamodb = client('dynamodb', region_name='us-west-1')
+        environ['DDB_TABLE_ARN'] = self.mock_ddb_table_name
+
+        dynamodb = client('dynamodb', region_name='us-west-1')
+
+        dynamodb.create_table(
+                                    AttributeDefinitions = [
+                                                                {
+                                                                    'AttributeName': 'id',
+                                                                    'AttributeType': 'S'
+                                                                }
+                                                            ],
+                                    TableName = self.mock_ddb_table_name,
+                                    BillingMode = 'PAY_PER_REQUEST',
+                                    KeySchema = [
+                                                    {
+                                                        'AttributeName': 'id',
+                                                        'KeyType': 'HASH'
+                                                    }
+                                                ]
+                                )
+        
+        dynamodb.put_item(
+                        TableName = self.mock_ddb_table_name,
+                        Item = {
+                            'id': {
+                                'S': '0'
+                            },
+                            'timesVisited': {
+                                'N': '0'
+                            }
+                        }
+                    )
+        
+        self.my_mock_resource = {
+            'client': client('dynamodb', region_name='us-west-1'),
+            'table_name': self.mock_ddb_table_name,
+            'counter_table_entry': {
+                'id': { 'S': '0' }
+            }
+        }
 
 
     def tearDown(self) -> None:
@@ -47,39 +88,17 @@ class TestLambdaHandlerFunction(TestCase):
             test correct path & method with  counter less than 100
             expected: counter increase by 1
         """
-        # creating the table
-        self.dynamodb.create_table(
-                                    AttributeDefinitions = [
-                                                                {
-                                                                    'AttributeName': 'id',
-                                                                    'AttributeType': 'S'
-                                                                }
-                                                            ],
-                                    TableName = self.mock_ddb_table_name,
-                                    BillingMode = 'PAY_PER_REQUEST',
-                                    KeySchema = [
-                                                    {
-                                                        'AttributeName': 'id',
-                                                        'KeyType': 'HASH'
-                                                    }
-                                                ]
-                                )
+        overriden_counter_value = '50'
 
-        # add an entry less than 100
-        # add entry of timesVisited (type N) to entry of id 0
-        test_counter_entry = '50'
+        overriden_mock_resource = self.my_mock_resource
 
-        self.dynamodb.put_item(
-                                TableName = self.mock_ddb_table_name,
-                                Item = {
-                                    'id': {
-                                        'S': '0'
-                                    },
-                                    'timesVisited': {
-                                        'N': test_counter_entry
-                                    }
-                                }
-                            )
+        overriden_mock_resource['counter_table_entry']['id']['S'] = overriden_counter_value
+
+        print(overriden_mock_resource)
+
+        my_mock_ddbvisitorcounter_class = DDBVisitorCounter(DDBResource=overriden_mock_resource)      
+
+        my_mock_ddbvisitorcounter_class.update_ddb()
 
         mock_event = {
                         "resource": "/visitor-count",
@@ -91,7 +110,7 @@ class TestLambdaHandlerFunction(TestCase):
         expected_response = {
                                 'statusCode': 200,
                                 'body': {
-                                            'timesVisited': str(int(test_counter_entry) + 1)
+                                            'timesVisited': str(int(overriden_counter_value) + 1)
                                         }
                             }
 

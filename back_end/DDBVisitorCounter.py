@@ -19,7 +19,7 @@ class DDBVisitorCounter:
                                     )
             
             if 'Item' not in response.keys():
-                raise Exception('Table entry does not exist')
+                raise Exception(f'Table entry does not exist, received: {response}')
             
             self.counter = int(response['Item']['timesVisited']['N'])
 

@@ -36,12 +36,15 @@ def lambda_handler(event, context=None):
             
 
         myVisitorCounter.update_ddb()
-
-        return LambdaResponse(response={
+        
+        test = LambdaResponse(response={
                                         'statusCode': 200,
                                         'body': dumps({ 'timesVisited': str(myVisitorCounter.counter) })
                                         }).json
+        
+
+        return test
     except Exception as e:
-        print(f'Encountered an exception: {e}')
+        print(f'UH OH...Encountered an exception: {e}')
 
     return
