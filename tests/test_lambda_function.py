@@ -38,7 +38,7 @@ class TestLambdaHandlerFunction(TestCase):
                                                     }
                                                 ]
                                 )
-        
+        # write first entry to table
         dynamodb.put_item(
                         TableName = self.mock_ddb_table_name,
                         Item = {
@@ -50,7 +50,7 @@ class TestLambdaHandlerFunction(TestCase):
                             }
                         }
                     )
-        
+        # prepare a resouce to manipulate
         self.my_mock_resource = {
             'client': client('dynamodb', region_name='us-west-1'),
             'table_name': self.mock_ddb_table_name,
