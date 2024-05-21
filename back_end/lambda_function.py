@@ -21,13 +21,23 @@ _VISITORCOUNTER_RESOURCE = {
 
 
 
-def lambda_handler(event, context=None):
+def lambda_handler(event, context):
     # ignore requests that are not POST to /visitor-count
     if event['resource'] != '/visitor-count' or event['httpMethod'] != 'POST':
         return LambdaResponse(response=_RESPONSE_DEFAULT).json
     
     try:
+        # print(f'in lambda_function, env variable DDB_TABLE_ARN: {os.environ.get('DDB_TABLE_ARN')}')
+
+        _VISITORCOUNTER_RESOURCE['table_name'] = os.environ.get('DDB_TABLE_ARN')
+
+
+        # print(f'in lambda_function, access key and secret: {os.environ.get('AWS_ACCESS_KEY_ID')} {os.environ.get('AWS_SECRET_ACCESS_KEY')}')
+
+        # print(f'in lambda_function, resource: {_VISITORCOUNTER_RESOURCE}')
+
         myVisitorCounter = DDBVisitorCounter(DDBResource=_VISITORCOUNTER_RESOURCE)
+
 
         myVisitorCounter.increase_counter()
 

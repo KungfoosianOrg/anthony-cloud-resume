@@ -12,7 +12,7 @@ class TestDDBVisitorCounter(TestCase):
         self.mock_aws.start()
 
         self.mocked_ddb_table_name = 'test-ddb-table'
-        environ['DDB_TABLE_ARN'] = self.mocked_ddb_table_name
+        # environ['DDB_TABLE_ARN'] = self.mocked_ddb_table_name
 
         self.initial_counter_value = 10
 
@@ -79,6 +79,7 @@ class TestDDBVisitorCounter(TestCase):
         increased_counter_expected = mocked_ddbvisitorcounter_class.counter + 1
 
         self.assertEqual(increased_counter_expected, mocked_ddbvisitorcounter_class.increase_counter())
+
 
     def test_reset_counter(self):
         """ test counter reset to 1"""

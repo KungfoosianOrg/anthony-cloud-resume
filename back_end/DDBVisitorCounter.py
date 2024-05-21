@@ -67,7 +67,8 @@ class DDBVisitorCounter:
                          ReturnValues = 'UPDATED_NEW'
                         )
             
-            print(response)
+            # print(response)
+            # print(f'passed in value is: {self.counter}')
 
             if response['ResponseMetadata']['HTTPStatusCode'] == 200:
                 new_counter_value = int(response['Attributes']['timesVisited']['N'])

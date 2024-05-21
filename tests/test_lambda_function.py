@@ -1,16 +1,17 @@
-from unittest import TestCase
+from unittest import TestCase, mock
 from boto3 import client
 from moto import mock_aws
-from os import environ
+# from os import environ
+import os
 
 from back_end.lambda_function import lambda_handler
 from back_end.DDBVisitorCounter import DDBVisitorCounter
-
 
 class TestLambdaHandlerFunction(TestCase):
     def setUp(self):
         self.mock_aws = mock_aws()
         self.mock_aws.start()
+
         self.default_http_response = {
                                         'statusCode': 200,
                                         'body': 'request processed'
@@ -18,7 +19,8 @@ class TestLambdaHandlerFunction(TestCase):
         
         # sets up a mock dynamoDB table to test API calls to AWS
         self.mock_ddb_table_name = 'mock-ddb-table'
-        environ['DDB_TABLE_ARN'] = self.mock_ddb_table_name
+        os.environ['DDB_TABLE_ARN'] = self.mock_ddb_table_name
+        
 
         dynamodb = client('dynamodb', region_name='us-west-1')
 
@@ -71,7 +73,7 @@ class TestLambdaHandlerFunction(TestCase):
                         "httpMethod": "POST"
                     }
         
-        self.assertEqual(lambda_handler(event=mock_event), self.default_http_response)
+        self.assertEqual(lambda_handler(event=mock_event, context=None), self.default_http_response)
         
     def test_lambda_handler_wrong_method(self):
         """test wrong method"""
@@ -80,39 +82,35 @@ class TestLambdaHandlerFunction(TestCase):
                         "httpMethod": "GET"
                     }
         
-        self.assertEqual(lambda_handler(event=mock_event), self.default_http_response)
+        self.assertEqual(lambda_handler(event=mock_event, context=None), self.default_http_response)
 
 
+    # @mock.patch('lambda_function._VISITORCOUNTER_RESOURCE', 'hi there')
     def test_lambda_handler_counter_less_than_100(self):
         """
             test correct path & method with  counter less than 100
             expected: counter increase by 1
-        """
-        overriden_counter_value = '50'
-
-        # print(overriden_mock_resource)
-
-        my_mock_ddbvisitorcounter_class = DDBVisitorCounter(DDBResource=self.my_mock_resource)      
-
-        returned= my_mock_ddbvisitorcounter_class.update_ddb()
-
-        print(f'returned counter value: {returned}')
+        """        
+        override_counter_value = 50
 
         mock_event = {
                         "resource": "/visitor-count",
                         "httpMethod": "POST"
                     }
-
-        # test_response = lambda_handler(event=mock_event)
+        
+        test_response = lambda_handler(event=mock_event, context=None)
 
         expected_response = {
                                 'statusCode': 200,
                                 'body': {
-                                            'timesVisited': str(int(overriden_counter_value) + 1)
+                                            'timesVisited': str(override_counter_value + 1)
                                         }
                             }
+    
+        print(f'Lambda function response {test_response}')
 
-        self.assertEqual(lambda_handler(event=mock_event), expected_response)
+        self.assertEqual(lambda_handler(event=mock_event, context=None), expected_response)
+
 
 
 
