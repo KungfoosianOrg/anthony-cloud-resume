@@ -22,6 +22,8 @@ jobs:
                 
                 echo "[default]\naws_access_key_id=test\naws_secret_access_key=test" > ~/.aws/config
 
+                cat ~/.aws/config
+
             - name: install python dependencies
               run: |
                 pip3 install -r requirements.txt
