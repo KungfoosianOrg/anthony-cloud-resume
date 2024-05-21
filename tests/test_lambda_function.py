@@ -1,8 +1,8 @@
-from unittest import TestCase, mock
+from unittest import TestCase
 from boto3 import client
 from moto import mock_aws
-# from os import environ
-import os
+import json
+from os import environ
 
 from back_end.lambda_function import lambda_handler
 from back_end.DDBVisitorCounter import DDBVisitorCounter
@@ -19,7 +19,7 @@ class TestLambdaHandlerFunction(TestCase):
         
         # sets up a mock dynamoDB table to test API calls to AWS
         self.mock_ddb_table_name = 'mock-ddb-table'
-        os.environ['DDB_TABLE_ARN'] = self.mock_ddb_table_name
+        environ['DDB_TABLE_ARN'] = self.mock_ddb_table_name
         
 
         dynamodb = client('dynamodb', region_name='us-west-1')
@@ -48,7 +48,7 @@ class TestLambdaHandlerFunction(TestCase):
                                 'S': '0'
                             },
                             'timesVisited': {
-                                'N': '0'
+                                'N': '50'
                             }
                         }
                     )
@@ -98,16 +98,16 @@ class TestLambdaHandlerFunction(TestCase):
                         "httpMethod": "POST"
                     }
         
-        test_response = lambda_handler(event=mock_event, context=None)
+        # test_response = lambda_handler(event=mock_event, context=None)
 
         expected_response = {
                                 'statusCode': 200,
-                                'body': {
-                                            'timesVisited': str(override_counter_value + 1)
-                                        }
+                                'body': json.dumps({
+                                                        'timesVisited': str(override_counter_value + 1)
+                                                    })
                             }
     
-        print(f'Lambda function response {test_response}')
+        # print(f'Lambda function response {test_response}')
 
         self.assertEqual(lambda_handler(event=mock_event, context=None), expected_response)
 
