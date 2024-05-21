@@ -13,10 +13,14 @@ class DDBVisitorCounter:
             Tests: get entry that exist, get entry that doesn't
         """
         try:
+
             response = self.client.get_item( 
                                     TableName = self.table_name,
                                     Key = self.counter_table_entry
                                     )
+            
+            # print(f'table name: {self.table_name}, entry: {self.counter_table_entry}')
+            # print(response)
             
             if 'Item' not in response.keys():
                 raise Exception(f'Table entry does not exist, received: {response}')
@@ -47,20 +51,26 @@ class DDBVisitorCounter:
         return self.counter
 
 
-    def update_ddb(self) -> int:
+    def update_ddb(self, overrideValue:int=None) -> int:
         """
             Updates DDB entry visitorCounter to whichever number self.counter has
             @return int updated counter number
         """
+        
+
         try:
             response = self.client.update_item(
                          TableName = self.table_name,
                          Key = self.counter_table_entry,
-                         ExpressionAttributeValues={ ':newValue': { 'N': str(self.counter) } },
+                        #  ExpressionAttributeValues={ ':newValue': { 'N': str(overrideValue) if overrideValue != None else str(self.counter)} },
+                        # TODO: Something wrong with value  passed in
+                         ExpressionAttributeValues={ ':newValue': { 'N': '42069'} },
                          UpdateExpression = 'SET timesVisited = :newValue',
                          ReturnValues = 'UPDATED_NEW'
                         )
-            # print(response)
+            
+            print(response)
+
             if response['ResponseMetadata']['HTTPStatusCode'] == 200:
                 new_counter_value = int(response['Attributes']['timesVisited']['N'])
 

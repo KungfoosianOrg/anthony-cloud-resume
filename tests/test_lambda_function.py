@@ -90,15 +90,13 @@ class TestLambdaHandlerFunction(TestCase):
         """
         overriden_counter_value = '50'
 
-        overriden_mock_resource = self.my_mock_resource
+        # print(overriden_mock_resource)
 
-        overriden_mock_resource['counter_table_entry']['id']['S'] = overriden_counter_value
+        my_mock_ddbvisitorcounter_class = DDBVisitorCounter(DDBResource=self.my_mock_resource)      
 
-        print(overriden_mock_resource)
+        returned= my_mock_ddbvisitorcounter_class.update_ddb()
 
-        my_mock_ddbvisitorcounter_class = DDBVisitorCounter(DDBResource=overriden_mock_resource)      
-
-        my_mock_ddbvisitorcounter_class.update_ddb()
+        print(f'returned counter value: {returned}')
 
         mock_event = {
                         "resource": "/visitor-count",
