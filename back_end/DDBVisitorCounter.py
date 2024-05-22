@@ -6,6 +6,7 @@ class DDBVisitorCounter:
         self.counter = self.get_counter_entry() 
 
     
+    
     def get_counter_entry(self) -> int:
         """
             Gets visitor counter
