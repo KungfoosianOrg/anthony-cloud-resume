@@ -77,6 +77,7 @@ class DDBVisitorCounter:
         """
         self.counter = 0
         
+        
         try:
             self.client.put_item(
                                     TableName = self.table_name,
