@@ -31,3 +31,27 @@ jobs:
             - name: run Python unittest
               run: |
                 python3 -m unittest
+
+            - name: get temporary AWS credentials
+              uses: aws-actions/configure-aws-credentials@v4
+              with:
+                aws-region: ${{ secrets.S3_BUCKET_REGION }}
+                role-to-assume: ${{ secrets.AWS_ROLE_ARN }} 
+                role-session-name: GHASession-anthony_cloud_resume
+                unset-current-credentials: true
+                retry-max-attempts: 3
+                output-credentials: true
+          
+                  
+            - name: verify temp credentials validity
+              run: |
+                aws sts get-caller-identity
+
+            - name: package lambda code for AWS
+              run:
+
+            - name: deploy lambda package to s3
+              run:
+
+            - name: publish new version of package to Lambda
+              run:

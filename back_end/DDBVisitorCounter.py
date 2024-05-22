@@ -6,22 +6,20 @@ class DDBVisitorCounter:
         self.counter = self.get_counter_entry() 
 
     
-    
     def get_counter_entry(self) -> int:
         """
-            Gets visitor counter
-
-            Tests: get entry that exist, get entry that doesn't
+            Gets visitor counter, if counter entry does not exist, create a new entry, else, return the counter value
         """
         try:
-
             response = self.client.get_item( 
                                     TableName = self.table_name,
                                     Key = self.counter_table_entry
                                     )
-            
+
             if 'Item' not in response.keys():
-                raise Exception(f'Table entry does not exist, received: {response}')
+                print('entry does not exist, creating new one')
+                return self.write_first_entry()
+                
             
             self.counter = int(response['Item']['timesVisited']['N'])
 
@@ -54,13 +52,11 @@ class DDBVisitorCounter:
             Updates DDB entry visitorCounter to whichever number self.counter has
             @return int updated counter number
         """
-        
-
         try:
             response = self.client.update_item(
                          TableName = self.table_name,
                          Key = self.counter_table_entry,
-                ExpressionAttributeValues={ ':newValue': { 'N': str(self.counter)} },
+                         ExpressionAttributeValues={ ':newValue': { 'N': str(self.counter) } },
                          UpdateExpression = 'SET timesVisited = :newValue',
                          ReturnValues = 'UPDATED_NEW'
                         )
@@ -71,5 +67,29 @@ class DDBVisitorCounter:
                 self.counter = new_counter_value
 
                 return new_counter_value
+        except Exception as e:
+            raise e
+            
+    
+    def write_first_entry(self) -> int:
+        """
+            write first counter entry with value of 0 to table
+        """
+        self.counter = 0
+        
+        try:
+            self.client.put_item(
+                                    TableName = self.table_name,
+                                    Item = {
+                                        'id': {
+                                            'S': '0'
+                                        },
+                                        'timesVisited': {
+                                            'N': str(self.counter)
+                                        }
+                                    }
+                                )
+
+            return self.counter
         except Exception as e:
             raise e

@@ -12,15 +12,14 @@ class TestDDBVisitorCounter(TestCase):
         self.mock_aws.start()
 
         self.mocked_ddb_table_name = 'test-ddb-table'
-        # environ['DDB_TABLE_ARN'] = self.mocked_ddb_table_name
 
         self.initial_counter_value = 10
 
         # to test the code, need to create a DDB table with an entry of id of 0, type string (S), and a timesVisited entry type number (N)
-        dynamodb = client('dynamodb', region_name='us-west-1')
+        self.dynamodb = client('dynamodb', region_name='us-west-1')
 
         # creating the table
-        dynamodb.create_table(
+        self.dynamodb.create_table(
             AttributeDefinitions = [
                                         {
                                             'AttributeName': 'id',
@@ -38,7 +37,7 @@ class TestDDBVisitorCounter(TestCase):
         )
 
         # add entry of timesVisited (type N) to entry of id 0
-        dynamodb.put_item(
+        self.dynamodb.put_item(
             TableName = self.mocked_ddb_table_name,
             Item = {
                 'id': {
@@ -63,13 +62,35 @@ class TestDDBVisitorCounter(TestCase):
         self.mock_aws.stop()
 
 
-    def test_get_counter_entry(self):
-        """ makes sure we can get a number from the table"""
+    def test_get_counter_entry_exist(self):
+        """ get existing counter number from the table """
+        
+
         mocked_ddbvisitorcounter_class = DDBVisitorCounter(DDBResource=self.mocked_visitorcounter_resource)
 
-        test_return_value = mocked_ddbvisitorcounter_class.get_counter_entry()
+        # test_return_value = mocked_ddbvisitorcounter_class.get_counter_entry()
 
-        self.assertEqual(test_return_value, int(self.initial_counter_value))
+        # self.assertEqual(test_return_value, int(self.initial_counter_value))
+        self.assertEqual(mocked_ddbvisitorcounter_class.counter, int(self.initial_counter_value))
+
+    
+    def test_get_counter_entry_not_exist(self):
+        """ get non-existing counter value. Expected: new entry created, counter set to 0"""
+        # delete the counter entry so test can proceed
+        # add entry of timesVisited (type N) to entry of id 0
+        self.dynamodb.delete_item(
+            TableName = self.mocked_ddb_table_name,
+            Key = {
+                'id': {
+                    'S': '0'
+                }
+            }
+        )
+
+
+        mocked_ddbvisitorcounter_class = DDBVisitorCounter(DDBResource=self.mocked_visitorcounter_resource)
+
+        self.assertEqual(mocked_ddbvisitorcounter_class.counter, 0)
 
 
     def test_increase_counter(self):
