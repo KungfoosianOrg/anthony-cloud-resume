@@ -24,45 +24,45 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: checks out this repo 
-      uses: actions/checkout@v3
+      - name: checks out this repo 
+        uses: actions/checkout@v3
 
-    - name: validates HTML
-      uses: anishathalye/proof-html@v2
-      with:
-        directory: ./${{ env.GITHUB_SRC_FOLDER }}
+      - name: validates HTML
+        uses: anishathalye/proof-html@v2
+        with:
+          directory: ./${{ env.GITHUB_SRC_FOLDER }}
 
-    - name: runs script tests
-      run: |
-        npm install
-        npm test
-
-
-    - name: get temporary AWS credentials
-      uses: aws-actions/configure-aws-credentials@v4
-      with:
-        aws-region: ${{ secrets.S3_BUCKET_REGION }}
-        role-to-assume: ${{ secrets.AWS_ROLE_ARN }} 
-        role-session-name: GHASession-anthony_cloud_resume
-        unset-current-credentials: true
-        retry-max-attempts: 3
-        output-credentials: true
-
-        
-    - name: verify temp credentials validity
-      run: |
-        aws sts get-caller-identity
+      - name: runs script tests
+        run: |
+          npm install
+          npm test
 
 
-    - name: sync files to aws s3
-      shell: bash
-      run: |
-        aws s3 sync ./${{ env.GITHUB_SRC_FOLDER }}/ s3://${{ secrets.S3_BUCKET_NAME }} \
-                                                   --follow-symlinks \
-                                                   --delete \
-                                                   --exclude '.git/*' \
-                                                   --exclude 'README.md' \
-                                                   --exclude '.github/*'
+      - name: get temporary AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ${{ secrets.S3_BUCKET_REGION }}
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }} 
+          role-session-name: GHASession-anthony_cloud_resume
+          unset-current-credentials: true
+          retry-max-attempts: 3
+          output-credentials: true
+
+          
+      - name: verify temp credentials validity
+        run: |
+          aws sts get-caller-identity
+
+
+      - name: sync files to aws s3
+        shell: bash
+        run: |
+          aws s3 sync ./${{ env.GITHUB_SRC_FOLDER }}/ s3://${{ secrets.S3_BUCKET_NAME }} \
+                                                    --follow-symlinks \
+                                                    --delete \
+                                                    --exclude '.git/*' \
+                                                    --exclude 'README.md' \
+                                                    --exclude '.github/*'
                                                   
 
         
