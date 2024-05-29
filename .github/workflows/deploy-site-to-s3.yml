@@ -38,6 +38,11 @@ jobs:
           npm test
 
 
+      - name: update visitor counter API's invocation URL
+        run: |
+          sed -i "s/.*const VISITOR_COUNTER_API_INVOKE_URL.*/const VISITOR_COUNTER_API_INVOKE_URL='${{ vars.VISITOR_COUNTER_API_INVOKE_URL }}'/" ./site/scripts/visitorCounterModule.js
+  
+
       - name: get temporary AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
