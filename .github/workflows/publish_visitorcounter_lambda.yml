@@ -44,6 +44,7 @@ jobs:
       - name: update API invoke URL
         run: |
           sed -i '' "s/.*const VISITOR_COUNTER_API_INVOKE_URL.*/const VISITOR_COUNTER_API_INVOKE_URL=${{ env.VISITOR_COUNTER_API_INVOKE_URL }}/" ${{ env.GITHUB_WORKSPACE }}/site/scripts/visitorCounterModule.js
+          head -n 1 ./site/scripts/visitorCounterModule.js
 
 
       - name: get temporary AWS credentials
@@ -71,7 +72,7 @@ jobs:
         run: |
           echo deploy package to s3
 
-          
+
       - name: publish new version of package to Lambda
         run: |
           echo publish new version to lambda
