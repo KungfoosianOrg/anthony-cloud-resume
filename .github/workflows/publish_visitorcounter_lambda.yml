@@ -40,6 +40,12 @@ jobs:
         run: |
           rm ~/.aws/config
 
+
+      - name: update API invoke URL
+        run: |
+          sed -i '' "s/.*const VISITOR_COUNTER_API_INVOKE_URL.*/const VISITOR_COUNTER_API_INVOKE_URL=${{ env.VISITOR_COUNTER_API_INVOKE_URL }}/" ${{ env.GITHUB_WORKSPACE }}/site/scripts/visitorCounterModule.js
+
+
       - name: get temporary AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -55,14 +61,17 @@ jobs:
         run: |
           aws sts get-caller-identity
 
+
       - name: package lambda code for AWS
         run: |
           echo package code for aws
+
 
       - name: deploy lambda package to s3
         run: |
           echo deploy package to s3
 
+          
       - name: publish new version of package to Lambda
         run: |
           echo publish new version to lambda
