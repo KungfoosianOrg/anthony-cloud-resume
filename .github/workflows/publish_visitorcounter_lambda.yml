@@ -43,7 +43,7 @@ jobs:
 
       - name: update API invoke URL
         run: |
-          sed -i "s/.*const VISITOR_COUNTER_API_INVOKE_URL.*/const VISITOR_COUNTER_API_INVOKE_URL=${{ vars.VISITOR_COUNTER_API_INVOKE_URL }}/" ./site/scripts/visitorCounterModule.js
+          sed -i "s/.*const VISITOR_COUNTER_API_INVOKE_URL.*/const VISITOR_COUNTER_API_INVOKE_URL='${{ vars.VISITOR_COUNTER_API_INVOKE_URL }}'/" ./site/scripts/visitorCounterModule.js
           head -n 1 ./site/scripts/visitorCounterModule.js
 
 
