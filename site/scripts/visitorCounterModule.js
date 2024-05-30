@@ -1,3 +1,5 @@
+const VISITOR_COUNTER_API_INVOKE_URL='hello_there'
+
 const enableBootstrapPopper = () => {
   const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
   const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
@@ -109,7 +111,6 @@ async function updateVisitorCounter(ApiUrl=null, method=null) {
 /**
  * 
  * @param {string} appendToElementId - ID of div element that you want to attach this module to
- * @returns
  */
 
 function createVisitorCounter(appendToElementId=null, ApiUrl=null, ApiMethod=null) {
@@ -154,7 +155,7 @@ function createVisitorCounter(appendToElementId=null, ApiUrl=null, ApiMethod=nul
 
 
 window.addEventListener('DOMContentLoaded', () => {
-  createVisitorCounter('visitorCounter-container','https://izsr45o8g5.execute-api.us-west-1.amazonaws.com/default/visitor-count','POST')
+  createVisitorCounter('visitorCounter-container',VISITOR_COUNTER_API_INVOKE_URL,'POST')
 })
 
 

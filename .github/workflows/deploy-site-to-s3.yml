@@ -38,10 +38,15 @@ jobs:
           npm test
 
 
+      - name: update visitor counter API's invocation URL
+        run: |
+          sed -i "s%.*const VISITOR_COUNTER_API_INVOKE_URL.*%const VISITOR_COUNTER_API_INVOKE_URL='${{ vars.VISITOR_COUNTER_API_INVOKE_URL }}'%" ./site/scripts/visitorCounterModule.js
+  
+
       - name: get temporary AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-region: ${{ secrets.S3_BUCKET_REGION }}
+          aws-region: ${{ secrets.AWS_STACK_REGION }}
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }} 
           role-session-name: GHASession-anthony_cloud_resume
           unset-current-credentials: true
