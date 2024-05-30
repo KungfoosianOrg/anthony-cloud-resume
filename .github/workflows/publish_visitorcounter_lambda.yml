@@ -2,7 +2,7 @@ name: Deploy Lambda for visitor counter to AWS
 
 on:
     push:
-        branches: ["main", "lambda-unittest"]
+        branches: ["main"]
         paths: ["back_end/**"]
 
     # Allows you to run this workflow manually from the Actions tab
