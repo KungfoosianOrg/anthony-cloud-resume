@@ -76,16 +76,22 @@ jobs:
           aws s3 cp ${{ vars.LAMBDA_DEPLOYMENT_ZIPPACKAGE_NAME }} s3://${{ secrets.S3_LAMBDA_BUCKET_NAME }}/
           
 
-
       - name: get and publish new version of package to Lambda
         run: |
           echo publish new version to lambda
 
           lambda_new_version=$(aws s3api list-object-versions \
-                    --bucket ${{ secrets.S3_LAMBDA_BUCKET_NAME }} \
-                    --prefix ${{ vars.LAMBDA_DEPLOYMENT_ZIPPACKAGE_NAME }} \
-                    --query 'Versions[?IsLatest].[VersionId]' \
-                    --output text)
+                                          --bucket ${{ secrets.S3_LAMBDA_BUCKET_NAME }} \
+                                          --prefix ${{ vars.LAMBDA_DEPLOYMENT_ZIPPACKAGE_NAME }} \
+                                          --query 'Versions[?IsLatest].[VersionId]' \
+                                          --output text)
+
+          aws lambda update-function-code \
+                      --function-name ${{ secrets.LAMBDA_FUNCTION_ARN }} \
+                      --region ${{ secrets.AWS_STACK_REGION }} \
+                      --s3-bucket ${{ secrets.S3_LAMBDA_BUCKET_NAME }} \
+                      --s3-key ${{ vars.LAMBDA_DEPLOYMENT_ZIPPACKAGE_NAME }} \
+                      --s3-object-version $lambda_new_version
 
           
 
