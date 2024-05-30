@@ -22,7 +22,7 @@ class TestLambdaHandlerFunction(TestCase):
         environ['DDB_TABLE_ARN'] = self.mock_ddb_table_name
         
 
-        self.dynamodb = client('dynamodb', region_name='us-west-1')
+        self.dynamodb = client('dynamodb', region_name='us-east-1')
 
         self.dynamodb.create_table(
                                     AttributeDefinitions = [
@@ -55,7 +55,7 @@ class TestLambdaHandlerFunction(TestCase):
         
         # prepare a resouce to manipulate
         self.my_mock_resource = {
-            'client': client('dynamodb', region_name='us-west-1'),
+            'client': client('dynamodb', region_name='us-east-1'),
             'table_name': self.mock_ddb_table_name,
             'counter_table_entry': {
                 'id': { 'S': '0' }
