@@ -12,7 +12,7 @@ _RESPONSE_DEFAULT = {
 }
 
 _VISITORCOUNTER_RESOURCE = {
-    'client': client('dynamodb', region_name=os.environ.get('DDB_TABLE_REGION') or 'us-west-1'),
+    'client': client('dynamodb', region_name=os.environ.get('DDB_TABLE_REGION') or 'us-east-1'),
     'table_name': os.environ.get('DDB_TABLE_ARN'),
     'counter_table_entry': {
         'id': { 'S': '0' }
