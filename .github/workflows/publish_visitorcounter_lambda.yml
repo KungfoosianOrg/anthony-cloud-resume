@@ -64,7 +64,7 @@ jobs:
           mkdir package
           pip install --target ./package boto3
           cd package
-          zip -r ../${{ vars.LAMBDA_DEPLOYMENT_ZIPPACKAGE_NAME }}
+          zip -r ../${{ vars.LAMBDA_DEPLOYMENT_ZIPPACKAGE_NAME }} .
           cd ..
           zip ${{ vars.LAMBDA_DEPLOYMENT_ZIPPACKAGE_NAME }} ${{ vars.LAMBDA_HANDLER_FILE_NAME }}
 
