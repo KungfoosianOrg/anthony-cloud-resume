@@ -44,7 +44,7 @@ jobs:
       - name: get temporary AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-region: ${{ secrets.S3_BUCKET_REGION }}
+          aws-region: ${{ secrets.AWS_STACK_REGION }}
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }} 
           role-session-name: GHASession-anthony_cloud_resume
           unset-current-credentials: true
@@ -60,13 +60,33 @@ jobs:
       - name: package lambda code for AWS
         run: |
           echo package code for aws
+          cd ./back_end
+          mkdir package
+          pip install --target ./package boto3
+          cd package
+          zip -r ../${{ vars.LAMBDA_DEPLOYMENT_ZIPPACKAGE_NAME }}
+          cd ..
+          zip ${{ vars.LAMBDA_DEPLOYMENT_ZIPPACKAGE_NAME }} ${{ vars.LAMBDA_HANDLER_FILE_NAME }}
 
 
       - name: deploy lambda package to s3
         run: |
           echo deploy package to s3
+          cd ./back_end
+          aws s3 cp ${{ vars.LAMBDA_DEPLOYMENT_ZIPPACKAGE_NAME }} s3://${{ secrets.S3_LAMBDA_BUCKET_NAME }}/
+          
 
 
       - name: get and publish new version of package to Lambda
         run: |
           echo publish new version to lambda
+
+          lambda_new_version=$(aws s3api list-object-versions \
+                    --bucket ${{ secrets.S3_LAMBDA_BUCKET_NAME }} \
+                    --prefix ${{ vars.LAMBDA_DEPLOYMENT_ZIPPACKAGE_NAME }} \
+                    --query 'Versions[?IsLatest].[VersionId]' \
+                    --output text)
+
+          
+
+          

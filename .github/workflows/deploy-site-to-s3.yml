@@ -46,7 +46,7 @@ jobs:
       - name: get temporary AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-region: ${{ secrets.S3_BUCKET_REGION }}
+          aws-region: ${{ secrets.AWS_STACK_REGION }}
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }} 
           role-session-name: GHASession-anthony_cloud_resume
           unset-current-credentials: true
