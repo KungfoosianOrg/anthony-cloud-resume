@@ -36,62 +36,62 @@ jobs:
           run: |
             python3 -m unittest
 
-      - name: remove AWS default config used for testing
-        run: |
-          rm ~/.aws/config
+        - name: remove AWS default config used for testing
+          run: |
+            rm ~/.aws/config
 
 
-      - name: get temporary AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-region: ${{ secrets.AWS_STACK_REGION }}
-          role-to-assume: ${{ secrets.AWS_ROLE_ARN }} 
-          role-session-name: GHASession-anthony_cloud_resume
-          unset-current-credentials: true
-          retry-max-attempts: 3
-          output-credentials: true
-    
+        - name: get temporary AWS credentials
+          uses: aws-actions/configure-aws-credentials@v4
+          with:
+            aws-region: ${{ secrets.AWS_STACK_REGION }}
+            role-to-assume: ${{ secrets.AWS_ROLE_ARN }} 
+            role-session-name: GHASession-anthony_cloud_resume
+            unset-current-credentials: true
+            retry-max-attempts: 3
+            output-credentials: true
+      
+              
+        - name: verify temp credentials validity
+          run: |
+            aws sts get-caller-identity
+
+
+        - name: package lambda code for AWS
+          run: |
+            echo package code for aws
+            cd ./back_end
+            mkdir package
+            pip install --target ./package boto3
+            cd package
+            zip -r ../${{ vars.LAMBDA_DEPLOYMENT_ZIPPACKAGE_NAME }} .
+            cd ..
+            zip ${{ vars.LAMBDA_DEPLOYMENT_ZIPPACKAGE_NAME }} *.py
+
+
+        - name: deploy lambda package to s3
+          run: |
+            echo deploy package to s3
+            cd ./back_end
+            aws s3 cp ${{ vars.LAMBDA_DEPLOYMENT_ZIPPACKAGE_NAME }} s3://${{ secrets.S3_LAMBDA_BUCKET_NAME }}/
             
-      - name: verify temp credentials validity
-        run: |
-          aws sts get-caller-identity
 
+        - name: get and publish new version of package to Lambda
+          run: |
+            echo publish new version to lambda
 
-      - name: package lambda code for AWS
-        run: |
-          echo package code for aws
-          cd ./back_end
-          mkdir package
-          pip install --target ./package boto3
-          cd package
-          zip -r ../${{ vars.LAMBDA_DEPLOYMENT_ZIPPACKAGE_NAME }} .
-          cd ..
-          zip ${{ vars.LAMBDA_DEPLOYMENT_ZIPPACKAGE_NAME }} *.py
+            lambda_new_version=$(aws s3api list-object-versions \
+                                            --bucket ${{ secrets.S3_LAMBDA_BUCKET_NAME }} \
+                                            --prefix ${{ vars.LAMBDA_DEPLOYMENT_ZIPPACKAGE_NAME }} \
+                                            --query 'Versions[?IsLatest].[VersionId]' \
+                                            --output text)
 
-
-      - name: deploy lambda package to s3
-        run: |
-          echo deploy package to s3
-          cd ./back_end
-          aws s3 cp ${{ vars.LAMBDA_DEPLOYMENT_ZIPPACKAGE_NAME }} s3://${{ secrets.S3_LAMBDA_BUCKET_NAME }}/
-          
-
-      - name: get and publish new version of package to Lambda
-        run: |
-          echo publish new version to lambda
-
-          lambda_new_version=$(aws s3api list-object-versions \
-                                          --bucket ${{ secrets.S3_LAMBDA_BUCKET_NAME }} \
-                                          --prefix ${{ vars.LAMBDA_DEPLOYMENT_ZIPPACKAGE_NAME }} \
-                                          --query 'Versions[?IsLatest].[VersionId]' \
-                                          --output text)
-
-          aws lambda update-function-code \
-                      --function-name ${{ secrets.LAMBDA_FUNCTION_ARN }} \
-                      --region ${{ secrets.AWS_STACK_REGION }} \
-                      --s3-bucket ${{ secrets.S3_LAMBDA_BUCKET_NAME }} \
-                      --s3-key ${{ vars.LAMBDA_DEPLOYMENT_ZIPPACKAGE_NAME }} \
-                      --s3-object-version $lambda_new_version
+            aws lambda update-function-code \
+                        --function-name ${{ secrets.LAMBDA_FUNCTION_ARN }} \
+                        --region ${{ secrets.AWS_STACK_REGION }} \
+                        --s3-bucket ${{ secrets.S3_LAMBDA_BUCKET_NAME }} \
+                        --s3-key ${{ vars.LAMBDA_DEPLOYMENT_ZIPPACKAGE_NAME }} \
+                        --s3-object-version $lambda_new_version
 
           
 
