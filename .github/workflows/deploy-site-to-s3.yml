@@ -40,7 +40,7 @@ jobs:
 
       - name: update visitor counter API's invocation URL
         run: |
-          sed -i 's/.*const VISITOR_COUNTER_API_INVOKE_URL.*/const VISITOR_COUNTER_API_INVOKE_URL="${{ vars.VISITOR_COUNTER_API_INVOKE_URL }}"/' ./site/scripts/visitorCounterModule.js
+          sed -i '' 's/.*const VISITOR_COUNTER_API_INVOKE_URL.*/const VISITOR_COUNTER_API_INVOKE_URL="${{ vars.VISITOR_COUNTER_API_INVOKE_URL }}"/' ./site/scripts/visitorCounterModule.js
   
 
       - name: get temporary AWS credentials
