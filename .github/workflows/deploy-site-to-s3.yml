@@ -1,4 +1,4 @@
-name: Deploy static site to AWS S3
+name: Site Update
 
 on:
   push:
@@ -16,7 +16,7 @@ permissions:
 
 
 env:
-  GITHUB_SRC_FOLDER: 'site' # GitHub folder to sync to AWS ending with '/', e.g: 'prod/'. If sync from root folder, leave as ''
+  GITHUB_SRC_FOLDER: 'github' # GitHub folder to sync to AWS ending with '/', e.g: 'prod/'. If sync from root folder, leave as ''
 
 
 jobs:
@@ -38,11 +38,6 @@ jobs:
           npm test
 
 
-      - name: update visitor counter API's invocation URL
-        run: |
-          sed -i "s%.*const VISITOR_COUNTER_API_INVOKE_URL.*%const VISITOR_COUNTER_API_INVOKE_URL='${{ vars.VISITOR_COUNTER_API_INVOKE_URL }}'%" ./site/scripts/visitorCounterModule.js
-  
-
       - name: get temporary AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -57,6 +52,11 @@ jobs:
       - name: verify temp credentials validity
         run: |
           aws sts get-caller-identity
+
+
+      - name: update visitor counter API's invocation URL
+        run: |
+          sed -i "s%.*const VISITOR_COUNTER_API_INVOKE_URL.*%const VISITOR_COUNTER_API_INVOKE_URL='${{ vars.VISITOR_COUNTER_API_INVOKE_URL }}'%" ./${{ env.GITHUB_SRC_FOLDER }}/scripts/visitorCounterModule.js
 
 
       - name: sync files to aws s3

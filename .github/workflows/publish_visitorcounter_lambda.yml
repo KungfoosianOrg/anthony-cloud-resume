@@ -1,9 +1,9 @@
-name: Deploy Lambda for visitor counter to AWS
+name: Deploy Visitor Counter SAM app to AWS
 
 on:
     push:
-        branches: ["main"]
-        paths: ["back_end/**"]
+        branches: ["main", "gha-overhaul"]
+        paths: ["aws/**"]
 
     # Allows you to run this workflow manually from the Actions tab
     workflow_dispatch:
@@ -12,87 +12,124 @@ permissions:
   id-token: write
   contents: read
 
+env:
+  STACK_NAME: vocloudresume-sam-app
+
 jobs:
-  test-lambda-and-deploy:
-      runs-on: ubuntu-latest
+  test-lambda:
+    runs-on: ubuntu-latest
 
-      steps:
-        - name: check out repo
-          uses: actions/checkout@v3
+    steps:
+      - name: check out repo
+        uses: actions/checkout@v3
 
-        - name: create default aws config for unittest
-          run: |
-            mkdir ~/.aws
-            touch ~/.aws/config
-            echo "[default]" >> ~/.aws/config
-            echo "aws_access_key_id=test" >> ~/.aws/config
-            echo "aws_secret_access_key=test" >> ~/.aws/config
+      - name: create default aws config for unittest
+        run: |
+          mkdir ~/.aws
+          touch ~/.aws/config
+          echo "[default]" >> ~/.aws/config
+          echo "aws_access_key_id=test" >> ~/.aws/config
+          echo "aws_secret_access_key=test" >> ~/.aws/config
 
-        - name: install python dependencies
-          run: |
-            pip3 install -r requirements.txt
+      - name: install python test dependencies
+        run: |
+          pip3 install -r ./tests/requirements.txt
 
-        - name: run Python unittest
-          run: |
-            python3 -m unittest
+      - name: run Python unittest
+        run: |
+          python3 -m unittest
+  
 
-        - name: remove AWS default config used for testing
-          run: |
-            rm ~/.aws/config
+  deploy-sam-app:
+    runs-on: ubuntu-latest
 
+    needs: [
+      test-lambda
+    ]
 
-        - name: get temporary AWS credentials
-          uses: aws-actions/configure-aws-credentials@v4
-          with:
-            aws-region: ${{ secrets.AWS_STACK_REGION }}
-            role-to-assume: ${{ secrets.AWS_ROLE_ARN }} 
-            role-session-name: GHASession-anthony_cloud_resume
-            unset-current-credentials: true
-            retry-max-attempts: 3
-            output-credentials: true
+    outputs:
+      newEndpointUrl: ${{ steps.getSamIdStep.newEndpointUrl }}
+      isEndpointNeedUpdate: ${{ steps.getSamIdStep.isEndpointNeedUpdate }}
       
-              
-        - name: verify temp credentials validity
-          run: |
-            aws sts get-caller-identity
 
+    steps:
+      - name: check out repo
+        uses: actions/checkout@v3
 
-        - name: package lambda code for AWS
-          run: |
-            echo package code for aws
-            cd ./back_end
-            mkdir package
-            pip install --target ./package boto3
-            cd package
-            zip -r ../${{ vars.LAMBDA_DEPLOYMENT_ZIPPACKAGE_NAME }} .
-            cd ..
-            zip ${{ vars.LAMBDA_DEPLOYMENT_ZIPPACKAGE_NAME }} *.py
+      # - name: remove AWS default config used for testing
+      #   run: |
+      #     rm ~/.aws/config
 
+      - name: change samconfig.toml to prod values
+        run: |
+          echo Removing profile line to use default profile
+          sed -i 's/.*profile.*//' ./samconfig.toml
 
-        - name: deploy lambda package to s3
-          run: |
-            echo deploy package to s3
-            cd ./back_end
-            aws s3 cp ${{ vars.LAMBDA_DEPLOYMENT_ZIPPACKAGE_NAME }} s3://${{ secrets.S3_LAMBDA_BUCKET_NAME }}/
+          echo Add SAM parameters
+          sed -i 's/.*parameter_overrides.*/parameter_overrides = "SubscriberEmailParam=\\"${{ secrets.SNS_ALERT_EMAIL }}\\""/' ./samconfig.toml 
+          
+          echo Set App production name and corresponding S3 bucket
+          sed -i 's/.*stack_name.*/stack_name = "${{ env.STACK_NAME }}"/' ./samconfig.toml
+          sed -i 's/.*s3_prefix.*/s3_prefix = "${{ env.STACK_NAME }}"/' ./samconfig.toml
+
+      - name: get temporary AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ${{ secrets.AWS_STACK_REGION }}
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }} 
+          role-session-name: GHASession-anthony_cloud_resume
+          unset-current-credentials: true
+          retry-max-attempts: 3
+          output-credentials: true    
             
+      - name: verify temp credentials validity
+        run: |
+          aws sts get-caller-identity    
 
-        - name: get and publish new version of package to Lambda
-          run: |
-            echo publish new version to lambda
+      - name: Install SAM CLI ?
+        run: |
+          echo TODO if needed
 
-            lambda_new_version=$(aws s3api list-object-versions \
-                                            --bucket ${{ secrets.S3_LAMBDA_BUCKET_NAME }} \
-                                            --prefix ${{ vars.LAMBDA_DEPLOYMENT_ZIPPACKAGE_NAME }} \
-                                            --query 'Versions[?IsLatest].[VersionId]' \
-                                            --output text)
+      - name: deploy SAM template
+        run: |
+          sam deploy
 
-            aws lambda update-function-code \
-                        --function-name ${{ secrets.LAMBDA_FUNCTION_ARN }} \
-                        --region ${{ secrets.AWS_STACK_REGION }} \
-                        --s3-bucket ${{ secrets.S3_LAMBDA_BUCKET_NAME }} \
-                        --s3-key ${{ vars.LAMBDA_DEPLOYMENT_ZIPPACKAGE_NAME }} \
-                        --s3-object-version $lambda_new_version
+      - name: get API URL output and see if update repo environment variable and cloudFormation stack is needed
+        id: getSamIdStep
+        run: |
+          echo get SAM stack ID
+          api_id=$(sam list stack-outputs --output json --stack-name ${{ env.STACK_NAME }} --region ${{ secrets.AWS_STACK_REGION }} | jq -r '.[].OutputValue')
 
-          
+          new_endpoint_url="$api_id.execute-api.${{ secrets.AWS_STACK_REGION }}.amazonaws.com"
+        
+          echo check if new url and current environment variable are same
+          if [ $new_endpoint_url -ne ${{vars.VISITOR_COUNTER_API_INVOKE_URL}} ];
+          then
+            echo updating environment variable 
+            echo "newEndpointUrl=$new_endpoint_url" >> "$GITHUB_OUTPUT"
+            echo "isEndpointNeedUpdate=true" >> "$GITHUB_OUTPUT"
 
-          
+  
+  update_env_and_stack_w_new_API_endpoint:
+    runs-on: ubuntu-latest
+    
+    needs: [
+      deploy-sam-app
+      ]
+      
+    if: ${{needs.deploy-sam-app.outputs.isEndpointNeedUpdate}} == 'true'
+
+    steps:
+      - name: set repo environment variable
+        uses: action-pack/set-variable@v1
+        with:
+          name: VISITOR_COUNTER_API_INVOKE_URL
+          value: ${{needs.deploy-sam-app.outputs.newEndpointUrl}}
+          token: ${{ secrets.MY_GH_PERSONAL_ACCESS_TOKEN }}
+
+      - name: update stack
+        run: |
+          # TODO
+
+
+            
