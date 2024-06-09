@@ -1,0 +1,12 @@
+version = 0.1
+
+[default.deploy.parameters]
+stack_name = "prod-vocloudresume-app"
+resolve_s3 = true
+s3_prefix = "prod-vocloudresume-app"
+region = "us-west-1"
+
+capabilities = "CAPABILITY_IAM"
+image_repositories = []
+disable_rollback = true
+parameter_overrides = "SubscriberEmailParam=\"test@mail.com\""

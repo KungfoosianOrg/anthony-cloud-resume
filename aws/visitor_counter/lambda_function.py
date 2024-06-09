@@ -23,7 +23,7 @@ _VISITORCOUNTER_RESOURCE = {
 
 def lambda_handler(event, context):
     # ignore requests that are not POST to /visitor-count
-    if event['resource'] != '/visitor-count' or event['httpMethod'] != 'POST':
+    if event['rawPath'] != '/visitor-counter' or event['requestContext']['http']['method'] != 'POST':
         return LambdaResponse(response=_RESPONSE_DEFAULT).json
     
     try:
