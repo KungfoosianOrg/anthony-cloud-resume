@@ -49,7 +49,7 @@ jobs:
 
     outputs:
       newEndpointUrl: ${{ steps.getSamIdStep.newEndpointUrl }}
-      isEndpointNeedUpdate: ${{ steps.getSamIdStep.isEndpointNeedUpdate }}
+      endpointNeedUpdate: ${{ steps.getSamIdStep.endpointNeedUpdate }}
       
 
     steps:
@@ -107,7 +107,7 @@ jobs:
           then
             echo updating environment variable 
             echo "newEndpointUrl=$new_endpoint_url" >> "$GITHUB_OUTPUT"
-            echo "isEndpointNeedUpdate=true" >> "$GITHUB_OUTPUT"
+            echo "endpointNeedUpdate=true" >> "$GITHUB_OUTPUT"
 
   
   update_env_and_stack_w_new_API_endpoint:
@@ -117,19 +117,45 @@ jobs:
       deploy-sam-app
       ]
       
-    if: ${{needs.deploy-sam-app.outputs.isEndpointNeedUpdate}} == 'true'
+    if: ${{ needs.deploy-sam-app.outputs.endpointNeedUpdate }} == 'true'
 
     steps:
+      - name: check out repo
+        uses: actions/checkout@v3
+
       - name: set repo environment variable
         uses: action-pack/set-variable@v1
         with:
           name: VISITOR_COUNTER_API_INVOKE_URL
-          value: ${{needs.deploy-sam-app.outputs.newEndpointUrl}}
+          value: ${{ needs.deploy-sam-app.outputs.newEndpointUrl }}
           token: ${{ secrets.MY_GH_PERSONAL_ACCESS_TOKEN }}
 
-      - name: update stack
+      - name: get temporary AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ${{ secrets.AWS_STACK_REGION }}
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }} 
+          role-session-name: GHASession-anthony_cloud_resume
+          unset-current-credentials: true
+          retry-max-attempts: 3
+          output-credentials: true    
+              
+      - name: verify temp credentials validity
         run: |
-          # TODO
+          aws sts get-caller-identity    
+
+      - name: update stack with new endpoint URL
+        run: |
+          aws cloudformation update-stack --stack-name ${{ secrets.AWS_ROOT_STACK_ID }} \
+                                          --use-previous-template \
+                                          --parameters ParameterKey=GitHubOrgParameter,UsePreviousValue=true \
+                                                       ParameterKey=RepositoryNameParameter,UsePreviousValue=true \
+                                                       ParameterKey=OIDCProviderARNParameter,UsePreviousValue=true \
+                                                       ParameterKey=OIDCAudienceParameter,UsePreviousValue=true \
+                                                       ParameterKey=RegisteredDomainNameParam,UsePreviousValue=true \
+                                                       ParameterKey=FQDNsParam,UsePreviousValue=true \
+                                                       ParameterKey=Route53HostedZoneIdParam,UsePreviousValue=true \
+                                                       ParameterKey=ApiEndpointIdParam,ParameterValue=${{ needs.deploy-sam-app.outputs.newEndpointUrl }} \
 
 
             
