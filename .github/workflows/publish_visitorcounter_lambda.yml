@@ -65,12 +65,13 @@ jobs:
           echo Removing profile line to use default profile
           sed -i 's/.*profile.*//' ./samconfig.toml
 
-          echo Add SAM parameters
+          echo Add SAM template parameters
           sed -i 's/.*parameter_overrides.*/parameter_overrides = "SubscriberEmailParam=\\"${{ secrets.SNS_ALERT_EMAIL }}\\""/' ./samconfig.toml 
-          
-          echo Set App production name and corresponding S3 bucket
+
+          echo Set App production name, region, and corresponding S3 bucket
           sed -i 's/.*stack_name.*/stack_name = "${{ env.STACK_NAME }}"/' ./samconfig.toml
           sed -i 's/.*s3_prefix.*/s3_prefix = "${{ env.STACK_NAME }}"/' ./samconfig.toml
+          sed -i 's/.*region.*/region = "${{ secrets.AWS_STACK_REGION }}"/' ./samconfig.toml
 
       - name: get temporary AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
