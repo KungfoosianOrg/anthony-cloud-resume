@@ -93,7 +93,7 @@ jobs:
 
       - name: deploy SAM template
         run: |
-          sam deploy
+          sam deploy --debug
 
       - name: get API URL output and see if update repo environment variable and cloudFormation stack is needed
         id: getSamIdStep
