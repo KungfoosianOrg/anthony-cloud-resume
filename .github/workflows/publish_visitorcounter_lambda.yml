@@ -93,6 +93,10 @@ jobs:
 
       - name: deploy SAM template
         run: |
+          echo Turning off telemetry
+          echo "export SAM_CLI_TELEMETRY=0" >>~/.profile
+          source ~/.profile
+          
           sam deploy --debug
 
       - name: get API URL output and see if update repo environment variable and cloudFormation stack is needed
