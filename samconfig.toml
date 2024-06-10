@@ -1,9 +1,9 @@
 version = 0.1
 
 [default.deploy.parameters]
-stack_name = "prod-vocloudresume-app"
+stack_name = "vocloudresume-app"
 resolve_s3 = true
-s3_prefix = "prod-vocloudresume-app"
+s3_prefix = "vocloudresume-app"
 region = "us-west-1"
 
 capabilities = "CAPABILITY_IAM"
