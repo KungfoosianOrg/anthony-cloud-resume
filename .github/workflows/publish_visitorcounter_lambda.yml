@@ -12,8 +12,6 @@ permissions:
   id-token: write
   contents: read
 
-env:
-  STACK_NAME: vocloudresume-sam-app
 
 jobs:
   test-lambda:
@@ -69,8 +67,8 @@ jobs:
           sed -i 's/.*parameter_overrides.*/parameter_overrides = "SubscriberEmailParam=\\"${{ secrets.SNS_ALERT_EMAIL }}\\""/' ./samconfig.toml 
 
           echo Set App production name, region, and corresponding S3 bucket
-          sed -i 's/.*stack_name.*/stack_name = "${{ env.STACK_NAME }}"/' ./samconfig.toml
-          sed -i 's/.*s3_prefix.*/s3_prefix = "${{ env.STACK_NAME }}"/' ./samconfig.toml
+          sed -i 's/.*stack_name.*/stack_name = "${{ secrets.AWS_STACK_NAME }}"/' ./samconfig.toml
+          sed -i 's/.*s3_prefix.*/s3_prefix = "${{ secrets.AWS_STACK_NAME }}"/' ./samconfig.toml
           sed -i 's/.*region.*/region = "${{ secrets.AWS_STACK_REGION }}"/' ./samconfig.toml
 
       - name: get temporary AWS credentials
@@ -103,7 +101,7 @@ jobs:
         id: getSamIdStep
         run: |
           echo get SAM stack ID
-          api_id=$(sam list stack-outputs --output json --stack-name ${{ env.STACK_NAME }} --region ${{ secrets.AWS_STACK_REGION }} | jq -r '.[].OutputValue')
+          api_id=$(sam list stack-outputs --output json --stack-name ${{ secrets.AWS_STACK_NAME }} --region ${{ secrets.AWS_STACK_REGION }} | jq -r '.[].OutputValue')
 
           new_endpoint_url="$api_id.execute-api.${{ secrets.AWS_STACK_REGION }}.amazonaws.com"
         
