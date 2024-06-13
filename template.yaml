@@ -34,7 +34,7 @@ Resources:
       RetentionInDays: 3
 
 
-  VisitorCounterApiGw:
+  SAMVisitorCounterApiGw:
     Type: AWS::Serverless::HttpApi
 
     Properties:
@@ -80,7 +80,7 @@ Resources:
           Properties:
               Method: post
               Path: /visitor-counter
-              ApiId: !Ref VisitorCounterApiGw
+              ApiId: !Ref SAMVisitorCounterApiGw
       LoggingConfig:
         ApplicationLogLevel: INFO
         LogFormat: JSON
@@ -131,7 +131,7 @@ Resources:
         MeasuringMetricParam: 4xx
         AlarmNameParam: 4xxApiResponse
         AlarmDescriptionParam: alarms when api gateway HTTP response is 4xx
-        ApiGwIdParam: !Ref VisitorCounterApiGw
+        ApiGwIdParam: !Ref SAMVisitorCounterApiGw
 
   
   CWAlarmApiResponse5xxStack:
@@ -145,7 +145,7 @@ Resources:
         MeasuringMetricParam: 5xx
         AlarmNameParam: 5xxApiResponse
         AlarmDescriptionParam: alarms when api gateway HTTP response is 5xx
-        ApiGwIdParam: !Ref VisitorCounterApiGw
+        ApiGwIdParam: !Ref SAMVisitorCounterApiGw
 
 
   CWAlarmApiResponseLatencyStack:
@@ -158,7 +158,7 @@ Resources:
         SubscriberEmailParam: !Ref SubscriberEmailParam
         MeasuringMetricParam: Latency
         AlarmNameParam: ApiResponseLatency
-        ApiGwIdParam: !Ref VisitorCounterApiGw
+        ApiGwIdParam: !Ref SAMVisitorCounterApiGw
         StatisticCalculationMethodParam: Maximum
         AlarmDescriptionParam: alarms when api gateway HTTP response takes more than 1 second
         AlarmThresholdParam: 1000
@@ -174,7 +174,7 @@ Resources:
         SubscriberEmailParam: !Ref SubscriberEmailParam
         MeasuringMetricParam: Count
         AlarmNameParam: ApiCallExceedExpected
-        ApiGwIdParam: !Ref VisitorCounterApiGw
+        ApiGwIdParam: !Ref SAMVisitorCounterApiGw
         MeasuringPeriodParam: 60
         StatisticCalculationMethodParam: SampleCount
         AlarmDescriptionParam: alarms when api calls exceed 100 within 1 minute
@@ -183,4 +183,4 @@ Resources:
 Outputs:
   VisitorCounterApiIdOutput:
     Description: "API Gateway ID for visitor counter lambda function"
-    Value: !Ref VisitorCounterApiGw
+    Value: !Ref SAMVisitorCounterApiGw
