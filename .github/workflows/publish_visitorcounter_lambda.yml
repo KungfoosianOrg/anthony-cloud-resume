@@ -12,6 +12,9 @@ permissions:
   id-token: write
   contents: read
 
+env:
+  ENV_STACK_NAME: my-sam-stack
+
 
 jobs:
   test-lambda:
@@ -67,8 +70,8 @@ jobs:
           sed -i 's/.*parameter_overrides.*/parameter_overrides = "SubscriberEmailParam=\\"${{ secrets.SNS_ALERT_EMAIL }}\\""/' ./samconfig.toml 
 
           echo Set App production name, region, and corresponding S3 bucket
-          sed -i 's/.*stack_name.*/stack_name = "${{ secrets.AWS_STACK_NAME }}"/' ./samconfig.toml
-          sed -i 's/.*s3_prefix.*/s3_prefix = "${{ secrets.AWS_STACK_NAME }}"/' ./samconfig.toml
+          sed -i 's/.*stack_name.*/stack_name = "${{ env.ENV_STACK_NAME }}"/' ./samconfig.toml
+          sed -i 's/.*s3_prefix.*/s3_prefix = "${{ env.ENV_STACK_NAME }}"/' ./samconfig.toml
           sed -i 's/.*region.*/region = "${{ secrets.AWS_STACK_REGION }}"/' ./samconfig.toml
 
       - name: get temporary AWS credentials
