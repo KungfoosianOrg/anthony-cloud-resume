@@ -57,6 +57,10 @@ jobs:
       - name: check out repo
         uses: actions/checkout@v3
 
+      - name: check if step is run on cleared environment, if nothing shows, then yes
+        run: |
+          cat ~/.aws/config
+
       # - name: remove AWS default config used for testing
       #   run: |
       #     rm ~/.aws/config
