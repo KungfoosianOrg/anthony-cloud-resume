@@ -57,14 +57,6 @@ jobs:
       - name: check out repo
         uses: actions/checkout@v3
 
-      - name: check if step is run on cleared environment, if nothing shows, then yes
-        run: |
-          cat ~/.aws/config
-
-      # - name: remove AWS default config used for testing
-      #   run: |
-      #     rm ~/.aws/config
-
       - name: change samconfig.toml to prod values
         run: |
           echo Removing profile line to use default profile
@@ -91,10 +83,7 @@ jobs:
       - name: verify temp credentials validity
         run: |
           aws sts get-caller-identity    
-
-      - name: Install SAM CLI ?
-        run: |
-          echo TODO if needed
+          
 
       - name: deploy SAM template
         run: |
