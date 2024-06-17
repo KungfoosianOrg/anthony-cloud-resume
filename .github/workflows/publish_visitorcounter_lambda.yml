@@ -107,6 +107,7 @@ jobs:
             echo updating environment variable 
             echo "newEndpointUrl=$new_endpoint_url" >> "$GITHUB_OUTPUT"
             echo "endpointNeedUpdate=true" >> "$GITHUB_OUTPUT"
+          fi
 
   
   update_env_and_stack_w_new_API_endpoint:
