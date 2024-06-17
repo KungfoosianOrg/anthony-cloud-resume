@@ -105,6 +105,7 @@ jobs:
           if [ "$new_endpoint_url" != "${{ vars.VISITOR_COUNTER_API_INVOKE_URL }}" ];
           then
             echo updating environment variable 
+            echo "new endpoint is $new_endpoint_url"
             echo "newEndpointUrl=$new_endpoint_url" >> "$GITHUB_OUTPUT"
             echo "endpointNeedUpdate=true" >> "$GITHUB_OUTPUT"
           fi
