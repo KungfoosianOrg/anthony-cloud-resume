@@ -102,7 +102,7 @@ jobs:
           new_endpoint_url="$api_id.execute-api.${{ secrets.AWS_STACK_REGION }}.amazonaws.com"
         
           echo check if new url and current environment variable are same
-          if [ $new_endpoint_url -ne ${{vars.VISITOR_COUNTER_API_INVOKE_URL}} ];
+          if [ $new_endpoint_url -ne "${{vars.VISITOR_COUNTER_API_INVOKE_URL}}" ];
           then
             echo updating environment variable 
             echo "newEndpointUrl=$new_endpoint_url" >> "$GITHUB_OUTPUT"
