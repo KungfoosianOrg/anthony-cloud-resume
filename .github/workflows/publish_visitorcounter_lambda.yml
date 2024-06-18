@@ -107,6 +107,8 @@ jobs:
             echo updating environment variable 
             echo "new endpoint id is $api_id"
 
+            ${{ vars.VISITOR_COUNTER_API_INVOKE_URL }} = $new_endpoint_url
+
             EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
             echo "newEndpointUrl<<$EOF" >> "$GITHUB_OUTPUT"
             echo "$new_endpoint_url" >> "$GITHUB_OUTPUT"
