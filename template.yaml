@@ -180,7 +180,7 @@ Resources:
         AlarmDescriptionParam: alarms when api calls exceed 100 within 1 minute
         AlarmThresholdParam: 100
 
-# Outputs:
-#   VisitorCounterApiIdOutput:
-#     Description: "API Gateway ID for visitor counter lambda function"
-#     Value: !Ref SAMVisitorCounterApiGw
+Outputs:
+  VisitorCounterApiIdOutput:
+    Description: "API Gateway ID for visitor counter lambda function"
+    Value: !Ref SAMVisitorCounterApiGw
