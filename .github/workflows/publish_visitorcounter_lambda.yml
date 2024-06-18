@@ -96,6 +96,8 @@ jobs:
       - name: get API URL output and see if update repo environment variable and cloudFormation stack is needed
         id: getSamIdStep
         run: |
+          sudo apt-get install -y jq
+        
           echo get SAM stack ID
           api_id=$(sam list stack-outputs --output json --stack-name ${{ secrets.AWS_STACK_NAME }} --region ${{ secrets.AWS_STACK_REGION }} | jq -r '.[].OutputValue')
 
