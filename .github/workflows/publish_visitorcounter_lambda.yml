@@ -106,8 +106,15 @@ jobs:
           then
             echo updating environment variable 
             echo "new endpoint id is $api_id"
-            echo "newEndpointUrl=$new_endpoint_url" >> "$GITHUB_OUTPUT"
-            echo "endpointNeedUpdate=true" >> "$GITHUB_OUTPUT"
+
+            EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
+            echo "newEndpointUrl<<$EOF" >> "$GITHUB_OUTPUT"
+            echo "$new_endpoint_url" >> "$GITHUB_OUTPUT"
+            echo "$EOF" >> "$GITHUB_OUTPUT"
+
+            echo "endpointNeedUpdate<<$EOF" >> "$GITHUB_OUTPUT"
+            echo "true" >> "$GITHUB_OUTPUT"
+            echo "$EOF" >> "$GITHUB_OUTPUT"
           fi
 
   
