@@ -95,19 +95,17 @@ jobs:
 
       - name: get API URL output and see if update repo environment variable and cloudFormation stack is needed
         id: getSamIdStep
-        run: |
-          sudo apt-get install -y jq
-        
+        run: |        
           echo get SAM stack ID
           api_id=$(sam list stack-outputs --output json --stack-name ${{ secrets.AWS_STACK_NAME }} --region ${{ secrets.AWS_STACK_REGION }} | jq -r '.[].OutputValue')
 
-          new_endpoint_url="$api_id.execute-api.${{ secrets.AWS_STACK_REGION }}.amazonaws.com"
+          new_endpoint_url="https://$api_id.execute-api.${{ secrets.AWS_STACK_REGION }}.amazonaws.com"
         
           echo check if new url and current environment variable are same
           if [ "$new_endpoint_url" != "${{ vars.VISITOR_COUNTER_API_INVOKE_URL }}" ];
           then
             echo updating environment variable 
-            echo "new endpoint is $new_endpoint_url"
+            echo "new endpoint id is $api_id"
             echo "newEndpointUrl=$new_endpoint_url" >> "$GITHUB_OUTPUT"
             echo "endpointNeedUpdate=true" >> "$GITHUB_OUTPUT"
           fi
