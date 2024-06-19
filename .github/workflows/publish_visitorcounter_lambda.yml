@@ -131,12 +131,7 @@ jobs:
             echo updating environment variable 
             echo "new endpoint id is $api_id"
 
-            gh api \
-               --method PATCH \
-               -H "Accept: application/vnd.github+json" \
-               -H "X-GitHub-Api-Version: 2022-11-28" \
-               /repos/KungfoosianOrg/anthony-cloud-resume/environments/MY_ENVIRONMENT_NAME/variables/VISITOR_COUNTER_API_INVOKE_URL \
-               -f "name=VISITOR_COUNTER_API_INVOKE_URL" -f "value=$new_endpoint_url"
+            gh variable set VISITOR_COUNTER_API_INVOKE_URL --body "$new_endpoint_url" 
 
             EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
             echo "newEndpointUrl<<$EOF" >> "$GITHUB_OUTPUT"
