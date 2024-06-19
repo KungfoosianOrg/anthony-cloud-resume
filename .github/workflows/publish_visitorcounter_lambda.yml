@@ -124,7 +124,12 @@ jobs:
           GH_TOKEN: ${{ secrets.MY_GH_PERSONAL_ACCESS_TOKEN }}
         run: |        
           echo get SAM stack ID
+
+          echo What SAM stack outputs
           sam  list stack-outputs json --stack-name ${{ secrets.AWS_STACK_NAME }} --region ${{ secrets.AWS_STACK_REGION }}
+
+          echo GH CLI of variable value before:
+          gh variable get VISITOR_COUNTER_API_INVOKE_URL
 
           api_id=$(sam list stack-outputs --output json --stack-name ${{ secrets.AWS_STACK_NAME }} --region ${{ secrets.AWS_STACK_REGION }} | jq -r '.[].OutputValue')
 
@@ -137,6 +142,9 @@ jobs:
             echo "new endpoint id is $api_id"
 
             gh variable set VISITOR_COUNTER_API_INVOKE_URL --body "$new_endpoint_url" 
+
+            echo GH CLI of variable value after:
+            gh variable get VISITOR_COUNTER_API_INVOKE_URL
 
             EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
             echo "newEndpointUrl<<$EOF" >> "$GITHUB_OUTPUT"
