@@ -117,6 +117,8 @@ jobs:
 
       - name: get SAM output for new API endpoint, see if update repo environment variable and cloudFormation stack is needed
         id: getSamIdStep
+        env:
+          GH_TOKEN: ${{ secrets.MY_GH_PERSONAL_ACCESS_TOKEN }}
         run: |        
           echo get SAM stack ID
           api_id=$(sam list stack-outputs --output json --stack-name ${{ secrets.AWS_STACK_NAME }} --region ${{ secrets.AWS_STACK_REGION }} | jq -r '.[].OutputValue')
