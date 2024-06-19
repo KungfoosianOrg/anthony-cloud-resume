@@ -126,7 +126,7 @@ jobs:
           echo get SAM stack ID
 
           echo What SAM stack outputs
-          sam  list stack-outputs json --stack-name ${{ secrets.AWS_STACK_NAME }} --region ${{ secrets.AWS_STACK_REGION }}
+          sam  list stack-outputs --output json --stack-name ${{ secrets.AWS_STACK_NAME }} --region ${{ secrets.AWS_STACK_REGION }}
 
           echo GH CLI of variable value before:
           gh variable get VISITOR_COUNTER_API_INVOKE_URL
