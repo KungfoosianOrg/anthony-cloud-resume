@@ -101,6 +101,9 @@ jobs:
       endpointNeedUpdate: ${{ steps.getSamIdStep.endpointNeedUpdate }}
 
     steps:
+      - name: check out repo
+        uses: actions/checkout@v3
+        
       - name: get temporary AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
