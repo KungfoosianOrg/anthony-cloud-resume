@@ -48,11 +48,6 @@ jobs:
       test-lambda
     ]
 
-    outputs:
-      newEndpointUrl: ${{ steps.getSamIdStep.newEndpointUrl }}
-      endpointNeedUpdate: ${{ steps.getSamIdStep.endpointNeedUpdate }}
-      
-
     steps:
       - name: check out repo
         uses: actions/checkout@v3
@@ -91,9 +86,36 @@ jobs:
           echo "export SAM_CLI_TELEMETRY=0" >>~/.profile
           source ~/.profile
           
-          sam deploy --debug
+          sam deploy
+      
 
-      - name: get API URL output and see if update repo environment variable and cloudFormation stack is needed
+  update_endpoint_if_needed:
+    runs-on: ubuntu-latest
+
+    needs: [
+      deploy-sam-app
+    ]
+
+    outputs:
+      newEndpointUrl: ${{ steps.getSamIdStep.newEndpointUrl }}
+      endpointNeedUpdate: ${{ steps.getSamIdStep.endpointNeedUpdate }}
+
+    steps:
+      - name: get temporary AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ${{ secrets.AWS_STACK_REGION }}
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }} 
+          role-session-name: GHASession-anthony_cloud_resume
+          unset-current-credentials: true
+          retry-max-attempts: 3
+          output-credentials: true    
+            
+      - name: verify temp credentials validity
+        run: |
+          aws sts get-caller-identity
+
+      - name: get SAM output for new API endpoint, see if update repo environment variable and cloudFormation stack is needed
         id: getSamIdStep
         run: |        
           echo get SAM stack ID
@@ -107,7 +129,12 @@ jobs:
             echo updating environment variable 
             echo "new endpoint id is $api_id"
 
-            ${{ vars.VISITOR_COUNTER_API_INVOKE_URL }} = $new_endpoint_url
+            gh api \
+               --method PATCH \
+               -H "Accept: application/vnd.github+json" \
+               -H "X-GitHub-Api-Version: 2022-11-28" \
+               /repos/KungfoosianOrg/anthony-cloud-resume/environments/MY_ENVIRONMENT_NAME/variables/VISITOR_COUNTER_API_INVOKE_URL \
+               -f "name=VISITOR_COUNTER_API_INVOKE_URL" -f "value=$new_endpoint_url"
 
             EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
             echo "newEndpointUrl<<$EOF" >> "$GITHUB_OUTPUT"
@@ -124,10 +151,10 @@ jobs:
     runs-on: ubuntu-latest
     
     needs: [
-      deploy-sam-app
+      update_endpoint_if_needed
       ]
       
-    if: ${{ needs.deploy-sam-app.outputs.endpointNeedUpdate }} == 'true'
+    if: ${{ needs.update_endpoint_if_needed.outputs.endpointNeedUpdate }} == 'true'
 
     steps:
       - name: check out repo
@@ -137,7 +164,7 @@ jobs:
         uses: action-pack/set-variable@v1
         with:
           name: VISITOR_COUNTER_API_INVOKE_URL
-          value: ${{ needs.deploy-sam-app.outputs.newEndpointUrl }}
+          value: ${{ needs.update_endpoint_if_needed.outputs.newEndpointUrl }}
           token: ${{ secrets.MY_GH_PERSONAL_ACCESS_TOKEN }}
 
       - name: get temporary AWS credentials
@@ -165,7 +192,7 @@ jobs:
                                                        ParameterKey=RegisteredDomainNameParam,UsePreviousValue=true \
                                                        ParameterKey=FQDNsParam,UsePreviousValue=true \
                                                        ParameterKey=Route53HostedZoneIdParam,UsePreviousValue=true \
-                                                       ParameterKey=ApiEndpointIdParam,ParameterValue=${{ needs.deploy-sam-app.outputs.newEndpointUrl }} \
+                                                       ParameterKey=ApiEndpointIdParam,ParameterValue=${{ needs.update_endpoint_if_needed.outputs.newEndpointUrl }} \
 
 
             
