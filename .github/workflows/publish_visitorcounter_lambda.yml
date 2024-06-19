@@ -97,7 +97,6 @@ jobs:
     ]
 
     outputs:
-      newEndpointUrl: ${{ steps.getSamIdStep.newEndpointUrl }}
       endpointNeedUpdate: ${{ steps.getSamIdStep.endpointNeedUpdate }}
 
     steps:
@@ -146,11 +145,6 @@ jobs:
             echo GH CLI of variable value after:
             gh variable get VISITOR_COUNTER_API_INVOKE_URL
 
-            EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
-            echo "newEndpointUrl<<$EOF" >> "$GITHUB_OUTPUT"
-            echo "$new_endpoint_url" >> "$GITHUB_OUTPUT"
-            echo "$EOF" >> "$GITHUB_OUTPUT"
-
             echo "endpointNeedUpdate<<$EOF" >> "$GITHUB_OUTPUT"
             echo "true" >> "$GITHUB_OUTPUT"
             echo "$EOF" >> "$GITHUB_OUTPUT"
@@ -169,13 +163,6 @@ jobs:
     steps:
       - name: check out repo
         uses: actions/checkout@v3
-
-      - name: set repo environment variable
-        uses: action-pack/set-variable@v1
-        with:
-          name: VISITOR_COUNTER_API_INVOKE_URL
-          value: ${{ needs.update_endpoint_if_needed.outputs.newEndpointUrl }}
-          token: ${{ secrets.MY_GH_PERSONAL_ACCESS_TOKEN }}
 
       - name: get temporary AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -202,7 +189,7 @@ jobs:
                                                        ParameterKey=RegisteredDomainNameParam,UsePreviousValue=true \
                                                        ParameterKey=FQDNsParam,UsePreviousValue=true \
                                                        ParameterKey=Route53HostedZoneIdParam,UsePreviousValue=true \
-                                                       ParameterKey=ApiEndpointIdParam,ParameterValue=${{ needs.update_endpoint_if_needed.outputs.newEndpointUrl }} \
+                                                       ParameterKey=ApiEndpointIdParam,ParameterValue=${{ vars.VISITOR_COUNTER_API_INVOKE_URL }} \
 
 
             
