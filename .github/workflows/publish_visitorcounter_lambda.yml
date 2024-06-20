@@ -122,9 +122,13 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.MY_GH_PERSONAL_ACCESS_TOKEN }}
         run: |        
-          echo get SAM stack ID
+          echo STEP: get SAM stack output for API endpoint
+            
+          echo Output from SAM stack
+          echo "  Turning off telemetry..."
+          echo "export SAM_CLI_TELEMETRY=0" >>~/.profile
+          source ~/.profile
 
-          echo What SAM stack outputs
           sam  list stack-outputs --output json --stack-name ${{ secrets.AWS_SAM_STACK_NAME }} --region ${{ secrets.AWS_STACK_REGION }}
 
           echo GH CLI of variable value before:
@@ -134,10 +138,10 @@ jobs:
 
           new_endpoint_url="https://$api_id.execute-api.${{ secrets.AWS_STACK_REGION }}.amazonaws.com"
         
-          echo check if new url and current environment variable are same
+          echo checking if new url and current repo environment variable are same
           if [ "$new_endpoint_url" != "${{ vars.VISITOR_COUNTER_API_INVOKE_URL }}" ];
           then
-            echo updating environment variable 
+            echo values different, updating environment variable 
             echo "new endpoint id is $api_id"
 
             gh variable set VISITOR_COUNTER_API_INVOKE_URL --body "$new_endpoint_url" 
@@ -178,14 +182,15 @@ jobs:
         run: |
           aws sts get-caller-identity    
 
-      - name: update stack with new endpoint URL
+      - name: call workflow to update site with new API endpoint
+
+      - name: not needed - update stack with new endpoint URL
         run: |
           aws cloudformation update-stack --stack-name ${{ secrets.AWS_ROOT_STACK_ID }} \
-                                          --use-previous-template \
+                                          --template-url "${{ secrets.SAM_TEMPLATE_URL }}" \
                                           --parameters ParameterKey=GitHubOrgParameter,UsePreviousValue=true \
                                                        ParameterKey=RepositoryNameParameter,UsePreviousValue=true \
                                                        ParameterKey=OIDCProviderARNParameter,UsePreviousValue=true \
-                                                       ParameterKey=OIDCAudienceParameter,UsePreviousValue=true \
                                                        ParameterKey=RegisteredDomainNameParam,UsePreviousValue=true \
                                                        ParameterKey=FQDNsParam,UsePreviousValue=true \
                                                        ParameterKey=Route53HostedZoneIdParam,UsePreviousValue=true \
