@@ -196,7 +196,7 @@ jobs:
                                                        ParameterKey=ApiEndpointUrlParam,ParameterValue=${{ vars.VISITOR_COUNTER_API_INVOKE_URL }} \
                                                        ParameterKey=SamStackNameParam,ParameterValue=${{ env.ENV_STACK_NAME }}
       
-                                                       
+
       - name: call update s3 workflow to update client side
         run: |
           echo update url on client side
