@@ -182,9 +182,8 @@ jobs:
         run: |
           aws sts get-caller-identity    
 
-      - name: call workflow to update site with new API endpoint
 
-      - name: not needed - update stack with new endpoint URL
+      - name: update stack CSP with new endpoint URL
         run: |
           aws cloudformation update-stack --stack-name ${{ secrets.AWS_ROOT_STACK_ID }} \
                                           --template-url "${{ secrets.SAM_TEMPLATE_URL }}" \
@@ -194,7 +193,13 @@ jobs:
                                                        ParameterKey=RegisteredDomainNameParam,UsePreviousValue=true \
                                                        ParameterKey=FQDNsParam,UsePreviousValue=true \
                                                        ParameterKey=Route53HostedZoneIdParam,UsePreviousValue=true \
-                                                       ParameterKey=ApiEndpointIdParam,ParameterValue=${{ vars.VISITOR_COUNTER_API_INVOKE_URL }} \
-
+                                                       ParameterKey=ApiEndpointUrlParam,ParameterValue=${{ vars.VISITOR_COUNTER_API_INVOKE_URL }} \
+                                                       ParameterKey=SamStackNameParam,ParameterValue=${{ env.ENV_STACK_NAME }}
+      
+                                                       
+      - name: call update s3 workflow to update client side
+        run: |
+          echo update url on client side
+          
 
             
