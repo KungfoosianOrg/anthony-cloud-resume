@@ -204,7 +204,5 @@ jobs:
       
     if: ${{ needs.update_endpoint_if_needed.outputs.endpointNeedUpdate }} == 'true'
 
-    uses: ./github/workflows/deploy-site-to-s3.yml
+    uses: ./.github/workflows/deploy-site-to-s3.yml
           
-
-            
