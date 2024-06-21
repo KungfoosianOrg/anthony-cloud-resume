@@ -155,7 +155,7 @@ jobs:
           fi
 
   
-  update_env_and_stack_w_new_API_endpoint:
+  update_root_stack_csp_w_new_API_endpoint:
     runs-on: ubuntu-latest
     
     needs: [
@@ -183,7 +183,7 @@ jobs:
           aws sts get-caller-identity    
 
 
-      - name: update stack CSP with new endpoint URL
+      - name: update root stack CSP with new endpoint URL
         run: |
           aws cloudformation update-stack --stack-name ${{ secrets.AWS_ROOT_STACK_ID }} \
                                           --template-url "${{ secrets.SAM_TEMPLATE_URL }}" \
@@ -197,9 +197,14 @@ jobs:
                                                        ParameterKey=SamStackNameParam,ParameterValue=${{ env.ENV_STACK_NAME }}
       
 
-      - name: call update s3 workflow to update client side
-        run: |
-          echo update url on client side
+  update_client_side_w_new_API_endpoint:
+    needs: [
+      update_endpoint_if_needed
+      ]
+      
+    if: ${{ needs.update_endpoint_if_needed.outputs.endpointNeedUpdate }} == 'true'
+
+    uses: ./github/workflows/deploy-site-to-s3.yml
           
 
             
