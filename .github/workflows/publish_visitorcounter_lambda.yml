@@ -136,7 +136,7 @@ jobs:
 
           api_id=$(sam list stack-outputs --output json --stack-name ${{ secrets.AWS_SAM_STACK_NAME }} --region ${{ secrets.AWS_STACK_REGION }} | jq -r '.[].OutputValue')
 
-          new_endpoint_url="https://$api_id.execute-api.${{ secrets.AWS_STACK_REGION }}.amazonaws.com"
+          new_endpoint_url="https://$api_id.execute-api.${{ secrets.AWS_STACK_REGION }}.amazonaws.com/visitor-counter"
         
           echo checking if new url and current repo environment variable are same
           if [ "$new_endpoint_url" != "${{ vars.VISITOR_COUNTER_API_INVOKE_URL }}" ];
