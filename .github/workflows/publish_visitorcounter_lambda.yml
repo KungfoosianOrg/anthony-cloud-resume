@@ -192,9 +192,9 @@ jobs:
                                                        ParameterKey=OIDCProviderARNParameter,UsePreviousValue=true \
                                                        ParameterKey=RegisteredDomainNameParam,UsePreviousValue=true \
                                                        ParameterKey=FQDNsParam,UsePreviousValue=true \
-                                                       ParameterKey=Route53HostedZoneIdParam,UsePreviousValue=true \
                                                        ParameterKey=ApiEndpointUrlParam,ParameterValue=${{ vars.VISITOR_COUNTER_API_INVOKE_URL }} \
                                                        ParameterKey=SamStackNameParam,ParameterValue=${{ env.ENV_STACK_NAME }}
+                                                       ParameterKey=Route53HostedZoneIdParam,ParameterValue=${{ ROUTE53_ZONE_ID }}
       
 
   update_client_side_w_new_API_endpoint:
