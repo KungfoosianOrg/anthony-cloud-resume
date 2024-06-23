@@ -149,6 +149,8 @@ jobs:
             echo GH CLI of variable value after:
             gh variable get VISITOR_COUNTER_API_INVOKE_URL
 
+            EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
+
             echo "endpointNeedUpdate<<$EOF" >> "$GITHUB_OUTPUT"
             echo "true" >> "$GITHUB_OUTPUT"
             echo "$EOF" >> "$GITHUB_OUTPUT"
