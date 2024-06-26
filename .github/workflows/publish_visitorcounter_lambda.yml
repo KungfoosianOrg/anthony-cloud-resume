@@ -189,14 +189,14 @@ jobs:
         run: |
           aws cloudformation update-stack --stack-name ${{ secrets.AWS_ROOT_STACK_ID }} \
                                           --template-url "${{ secrets.SAM_TEMPLATE_URL }}" \
-                                          --region ${{ secrets.AWS_STACK_REGION }}
+                                          --region ${{ secrets.AWS_STACK_REGION }} \
                                           --parameters ParameterKey=GitHubRepositoryNameParam,ParameterValue="${{ github.repository }}" \
-                                                       ParameterKey=OIDCProviderARNParameter,UsePreviousValue=true \
-                                                       ParameterKey=RegisteredDomainNameParam,UsePreviousValue=true \
-                                                       ParameterKey=FQDNsParam,UsePreviousValue=true \
-                                                       ParameterKey=ApiEndpointUrlParam,ParameterValue="${{ vars.VISITOR_COUNTER_API_INVOKE_URL }}" \
-                                                       ParameterKey=SamStackNameParam,ParameterValue=${{ env.ENV_STACK_NAME }} \
-                                                       ParameterKey=Route53HostedZoneIdParam,ParameterValue=${{ secrets.ROUTE53_ZONE_ID }} \
+                                                      ParameterKey=OIDCProviderARNParameter,UsePreviousValue=true \
+                                                      ParameterKey=RegisteredDomainNameParam,UsePreviousValue=true \
+                                                      ParameterKey=FQDNsParam,UsePreviousValue=true \
+                                                      ParameterKey=ApiEndpointUrlParam,ParameterValue="${{ vars.VISITOR_COUNTER_API_INVOKE_URL }}" \
+                                                      ParameterKey=SamStackNameParam,ParameterValue=${{ env.ENV_STACK_NAME }} \
+                                                      ParameterKey=Route53HostedZoneIdParam,ParameterValue=${{ secrets.ROUTE53_ZONE_ID }}
       
 
   update_client_side_w_new_API_endpoint:
