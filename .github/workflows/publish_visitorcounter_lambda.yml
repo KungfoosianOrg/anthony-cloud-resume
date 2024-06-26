@@ -190,7 +190,7 @@ jobs:
           aws cloudformation update-stack --stack-name ${{ secrets.AWS_ROOT_STACK_ID }} \
                                           --template-url "${{ secrets.SAM_TEMPLATE_URL }}" \
                                           --region ${{ secrets.AWS_STACK_REGION }}
-                                          --parameters ParameterKey=GitHubOrgParameter,UsePreviousValue="KungfoosianOrg" \
+                                          --parameters ParameterKey=GitHubOrgParameter,ParameterValue="KungfoosianOrg" \
                                                        ParameterKey=RepositoryNameParameter,UsePreviousValue=true \
                                                        ParameterKey=OIDCProviderARNParameter,UsePreviousValue=true \
                                                        ParameterKey=RegisteredDomainNameParam,UsePreviousValue=true \
