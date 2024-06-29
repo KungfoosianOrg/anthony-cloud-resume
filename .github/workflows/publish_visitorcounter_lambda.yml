@@ -2,7 +2,7 @@ name: Deploy Visitor Counter SAM app to AWS
 
 on:
     push:
-        branches: ["main", "gha-overhaul"]
+        branches: ["main"]
         paths: ["aws/**"]
 
     # Allows you to run this workflow manually from the Actions tab
