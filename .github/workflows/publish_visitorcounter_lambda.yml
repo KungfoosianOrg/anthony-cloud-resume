@@ -1,9 +1,9 @@
-name: Deploy Lambda for visitor counter to AWS
+name: Deploy Visitor Counter SAM app to AWS
 
 on:
     push:
         branches: ["main"]
-        paths: ["back_end/**"]
+        paths: ["aws/**"]
 
     # Allows you to run this workflow manually from the Actions tab
     workflow_dispatch:
@@ -12,87 +12,201 @@ permissions:
   id-token: write
   contents: read
 
+env:
+  ENV_STACK_NAME: my-sam-stack
+
+
 jobs:
-  test-lambda-and-deploy:
-      runs-on: ubuntu-latest
+  test-lambda:
+    runs-on: ubuntu-latest
 
-      steps:
-        - name: check out repo
-          uses: actions/checkout@v3
+    steps:
+      - name: check out repo
+        uses: actions/checkout@v3
 
-        - name: create default aws config for unittest
-          run: |
-            mkdir ~/.aws
-            touch ~/.aws/config
-            echo "[default]" >> ~/.aws/config
-            echo "aws_access_key_id=test" >> ~/.aws/config
-            echo "aws_secret_access_key=test" >> ~/.aws/config
+      - name: create default aws config for unittest
+        run: |
+          mkdir ~/.aws
+          touch ~/.aws/config
+          echo "[default]" >> ~/.aws/config
+          echo "aws_access_key_id=test" >> ~/.aws/config
+          echo "aws_secret_access_key=test" >> ~/.aws/config
 
-        - name: install python dependencies
-          run: |
-            pip3 install -r requirements.txt
+      - name: install python test dependencies
+        run: |
+          pip3 install -r ./tests/requirements.txt
 
-        - name: run Python unittest
-          run: |
-            python3 -m unittest
+      - name: run Python unittest
+        run: |
+          python3 -m unittest
+  
 
-        - name: remove AWS default config used for testing
-          run: |
-            rm ~/.aws/config
+  deploy-sam-app:
+    runs-on: ubuntu-latest
 
+    needs: [
+      test-lambda
+    ]
 
-        - name: get temporary AWS credentials
-          uses: aws-actions/configure-aws-credentials@v4
-          with:
-            aws-region: ${{ secrets.AWS_STACK_REGION }}
-            role-to-assume: ${{ secrets.AWS_ROLE_ARN }} 
-            role-session-name: GHASession-anthony_cloud_resume
-            unset-current-credentials: true
-            retry-max-attempts: 3
-            output-credentials: true
-      
-              
-        - name: verify temp credentials validity
-          run: |
-            aws sts get-caller-identity
+    steps:
+      - name: check out repo
+        uses: actions/checkout@v3
 
+      - name: change samconfig.toml to prod values
+        run: |
+          echo Removing profile line to use default profile
+          sed -i 's/.*profile.*//' ./samconfig.toml
 
-        - name: package lambda code for AWS
-          run: |
-            echo package code for aws
-            cd ./back_end
-            mkdir package
-            pip install --target ./package boto3
-            cd package
-            zip -r ../${{ vars.LAMBDA_DEPLOYMENT_ZIPPACKAGE_NAME }} .
-            cd ..
-            zip ${{ vars.LAMBDA_DEPLOYMENT_ZIPPACKAGE_NAME }} *.py
+          echo Add SAM template parameters
+          sed -i 's/.*parameter_overrides.*/parameter_overrides = "SubscriberEmailParam=\\"${{ secrets.SNS_ALERT_EMAIL }}\\""/' ./samconfig.toml 
 
+          echo Set App production name, region, and corresponding S3 bucket
+          sed -i 's/.*stack_name.*/stack_name = "${{ env.ENV_STACK_NAME }}"/' ./samconfig.toml
+          sed -i 's/.*s3_prefix.*/s3_prefix = "${{ env.ENV_STACK_NAME }}"/' ./samconfig.toml
+          sed -i 's/.*region.*/region = "${{ secrets.AWS_STACK_REGION }}"/' ./samconfig.toml
 
-        - name: deploy lambda package to s3
-          run: |
-            echo deploy package to s3
-            cd ./back_end
-            aws s3 cp ${{ vars.LAMBDA_DEPLOYMENT_ZIPPACKAGE_NAME }} s3://${{ secrets.S3_LAMBDA_BUCKET_NAME }}/
+      - name: get temporary AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ${{ secrets.AWS_STACK_REGION }}
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }} 
+          role-session-name: GHASession-anthony_cloud_resume
+          unset-current-credentials: true
+          retry-max-attempts: 3
+          output-credentials: true    
             
-
-        - name: get and publish new version of package to Lambda
-          run: |
-            echo publish new version to lambda
-
-            lambda_new_version=$(aws s3api list-object-versions \
-                                            --bucket ${{ secrets.S3_LAMBDA_BUCKET_NAME }} \
-                                            --prefix ${{ vars.LAMBDA_DEPLOYMENT_ZIPPACKAGE_NAME }} \
-                                            --query 'Versions[?IsLatest].[VersionId]' \
-                                            --output text)
-
-            aws lambda update-function-code \
-                        --function-name ${{ secrets.LAMBDA_FUNCTION_ARN }} \
-                        --region ${{ secrets.AWS_STACK_REGION }} \
-                        --s3-bucket ${{ secrets.S3_LAMBDA_BUCKET_NAME }} \
-                        --s3-key ${{ vars.LAMBDA_DEPLOYMENT_ZIPPACKAGE_NAME }} \
-                        --s3-object-version $lambda_new_version
-
+      - name: verify temp credentials validity
+        run: |
+          aws sts get-caller-identity    
           
 
+      - name: deploy SAM template
+        run: |
+          echo Turning off telemetry
+          echo "export SAM_CLI_TELEMETRY=0" >>~/.profile
+          source ~/.profile
+          
+          sam deploy
+      
+
+  update_endpoint_if_needed:
+    runs-on: ubuntu-latest
+
+    needs: [
+      deploy-sam-app
+    ]
+
+    outputs:
+      endpointNeedUpdate: ${{ steps.getSamIdStep.endpointNeedUpdate }}
+
+    steps:
+      - name: check out repo
+        uses: actions/checkout@v3
+
+      - name: get temporary AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ${{ secrets.AWS_STACK_REGION }}
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }} 
+          role-session-name: GHASession-anthony_cloud_resume
+          unset-current-credentials: true
+          retry-max-attempts: 3
+          output-credentials: true    
+            
+      - name: verify temp credentials validity
+        run: |
+          aws sts get-caller-identity
+
+      - name: get SAM output for new API endpoint, see if update repo environment variable and cloudFormation stack is needed
+        id: getSamIdStep
+        env:
+          GH_TOKEN: ${{ secrets.MY_GH_PERSONAL_ACCESS_TOKEN }}
+        run: |        
+          echo STEP: get SAM stack output for API endpoint
+            
+          echo Output from SAM stack
+          echo "  Turning off telemetry..."
+          echo "export SAM_CLI_TELEMETRY=0" >>~/.profile
+          source ~/.profile
+
+          sam  list stack-outputs --output json --stack-name ${{ secrets.AWS_SAM_STACK_NAME }} --region ${{ secrets.AWS_STACK_REGION }}
+
+          echo GH CLI of variable value before:
+          gh variable get VISITOR_COUNTER_API_INVOKE_URL
+
+          api_id=$(sam list stack-outputs --output json --stack-name ${{ secrets.AWS_SAM_STACK_NAME }} --region ${{ secrets.AWS_STACK_REGION }} | jq -r '.[].OutputValue')
+
+          new_endpoint_url="https://$api_id.execute-api.${{ secrets.AWS_STACK_REGION }}.amazonaws.com/visitor-counter"
+        
+          echo checking if new url and current repo environment variable are same
+          if [ "$new_endpoint_url" != "${{ vars.VISITOR_COUNTER_API_INVOKE_URL }}" ];
+          then
+            echo values different, updating environment variable 
+            echo "new endpoint id is $api_id"
+
+            gh variable set VISITOR_COUNTER_API_INVOKE_URL --body "$new_endpoint_url" 
+
+            echo GH CLI of variable value after:
+            gh variable get VISITOR_COUNTER_API_INVOKE_URL
+
+            EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
+
+            echo "endpointNeedUpdate<<$EOF" >> "$GITHUB_OUTPUT"
+            echo "true" >> "$GITHUB_OUTPUT"
+            echo "$EOF" >> "$GITHUB_OUTPUT"
+          fi
+
+  
+  update_root_stack_csp_w_new_API_endpoint:
+    runs-on: ubuntu-latest
+    
+    needs: [
+      update_endpoint_if_needed
+      ]
+      
+    if: ${{ needs.update_endpoint_if_needed.outputs.endpointNeedUpdate }} == 'true'
+
+    steps:
+      - name: check out repo
+        uses: actions/checkout@v3
+
+      - name: get temporary AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ${{ secrets.AWS_STACK_REGION }}
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }} 
+          role-session-name: GHASession-anthony_cloud_resume
+          unset-current-credentials: true
+          retry-max-attempts: 3
+          output-credentials: true    
+              
+      - name: verify temp credentials validity
+        run: |
+          aws sts get-caller-identity    
+
+
+      - name: update root stack CSP with new endpoint URL
+        run: |
+          aws cloudformation update-stack --stack-name ${{ secrets.AWS_ROOT_STACK_ID }} \
+                                          --template-url "${{ secrets.SAM_TEMPLATE_URL }}" \
+                                          --region ${{ secrets.AWS_STACK_REGION }} \
+                                          --parameters ParameterKey=GitHubRepositoryNameParam,ParameterValue="${{ github.repository }}" \
+                                                      ParameterKey=OIDCProviderARNParameter,UsePreviousValue=true \
+                                                      ParameterKey=RegisteredDomainNameParam,UsePreviousValue=true \
+                                                      ParameterKey=FQDNsParam,UsePreviousValue=true \
+                                                      ParameterKey=ApiEndpointUrlParam,ParameterValue="${{ vars.VISITOR_COUNTER_API_INVOKE_URL }}" \
+                                                      ParameterKey=SamStackNameParam,ParameterValue=${{ env.ENV_STACK_NAME }} \
+                                                      ParameterKey=Route53HostedZoneIdParam,ParameterValue=${{ secrets.ROUTE53_ZONE_ID }}
+      
+
+  update_client_side_w_new_API_endpoint:
+    needs: [
+      update_endpoint_if_needed
+      ]
+      
+    if: ${{ needs.update_endpoint_if_needed.outputs.endpointNeedUpdate }} == 'true'
+
+    uses: ./.github/workflows/deploy-site-to-s3.yml
+
+    secrets: inherit
           

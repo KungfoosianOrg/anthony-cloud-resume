@@ -4,7 +4,7 @@ from moto import mock_aws
 import json
 from os import environ
 
-from back_end.lambda_function import lambda_handler
+from aws.visitor_counter.lambda_function import lambda_handler
 
 
 class TestLambdaHandlerFunction(TestCase):
@@ -63,8 +63,12 @@ class TestLambdaHandlerFunction(TestCase):
         }
 
         self.mock_event = {
-                        "resource": "/visitor-count",
-                        "httpMethod": "POST"
+                        "rawPath": "/visitor-counter",
+                        "requestContext": {
+                            "http": {
+                                "method": "POST"
+                            }
+                        }
                     }
 
 
@@ -75,8 +79,12 @@ class TestLambdaHandlerFunction(TestCase):
     def test_lambda_handler_wrong_path(self):
         """test  wrong path"""
         mock_event = {
-                        "resource": "/path-does-not-exist",
-                        "httpMethod": "POST"
+                        "rawPath": "/path-does-not-exist",
+                        "requestContext": {
+                            "http": {
+                                "method": "POST"
+                            }
+                        }
                     }
         
         self.assertEqual(lambda_handler(event=mock_event, context=None), self.default_http_response)
@@ -85,8 +93,12 @@ class TestLambdaHandlerFunction(TestCase):
     def test_lambda_handler_wrong_method(self):
         """test wrong method"""
         mock_event = {
-                        "resource": "/visitor-count",
-                        "httpMethod": "GET"
+                        "rawPath": "/visitor-counter",
+                        "requestContext": {
+                            "http": {
+                                "method": "GET"
+                            }
+                        }
                     }
         
         self.assertEqual(lambda_handler(event=mock_event, context=None), self.default_http_response)

@@ -1,0 +1,186 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: vocloudresume in a SAM Template
+
+
+Parameters:
+  SubscriberEmailParam:
+    Description: Email to send CloudWatch alarms to
+    Type: String
+    AllowedPattern: ".+"
+
+
+
+Resources:
+  VisitorCounterLambdaLogGroup:
+    Type: 'AWS::Logs::LogGroup'
+
+    Properties:
+      LogGroupClass: STANDARD
+
+      LogGroupName: lambda/VisitorCounter
+
+      RetentionInDays: 3
+
+
+  VisitorCounterApiGatewayLogGroup:
+    Type: 'AWS::Logs::LogGroup'
+
+    Properties:
+      LogGroupClass: STANDARD
+
+      LogGroupName: apigateway/VisitorCounter
+
+      RetentionInDays: 3
+
+
+  SAMVisitorCounterApiGw:
+    Type: AWS::Serverless::HttpApi
+
+    Properties:
+      AccessLogSettings:
+        DestinationArn: !Sub
+          - 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:${LogGroupName}'
+          - LogGroupName: !Ref VisitorCounterApiGatewayLogGroup
+
+        Format: $context.identity.sourceIp - - [$context.requestTime] "$context.httpMethod $context.routeKey $context.protocol" $context.status $context.responseLength $context.requestId $context.integrationErrorMessage
+
+      CorsConfiguration:
+        AllowCredentials: false
+        AllowMethods:
+          - post
+        AllowOrigins:
+          - '*'
+        MaxAge: 0
+
+      DefaultRouteSettings:
+        DetailedMetricsEnabled: false
+
+      Description: API Gateway to read/write to DynamoDB table
+
+
+  VisitorCounterFunction:
+    Type: AWS::Serverless::Function
+
+    Properties:
+      CodeUri: aws/visitor_counter/
+      Handler: lambda_function.lambda_handler
+      Runtime: python3.9
+      Description: interacts with DDB, increments visitor counter by 1, reset to 1 if pass 100
+      Environment:
+        Variables:
+          DDB_TABLE_REGION: !Ref AWS::Region
+          DDB_TABLE_ARN: !Sub
+            - arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${DDBTableName}
+            - DDBTableName: !Ref VisitorCounterDDBTable
+
+      Events:
+        HttpPostCounterIncrement: 
+          Type: HttpApi
+          Properties:
+              Method: post
+              Path: /visitor-counter
+              ApiId: !Ref SAMVisitorCounterApiGw
+      LoggingConfig:
+        ApplicationLogLevel: INFO
+        LogFormat: JSON
+        LogGroup: !Ref VisitorCounterLambdaLogGroup
+        SystemLogLevel: INFO
+
+      Policies:
+        - Statement:
+          - Effect: Allow
+            Action:
+              - dynamodb:DeleteItem
+              - dynamodb:GetItem
+              - dynamodb:PutItem
+              - dynamodb:Scan
+              - dynamodb:UpdateItem
+              - dynamodb:DescribeTable
+            Resource: 
+              - !Sub
+                - arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${DDBTableName}
+                - DDBTableName: !Ref VisitorCounterDDBTable
+
+              - !Join
+                - '/'
+                - - !Sub
+                    - arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${DDBTableName}
+                    - DDBTableName: !Ref VisitorCounterDDBTable
+                  - 'index'
+                  - '*'
+
+  
+  VisitorCounterDDBTable:
+    Type: AWS::Serverless::SimpleTable
+
+    Properties:
+      PrimaryKey:
+        Name:  id
+        Type: String
+
+
+  CWAlarmApiResponse4xxStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: >-
+        https://cf-templates-1k53axc5c0441-us-east-1.s3.amazonaws.com/components/cloudwatch-alarm.yml
+      Parameters:
+        TopicNameParam: ApiResponse4xx
+        SubscriberEmailParam: !Ref SubscriberEmailParam
+        MeasuringMetricParam: 4xx
+        AlarmNameParam: 4xxApiResponse
+        AlarmDescriptionParam: alarms when api gateway HTTP response is 4xx
+        ApiGwIdParam: !Ref SAMVisitorCounterApiGw
+
+  
+  CWAlarmApiResponse5xxStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: >-
+        https://cf-templates-1k53axc5c0441-us-east-1.s3.amazonaws.com/components/cloudwatch-alarm.yml
+      Parameters:
+        TopicNameParam: ApiResponse5xx
+        SubscriberEmailParam: !Ref SubscriberEmailParam
+        MeasuringMetricParam: 5xx
+        AlarmNameParam: 5xxApiResponse
+        AlarmDescriptionParam: alarms when api gateway HTTP response is 5xx
+        ApiGwIdParam: !Ref SAMVisitorCounterApiGw
+
+
+  CWAlarmApiResponseLatencyStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: >-
+        https://cf-templates-1k53axc5c0441-us-east-1.s3.amazonaws.com/components/cloudwatch-alarm.yml
+      Parameters:
+        TopicNameParam: ApiResponseLatency
+        SubscriberEmailParam: !Ref SubscriberEmailParam
+        MeasuringMetricParam: Latency
+        AlarmNameParam: ApiResponseLatency
+        ApiGwIdParam: !Ref SAMVisitorCounterApiGw
+        StatisticCalculationMethodParam: Maximum
+        AlarmDescriptionParam: alarms when api gateway HTTP response takes more than 1 second
+        AlarmThresholdParam: 1000
+
+
+  CWAlarmApiCallExceedExpectedStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: >-
+        https://cf-templates-1k53axc5c0441-us-east-1.s3.amazonaws.com/components/cloudwatch-alarm.yml
+      Parameters:
+        TopicNameParam: ApiCallExceedExpected
+        SubscriberEmailParam: !Ref SubscriberEmailParam
+        MeasuringMetricParam: Count
+        AlarmNameParam: ApiCallExceedExpected
+        ApiGwIdParam: !Ref SAMVisitorCounterApiGw
+        MeasuringPeriodParam: 60
+        StatisticCalculationMethodParam: SampleCount
+        AlarmDescriptionParam: alarms when api calls exceed 100 within 1 minute
+        AlarmThresholdParam: 100
+
+Outputs:
+  VisitorCounterApiIdOutput:
+    Description: "API Gateway ID for visitor counter lambda function"
+    Value: !Ref SAMVisitorCounterApiGw

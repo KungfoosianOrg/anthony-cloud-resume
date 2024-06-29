@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from back_end.LambdaResponse import LambdaResponse
+from aws.visitor_counter.LambdaResponse import LambdaResponse
 
 
 class TestLambdaResponseClass(TestCase):

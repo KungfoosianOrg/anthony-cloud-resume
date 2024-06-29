@@ -3,3 +3,5 @@ __pycache__
 back_end/package
 my_deployment_pkg.zip
 .DS_Store
+.aws-sam
+samconfig-test.toml
