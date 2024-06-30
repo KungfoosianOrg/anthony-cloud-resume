@@ -192,9 +192,9 @@ jobs:
 
       - name: update root stack CSP with new endpoint URL
         run: |
-          echo "api url endpoint from repo environment variable: ${{ vars.VISITOR_COUNTER_API_INVOKE_URL }}"
+          echo api url endpoint from repo environment variable: ${{ vars.VISITOR_COUNTER_API_INVOKE_URL }}
 
-          echo "api url endpoint from previous step output: ${{ needs.update_endpoint_if_needed.outputs.newEndpointValue }}
+          echo api url endpoint from previous step output: ${{ needs.update_endpoint_if_needed.outputs.newEndpointValue }}
           
           aws cloudformation update-stack --stack-name ${{ secrets.AWS_ROOT_STACK_ID }} \
                                           --template-url "${{ secrets.SAM_TEMPLATE_URL }}" \
