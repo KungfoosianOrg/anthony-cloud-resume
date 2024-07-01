@@ -152,9 +152,9 @@ jobs:
 
             EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
 
-            echo "endpointNeedUpdate<<$EOF" >> "$GITHUB_OUTPUT"
-            echo "true" >> "$GITHUB_OUTPUT"
-            echo "$EOF" >> "$GITHUB_OUTPUT"
+            echo "endpointNeedUpdate<<$EOF" >> $GITHUB_OUTPUT
+            echo "true" >> $GITHUB_OUTPUT
+            echo "$EOF" >> $GITHUB_OUTPUT
 
             echo "newEndpointValue<<$EOF" >> $GITHUB_OUTPUT
             echo $new_endpoint_url >> $GITHUB_OUTPUT
@@ -191,10 +191,12 @@ jobs:
 
 
       - name: update root stack CSP with new endpoint URL
+        env:
+          API_ENDPOINT_URL: ${{ needs.update_endpoint_if_needed.outputs.newEndpointValue }}
         run: |
           echo api url endpoint from repo environment variable: ${{ vars.VISITOR_COUNTER_API_INVOKE_URL }}
 
-          echo api url endpoint from previous step output: ${{ needs.update_endpoint_if_needed.outputs.newEndpointValue }}
+          echo api url endpoint from previous step output: $API_ENDPOINT_URL
           
           aws cloudformation update-stack --stack-name ${{ secrets.AWS_ROOT_STACK_ID }} \
                                           --template-url "${{ secrets.SAM_TEMPLATE_URL }}" \
@@ -203,7 +205,7 @@ jobs:
                                                       ParameterKey=OIDCProviderARNParameter,UsePreviousValue=true \
                                                       ParameterKey=RegisteredDomainNameParam,UsePreviousValue=true \
                                                       ParameterKey=FQDNsParam,UsePreviousValue=true \
-                                                      ParameterKey=ApiEndpointUrlParam,ParameterValue="${{ needs.update_endpoint_if_needed.outputs.newEndpointValue }}" \
+                                                      ParameterKey=ApiEndpointUrlParam,ParameterValue="$API_ENDPOINT_URL" \
                                                       ParameterKey=SamStackNameParam,ParameterValue=${{ env.ENV_STACK_NAME }} \
                                                       ParameterKey=Route53HostedZoneIdParam,ParameterValue=${{ secrets.ROUTE53_ZONE_ID }}
       
