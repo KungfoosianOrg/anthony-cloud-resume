@@ -191,13 +191,10 @@ jobs:
 
 
       - name: update root stack CSP with new endpoint URL
-        env:
-          NEW_ENDPOINT_VALUE: ${{ needs.update_endpoint_if_needed.outputs.newEndpointValue }}
-
         run: |
           echo api url endpoint from repo environment variable: ${{ vars.VISITOR_COUNTER_API_INVOKE_URL }}
 
-          echo api url endpoint from previous step output: $NEW_ENDPOINT_VALUE
+          echo api url endpoint from previous step output: ${{ needs.update_endpoint_if_needed.outputs.newEndpointValue }}
           
           aws cloudformation update-stack --stack-name ${{ secrets.AWS_ROOT_STACK_ID }} \
                                           --template-url "${{ secrets.SAM_TEMPLATE_URL }}" \
@@ -206,7 +203,7 @@ jobs:
                                                       ParameterKey=OIDCProviderARNParameter,UsePreviousValue=true \
                                                       ParameterKey=RegisteredDomainNameParam,UsePreviousValue=true \
                                                       ParameterKey=FQDNsParam,UsePreviousValue=true \
-                                                      ParameterKey=ApiEndpointUrlParam,ParameterValue="$NEW_ENDPOINT_VALUE" \
+                                                      ParameterKey=ApiEndpointUrlParam,ParameterValue="${{ needs.update_endpoint_if_needed.outputs.newEndpointValue }}" \
                                                       ParameterKey=SamStackNameParam,ParameterValue=${{ env.ENV_STACK_NAME }} \
                                                       ParameterKey=Route53HostedZoneIdParam,ParameterValue=${{ secrets.ROUTE53_ZONE_ID }}
       
