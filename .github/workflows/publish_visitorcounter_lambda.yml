@@ -98,7 +98,6 @@ jobs:
 
     outputs:
       endpointNeedUpdate: ${{ steps.getSamIdStep.endpointNeedUpdate }}
-      newEndpointValue: ${{ steps.getSamIdStep.newEndpointValue }}
 
     steps:
       - name: check out repo
@@ -155,10 +154,6 @@ jobs:
             echo "endpointNeedUpdate<<$EOF" >> $GITHUB_OUTPUT
             echo "true" >> $GITHUB_OUTPUT
             echo "$EOF" >> $GITHUB_OUTPUT
-
-            echo "newEndpointValue<<$EOF" >> $GITHUB_OUTPUT
-            echo $new_endpoint_url >> $GITHUB_OUTPUT
-            echo "$EOF" >> $GITHUB_OUTPUT
           fi
 
   
@@ -192,15 +187,13 @@ jobs:
 
       - name: update root stack CSP with new endpoint URL
         env:
-          API_ENDPOINT_URL: ${{ needs.update_endpoint_if_needed.outputs.newEndpointValue }}
           GH_TOKEN: ${{ secrets.MY_GH_PERSONAL_ACCESS_TOKEN }}
 
         run: |
           echo api url endpoint from repo environment variable: ${{ vars.VISITOR_COUNTER_API_INVOKE_URL }}
-          echo api url endpoint from previous step output: $API_ENDPOINT_URL
           
-          new_var=$(gh variable get VISITOR_COUNTER_API_INVOKE_URL)
-          echo api url endpoint from GH CLI: $new_var
+          API_ENDPOINT_URL=$(gh variable get VISITOR_COUNTER_API_INVOKE_URL)
+          echo api url endpoint from GH CLI: $API_ENDPOINT_URL
           
           aws cloudformation update-stack --stack-name ${{ secrets.AWS_ROOT_STACK_ID }} \
                                           --template-url "${{ secrets.SAM_TEMPLATE_URL }}" \
