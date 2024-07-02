@@ -57,6 +57,9 @@ jobs:
 
 
       - name: update visitor counter API's invocation URL
+        env:
+          GH_TOKEN: ${{ secrets.MY_GH_PERSONAL_ACCESS_TOKEN }}
+          
         run: |
           API_ENDPOINT_URL=$(gh variable get VISITOR_COUNTER_API_INVOKE_URL)
           echo api url endpoint from GH CLI: $API_ENDPOINT_URL
