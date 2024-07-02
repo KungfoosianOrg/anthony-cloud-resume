@@ -14,6 +14,7 @@ permissions:
 
 env:
   ENV_STACK_NAME: my-sam-stack
+  VISITOR_COUNTER_MODULE_PATH: /scripts/visitorCounterModule.js
 
 
 jobs:
@@ -243,4 +244,7 @@ jobs:
 
       - name: refresh_cloudfront_scripts_path
         run: |
-          echo
+          aws cloudfront create-invalidation \
+              --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
+              --region ${{ secrets.AWS_STACK_REGION }} \
+              --paths "${{ env.VISITOR_COUNTER_MODULE_PATH }}"
