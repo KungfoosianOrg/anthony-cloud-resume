@@ -58,7 +58,10 @@ jobs:
 
       - name: update visitor counter API's invocation URL
         run: |
-          sed -i "s%.*const VISITOR_COUNTER_API_INVOKE_URL.*%const VISITOR_COUNTER_API_INVOKE_URL='${{ vars.VISITOR_COUNTER_API_INVOKE_URL }}'%" ./${{ env.GITHUB_SRC_FOLDER }}/scripts/visitorCounterModule.js
+          API_ENDPOINT_URL=$(gh variable get VISITOR_COUNTER_API_INVOKE_URL)
+          echo api url endpoint from GH CLI: $API_ENDPOINT_URL
+
+          sed -i "s%.*const VISITOR_COUNTER_API_INVOKE_URL.*%const VISITOR_COUNTER_API_INVOKE_URL='$API_ENDPOINT_URL'%" ./${{ env.GITHUB_SRC_FOLDER }}/scripts/visitorCounterModule.js
 
 
       - name: sync files to aws s3

@@ -190,9 +190,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.MY_GH_PERSONAL_ACCESS_TOKEN }}
 
-        run: |
-          echo api url endpoint from repo environment variable: ${{ vars.VISITOR_COUNTER_API_INVOKE_URL }}
-          
+        run: |     
           API_ENDPOINT_URL=$(gh variable get VISITOR_COUNTER_API_INVOKE_URL)
           echo api url endpoint from GH CLI: $API_ENDPOINT_URL
           
@@ -220,31 +218,31 @@ jobs:
     secrets: inherit
 
 
-  refresh_cloudfront_scripts_path:
-    runs-on: ubuntu-latest
+  # refresh_cloudfront_scripts_path:
+  #   runs-on: ubuntu-latest
 
-    needs: [
-      update_client_side_w_new_API_endpoint
-    ]
+  #   needs: [
+  #     update_client_side_w_new_API_endpoint
+  #   ]
 
-    steps:
-      - name: get temporary AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-region: ${{ secrets.AWS_STACK_REGION }}
-          role-to-assume: ${{ secrets.AWS_ROLE_ARN }} 
-          role-session-name: GHASession-anthony_cloud_resume
-          unset-current-credentials: true
-          retry-max-attempts: 3
-          output-credentials: true    
+  #   steps:
+  #     - name: get temporary AWS credentials
+  #       uses: aws-actions/configure-aws-credentials@v4
+  #       with:
+  #         aws-region: ${{ secrets.AWS_STACK_REGION }}
+  #         role-to-assume: ${{ secrets.AWS_ROLE_ARN }} 
+  #         role-session-name: GHASession-anthony_cloud_resume
+  #         unset-current-credentials: true
+  #         retry-max-attempts: 3
+  #         output-credentials: true    
               
-      - name: verify temp credentials validity
-        run: |
-          aws sts get-caller-identity    
+  #     - name: verify temp credentials validity
+  #       run: |
+  #         aws sts get-caller-identity    
 
-      - name: refresh_cloudfront_scripts_path
-        run: |
-          aws cloudfront create-invalidation \
-              --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
-              --region ${{ secrets.AWS_STACK_REGION }} \
-              --paths "${{ env.VISITOR_COUNTER_MODULE_PATH }}"
+  #     - name: refresh_cloudfront_scripts_path
+  #       run: |
+  #         aws cloudfront create-invalidation \
+  #             --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
+  #             --region ${{ secrets.AWS_STACK_REGION }} \
+  #             --paths "${{ env.VISITOR_COUNTER_MODULE_PATH }}"
