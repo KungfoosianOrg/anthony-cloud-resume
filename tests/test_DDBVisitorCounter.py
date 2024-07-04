@@ -3,7 +3,7 @@ from boto3 import client
 from moto import mock_aws
 from os import environ
 
-from  aws.visitor_counter.DDBVisitorCounter import DDBVisitorCounter
+from  aws.visitorCounter.DDBVisitorCounter import DDBVisitorCounter
 
 
 class TestDDBVisitorCounter(TestCase):
