@@ -2,7 +2,7 @@ import json
 import boto3
 import urllib.request
 
-ssm = boto3.client('ssm')
+ssm = boto3.client('ssm', region_name='us-east-1')
 
 _RESPONSE_DEFAULT = {
     'statusCode': 200,
@@ -13,6 +13,11 @@ def lambda_handler(event, context):
     try:
         if 'Records' not in event or event['Records'][0]['EventSource'] != 'aws:sns':
             return _RESPONSE_DEFAULT
+        
+
+        print(event)
+
+        print(context)
         
         # get the SNS topic name that triggered the Lambda to pass in message send to Slack
         sns_topic_arn = event['Records'][0]['Sns']['TopicArn']
@@ -29,12 +34,14 @@ def lambda_handler(event, context):
                                                           data=bytes(json.dumps({'text': f'Alarm {sns_topic_name} has been triggered'}), encoding="utf-8")),
                                                           timeout=5
                                     )
+        
+        print(r)
 
-
-        # If everything went OK, Slack will response with status 200 and 'ok', urllib receives as bytes so will need to convert
-        return {
-            'statusCode': 200,
-            'body': r.read().decode('utf-8')
-        }
+        # If everything went OK, Slack will response with status 200
+        if r.code == 200:
+            return {
+                'statusCode': 200,
+                'body': 'ok'
+            }
     except Exception as e:
         print(f'\tERROR: Lambda handler for sendSlackMessage encountered an exception: {e}')
