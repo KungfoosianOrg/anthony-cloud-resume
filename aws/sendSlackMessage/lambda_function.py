@@ -1,0 +1,40 @@
+import json
+import boto3
+import urllib.request
+
+ssm = boto3.client('ssm')
+
+_RESPONSE_DEFAULT = {
+    'statusCode': 200,
+    'body': 'request processed'
+}
+
+def lambda_handler(event, context):
+    try:
+        if 'Records' not in event or event['Records'][0]['EventSource'] != 'aws:sns':
+            return _RESPONSE_DEFAULT
+        
+        # get the SNS topic name that triggered the Lambda to pass in message send to Slack
+        sns_topic_arn = event['Records'][0]['Sns']['TopicArn']
+
+        sns_topic_name = sns_topic_arn.split(':')[-1]
+
+        # finally, get the slack webhook URL from Parameter Store
+        slack_url = ssm.get_parameter(Name='/SLACK_WEBHOOK_URL',WithDecryption=True)['Parameter']['Value']
+        
+        # post message to Slack
+        r = urllib.request.urlopen(urllib.request.Request(url=slack_url,
+                                                          headers={'Content-Type': 'application/json'},
+                                                          method='POST',
+                                                          data=bytes(json.dumps({'text': f'Alarm {sns_topic_name} has been triggered'}), encoding="utf-8")),
+                                                          timeout=5
+                                    )
+
+
+        # If everything went OK, Slack will response with status 200 and 'ok', urllib receives as bytes so will need to convert
+        return {
+            'statusCode': 200,
+            'body': r.read().decode('utf-8')
+        }
+    except Exception as e:
+        print(f'\tERROR: Lambda handler for sendSlackMessage encountered an exception: {e}')
