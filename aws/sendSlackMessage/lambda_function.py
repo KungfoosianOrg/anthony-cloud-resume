@@ -1,6 +1,7 @@
 import json
 import boto3
-import urllib.request
+import urllib3
+import urllib3.request
 
 ssm = boto3.client('ssm', region_name='us-east-1')
 
@@ -28,17 +29,19 @@ def lambda_handler(event, context):
         slack_url = ssm.get_parameter(Name='/SLACK_WEBHOOK_URL',WithDecryption=True)['Parameter']['Value']
         
         # post message to Slack
-        r = urllib.request.urlopen(urllib.request.Request(url=slack_url,
-                                                          headers={'Content-Type': 'application/json'},
-                                                          method='POST',
-                                                          data=bytes(json.dumps({'text': f'Alarm {sns_topic_name} has been triggered'}), encoding="utf-8")),
-                                                          timeout=5
-                                    )
-        
+        # r = urllib3.request.urlopen(urllib3.request.Request(url=slack_url,
+        #                                                   headers={'Content-Type': 'application/json'},
+        #                                                   method='POST',
+        #                                                   data=bytes(json.dumps({'text': f'Alarm {sns_topic_name} has been triggered'}), encoding="utf-8")),
+        #                                                   timeout=5
+        #                             )
+        r = urllib3.request('POST', slack_url, headers={'Content-Type': 'application/json'},json={'text': f'Alarm {sns_topic_name} has been triggered'})
+
+
         print(r)
 
         # If everything went OK, Slack will response with status 200
-        if r.code == 200:
+        if r['code'] == 200:
             return {
                 'statusCode': 200,
                 'body': 'ok'

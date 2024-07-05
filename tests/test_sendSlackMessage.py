@@ -2,12 +2,16 @@ from unittest import TestCase
 from unittest.mock import patch, MagicMock, Mock
 from moto import mock_aws
 from boto3 import client
+import http.client
 import json
 import urllib.request
 
 import aws.sendSlackMessage.lambda_function
 
 from aws.sendSlackMessage.lambda_function import lambda_handler
+
+def mocked_http_response(*args, **kwargs):
+    return { 'code': 200 }
 
 class TestLambdaHandlerFunction(TestCase):
     def setUp(self):
@@ -41,7 +45,7 @@ class TestLambdaHandlerFunction(TestCase):
 
 
     # @patch('urllib.request.urlopen')
-    @patch('aws.sendSlackMessage.lambda_function.urllib.request.urlopen')
+    @patch('aws.sendSlackMessage.lambda_function.urllib.request.urlopen', side_effect=mocked_http_response)
     def test_correct_event_initiator(self, value):
         """
             test with SNS as the event initiator
