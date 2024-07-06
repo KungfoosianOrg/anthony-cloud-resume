@@ -44,7 +44,7 @@ class TestLambdaHandlerFunction(TestCase):
         self.mock_aws.stop()
 
 
-    # @patch('urllib.request.urlopen')
+    # @patch('urllib3.request.urlopen')
     @patch('aws.sendSlackMessage.lambda_function.urllib.request.urlopen', side_effect=mocked_http_response)
     def test_correct_event_initiator(self, value):
         """
