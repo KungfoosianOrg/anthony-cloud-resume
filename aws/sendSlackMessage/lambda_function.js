@@ -4,35 +4,68 @@ console.log('Loading function');
 
 const https = require('https');
 
-const doPostRequest = () => {
+const doPostRequest = async () => {
+  try {
+    const url = "https://hooks.slack.com/services/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";
+
+    const data = JSON.stringify({ text: 'test from lambda' });
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: data
+    })
+
+    // Preserve newlines, etc. - use valid JSON
+    response = response.replace(/\\n/g, "\\n")
+                   .replace(/\\'/g, "\\'")
+                   .replace(/\\"/g, '\\"')
+                   .replace(/\\&/g, "\\&")
+                   .replace(/\\r/g, "\\r")
+                   .replace(/\\t/g, "\\t")
+                   .replace(/\\b/g, "\\b")
+                   .replace(/\\f/g, "\\f");
+    // Remove non-printable and other non-valid JSON characters
+    response = response.replace(/[\u0000-\u001F]+/g,"");
+    var o = JSON.parse(response);
+
+    // const json = await response.json();
+
+    console.log(o)
+
+  } catch (error) {
+    console.error('Something went wrong: ' + error);
+
+    return null;
+  }
+  
+  
+  // return new Promise((resolve, reject) => {
+  //   const options = {
+  //     method: 'POST',
+  //     headers: {
+  //       'Content-Type': 'application/json'
+  //     }
+  //   };
+  
+  //   //create the request object with the callback with the result
+  //   const req = https.request(url, options, (res) => {
+  //     resolve(JSON.stringify(res.statusCode));
+  //   });
     
-    const url = 'https://hooks.slack.com/services/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';
-    const data = JSON.stringify({ text: 'test from lambda'});
+  //   // handle the possible errors
+  //   req.on('error', (e) => {
+  //     reject(e.message);
+  //   });
     
-    return new Promise((resolve, reject) => {
-        const options = {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          }
-    };
+  //   //do the request
+  //   req.write(data);
     
-    //create the request object with the callback with the result
-    const req = https.request(url, options, (res) => {
-      resolve(JSON.stringify(res.statusCode));
-    });
-    
-    // handle the possible errors
-    req.on('error', (e) => {
-      reject(e.message);
-    });
-    
-    //do the request
-    req.write(data);
-    
-    //finish the request
-    req.end();
-    });
+  //   //finish the request
+  //   req.end();
+  // });
 };
 
 exports.handler = async (event) => {
