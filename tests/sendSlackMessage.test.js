@@ -1,6 +1,8 @@
 const sendSlackMessage = require('../aws/sendSlackMessage/lambda_function.js');
 const handler = sendSlackMessage.handler;
 
+const { mockClient } = require('aws-sdk-client-mock');
+
 // Overriding fetch for test
 global.fetch = jest.fn(() => {
     return Promise.resolve({

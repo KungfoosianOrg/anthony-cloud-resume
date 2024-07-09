@@ -3,8 +3,12 @@
         "test": "jest"
     },
     "devDependencies": {
+        "aws-sdk-client-mock": "^4.0.1",
         "jest": "^29.7.0",
         "jest-environment-jsdom": "^29.7.0",
         "jest-fetch-mock": "^3.0.3"
+    },
+    "dependencies": {
+        "aws-sdk": "^2.1656.0"
     }
 }
