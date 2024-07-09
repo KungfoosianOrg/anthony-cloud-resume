@@ -1,8 +1,11 @@
 /* global fetch */
-import { SSMClient, GetParameterCommand } from '@aws-sdk/client-ssm';
+const { SSMClient, GetParameterCommand } = require('@aws-sdk/client-ssm')
 
-const client = new SSMClient();
+const client = new SSMClient({
+  region: process.env.AWS_REGION || 'us-west-1'
+})
 
+// parameters for SSM client to retrieve
 const ssmInput = {
   Name: "/SLACK_WEBHOOK_URL", // required
   WithDecryption: true
@@ -43,7 +46,7 @@ const doPostRequest = async (snsTopicName) => {
   }
 };
 
-export const handler = async (event) => {
+const handler = async (event) => {
   if ( !Object.keys(event).includes('Records') || event['Records'][0]['EventSource'] !== 'aws:sns' ) {
     return {
       'statusCode': 200,
@@ -61,4 +64,11 @@ export const handler = async (event) => {
   await doPostRequest(snsTopicName)
     .then(result => console.log(`Status code: ${result}`))
     .catch(err => console.error(`Error doing the request for the event: ${JSON.stringify(event)} => ${err}`));
+};
+
+
+var module = module || {};
+
+module.exports = {
+  handler
 };

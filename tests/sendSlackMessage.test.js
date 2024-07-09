@@ -1,9 +1,5 @@
-// const sendSlackMessage = require('../aws/sendSlackMessage/lambda_function.mjs');
-// const handler = sendSlackMessage.handler;
-
-// TODO: https://dev.to/steveruizok/jest-and-esm-cannot-use-import-statement-outside-a-module-4mmj
-
-import { handler } from "../aws/sendSlackMessage/lambda_function.mjs";
+const sendSlackMessage = require('../aws/sendSlackMessage/lambda_function.js');
+const handler = sendSlackMessage.handler;
 
 // Overriding fetch for test
 global.fetch = jest.fn(() => {
@@ -25,12 +21,12 @@ describe('test with correct event initiator', () => {
         ]
     }
 
-    it('should return "Status code: 200"', () => {
-        expect(handler(testEvent)).toBe('Status code: 200')
+    it('should return "Status code: 200"', async () => {
+        expect(await handler(testEvent)).toBe('Status code: 200')
     })
 })
 
 
 
 
-describe('test with incorrect event initiator')
+// describe('test with incorrect event initiator')
