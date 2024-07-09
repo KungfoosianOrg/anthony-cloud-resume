@@ -3,13 +3,23 @@ import { SSMClient, GetParameterCommand } from '@aws-sdk/client-ssm';
 
 const client = new SSMClient();
 
+const ssmInput = {
+  Name: "/SLACK_WEBHOOK_URL", // required
+  WithDecryption: true
+}
+
 
 console.log('Loading function');
 
 
 const doPostRequest = async (snsTopicName) => {
   try {
-    const url = "https://hooks.slack.com/services/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";
+    const ssmCommand = new GetParameterCommand(ssmInput);
+    const ssmResponse = await client.send(ssmCommand);
+    
+    console.log(ssmResponse)
+    
+    const url = ssmResponse['Parameter']['Value'];
 
     const data = JSON.stringify({ text: `Alarm ${snsTopicName} has been triggered` });
 
@@ -33,7 +43,6 @@ const doPostRequest = async (snsTopicName) => {
   }
 };
 
-// exports.handler = async (event) => {
 export const handler = async (event) => {
   if ( !Object.keys(event).includes('Records') || event['Records'][0]['EventSource'] !== 'aws:sns' ) {
     return {
