@@ -20,7 +20,7 @@ const doPostRequest = async (snsTopicName) => {
     const ssmCommand = new GetParameterCommand(ssmInput);
     const ssmResponse = await client.send(ssmCommand);
     
-    // console.log(ssmResponse)
+    console.log(ssmResponse)
     
     const url = ssmResponse['Parameter']['Value'];
 
