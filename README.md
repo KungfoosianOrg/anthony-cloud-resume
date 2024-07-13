@@ -58,7 +58,7 @@ From the **root (/)** of this repo:
 
     - Javascript:
       1. Install Javascript
-      2. `npm install` to install all dependencies
+      2. Run 'npm install' to install all dependencies
 
     - Python:
       1. Install Python 3.x
