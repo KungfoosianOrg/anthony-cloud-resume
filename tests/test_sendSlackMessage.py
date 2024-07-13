@@ -24,7 +24,7 @@ class TestSendSlackMessage(unittest.TestCase):
         ssm = boto3.client('ssm', region_name=_REGION_DEFAULT)
         ssm.put_parameter(
             Name='/SLACK_WEBHOOK_URL',
-            Description='Mocked SSM parameter for unittest',
+            Description='Mocked SSM mocked request parameter for unittest',
             Value='test.slackwebhook.url',
             Type='SecureString'
         )
@@ -33,7 +33,7 @@ class TestSendSlackMessage(unittest.TestCase):
         """
             Test for events with wrong event source
         """
-
+        print('testing for incorrect initiator event source')
         # importing the code in test after injecting the environment variable
         from aws.sendSlackMessage.lambda_function import lambda_handler
 
@@ -41,7 +41,7 @@ class TestSendSlackMessage(unittest.TestCase):
             "Records": [
                 {
                     "EventVersion": "2.0",
-                    "eventsource": "aws:s3",
+                    "EventSource": "aws:s3",
                     "AwsRegion": "us-east-1"
                 }
             ]
@@ -50,7 +50,11 @@ class TestSendSlackMessage(unittest.TestCase):
         self.assertRaises(Exception, lambda_handler(event=test_event, context=None))
         return
     
-    def test_lambda_handler_correct_initiator(self):
+    # mock urllib3 http connection pool manager and http response
+    @unittest.mock.patch('urllib3.PoolManager')
+    def test_lambda_handler_correct_initiator(self, mock_PoolManager):
+        print('testing for correct initiator event source')
+
         from aws.sendSlackMessage.lambda_function import lambda_handler
 
         test_event = {
@@ -67,6 +71,8 @@ class TestSendSlackMessage(unittest.TestCase):
                 }
             ]
         }
+
+        # overriding the http response
   
         self.assertEqual(lambda_handler(event=test_event, context=None), 1)
 
