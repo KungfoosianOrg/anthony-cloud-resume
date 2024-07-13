@@ -1,6 +1,10 @@
-# Hello and welcome to my AWS cloud resume repository, following the Cloud Resume Challenge!
+# anthony-cloud-resume
+
+Hello and welcome to my AWS cloud resume repository, following the Cloud Resume Challenge!
 
 I will do my best to walk you through what's in each folder
+
+
 
 ## From top to  bottom, starting from root of repo (/):
 
@@ -30,6 +34,8 @@ Folder **/tests** contains all tests for code in this repo
 **/setupJest.js** sets up Jest testing
 
 **/template.yaml** AWS CloudFormation template for when a SAM stack is deployed
+
+
 
 ## Usage
 
