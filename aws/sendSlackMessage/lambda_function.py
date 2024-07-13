@@ -11,10 +11,11 @@ _RESPONSE_DEFAULT = {
     'body': 'request processed'
 }
 
+# print(os.environ['AWS_REGION'])
+
 def lambda_handler(event, context):
     try:
-        # need to call .lower() because the formatting for each event source is not consistent
-        if 'Records' not in event or event['Records'][0]['EventSource'.lower()] != 'aws:sns':
+        if 'Records' not in event or event['Records'][0]['EventSource'] != 'aws:sns':
             return _RESPONSE_DEFAULT
         
 
@@ -25,6 +26,8 @@ def lambda_handler(event, context):
 
         # finally, get the slack webhook URL from Parameter Store
         slack_url = ssm.get_parameter(Name='/SLACK_WEBHOOK_URL',WithDecryption=True)['Parameter']['Value']
+
+        print(f'slack_url is: {slack_url}')
         
         connectionPool = urllib3.PoolManager()
         

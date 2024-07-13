@@ -7,7 +7,7 @@ import urllib3
 import os
 
 
-_REGION_DEFAULT = 'the-basement'
+_REGION_DEFAULT = 'us-east-1'
 
 _RESPONSE_DEFAULT = {
     'statusCode': 200,
@@ -20,9 +20,16 @@ _RESPONSE_DEFAULT = {
 class TestSendSlackMessage(unittest.TestCase):
     
     def setUp(self):
+        # sets up parameter in SSM
         ssm = boto3.client('ssm', region_name=_REGION_DEFAULT)
+        ssm.put_parameter(
+            Name='/SLACK_WEBHOOK_URL',
+            Description='Mocked SSM parameter for unittest',
+            Value='test.slackwebhook.url',
+            Type='SecureString'
+        )
 
-    def test_lambda_handler_no_initiator_event_source(self):
+    def test_lambda_handler_incorrect_initiator_event_source(self):
         """
             Test for events with wrong event source
         """
@@ -40,10 +47,27 @@ class TestSendSlackMessage(unittest.TestCase):
             ]
         }
 
-        self.assertEqual(lambda_handler(event=test_event, context=None), _RESPONSE_DEFAULT)
-        # self.assertRaises(Exception, lambda_handler(event=test_event, context=None))
-
+        self.assertRaises(Exception, lambda_handler(event=test_event, context=None))
         return
     
     def test_lambda_handler_correct_initiator(self):
+        from aws.sendSlackMessage.lambda_function import lambda_handler
+
+        test_event = {
+            "Records": [
+                {
+                    "EventSource": "aws:sns",
+                    "EventVersion": "1.0",
+                    "EventSubscriptionArn": "arn:aws:sns:us-east-1::ExampleTopic",
+                    "Sns": {
+                        "Type": "Notification",
+                        "MessageId": "95df01b4-ee98-5cb9-9903-4c221d41eb5e",
+                        "TopicArn": "arn:aws:sns:us-east-1:123456789012:ExampleTopic"
+                    }
+                }
+            ]
+        }
+  
+        self.assertEqual(lambda_handler(event=test_event, context=None), 1)
+
         return
