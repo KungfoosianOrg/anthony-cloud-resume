@@ -13,7 +13,8 @@ _RESPONSE_DEFAULT = {
 
 def lambda_handler(event, context):
     try:
-        if 'Records' not in event or event['Records'][0]['EventSource'] != 'aws:sns':
+        # need to call .lower() because the formatting for each event source is not consistent
+        if 'Records' not in event or event['Records'][0]['EventSource'.lower()] != 'aws:sns':
             return _RESPONSE_DEFAULT
         
 
