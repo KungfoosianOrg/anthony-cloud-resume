@@ -13,3 +13,5 @@ import os
 
 class TestSendSlackMessage(unittest.TestCase):
     @unittest.mock('lambda_handler.ssm')
+    def test_lambda_handler():
+        return
