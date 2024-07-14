@@ -9,13 +9,10 @@ import os
 
 _REGION_DEFAULT = 'us-east-1'
 
-_RESPONSE_DEFAULT = {
+_RESPONSE_SUCCESS = { 
     'statusCode': 200,
-    'body': 'request processed'
+    'body': 'ok'
 }
-
-def test():
-    return 'hi'
 
 # Calls decorators to mock AWS and environment variables for use in test case
 @mock_aws
@@ -53,10 +50,14 @@ class TestSendSlackMessage(unittest.TestCase):
         self.assertRaises(Exception, lambda_handler(event=test_event, context=None))
         return
     
-    # mock urllib3 http connection pool manager and http response
+    # mock urllib3 http connection pool manager
     @unittest.mock.patch('urllib3.PoolManager')
-    # @unittest.mock.patch('urllib3.PoolManager.request')
     def test_lambda_handler_correct_initiator(self, mock_PoolManager):
+        # creating an HTTPResponse class since urllib3.PoolManager().request() expects a return variable of class HTTPResponse
+        class HTTPResponse:
+            def __init__(self, status):
+                self.status = status
+
         print('testing for correct initiator event source')
 
         from aws.sendSlackMessage.lambda_function import lambda_handler
@@ -76,10 +77,10 @@ class TestSendSlackMessage(unittest.TestCase):
             ]
         }
 
-        # overriding the urllib3 PoolManager().request() response
-        mock_PoolManager().request.return_value = { 'status': 200 }
+        # overriding the urllib3 PoolManager().request() response with the HTTPResponse custom class, since the actual code expects a HTTPResponse class with status attribute
+        mock_PoolManager().request.return_value = HTTPResponse(200)
 
 
-        self.assertEqual(lambda_handler(event=test_event, context=None), 1)
+        self.assertEqual(lambda_handler(event=test_event, context=None), json.dumps(_RESPONSE_SUCCESS))
 
         return

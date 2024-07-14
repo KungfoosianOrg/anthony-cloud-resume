@@ -48,6 +48,8 @@ def lambda_handler(event, context):
         
         print(f'PoolManager is: {connection_pool}')
 
+        urllib3.PoolManager().request()
+
         r = connection_pool.request(method='POST',
                                   url=slack_url,
                                   body=encoded_body,
@@ -55,6 +57,8 @@ def lambda_handler(event, context):
                                   )
         
         print(f'got response: {r}')
+        print(f'type of response: {type(r)}')
+
         
         # If everything went OK, Slack will response with status 200
         if r.status == 200:
