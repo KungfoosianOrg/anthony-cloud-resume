@@ -14,6 +14,9 @@ _RESPONSE_DEFAULT = {
     'body': 'request processed'
 }
 
+def test():
+    return 'hi'
+
 # Calls decorators to mock AWS and environment variables for use in test case
 @mock_aws
 @unittest.mock.patch.dict(os.environ, { 'AWS_REGION': _REGION_DEFAULT })
@@ -52,6 +55,7 @@ class TestSendSlackMessage(unittest.TestCase):
     
     # mock urllib3 http connection pool manager and http response
     @unittest.mock.patch('urllib3.PoolManager')
+    # @unittest.mock.patch('urllib3.PoolManager.request')
     def test_lambda_handler_correct_initiator(self, mock_PoolManager):
         print('testing for correct initiator event source')
 
@@ -72,8 +76,10 @@ class TestSendSlackMessage(unittest.TestCase):
             ]
         }
 
-        # overriding the http response
-  
+        # overriding the urllib3 PoolManager().request() response
+        mock_PoolManager().request.return_value = { 'status': 200 }
+
+
         self.assertEqual(lambda_handler(event=test_event, context=None), 1)
 
         return

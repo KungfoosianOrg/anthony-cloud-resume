@@ -54,7 +54,7 @@ def lambda_handler(event, context):
                                   headers={'Content-Type': 'application/json'}
                                   )
         
-        print(r)
+        print(f'got response: {r}')
         
         # If everything went OK, Slack will response with status 200
         if r.status == 200:
