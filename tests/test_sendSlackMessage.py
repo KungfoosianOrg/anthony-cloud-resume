@@ -3,7 +3,6 @@ import unittest
 
 import json
 import boto3
-import urllib3
 import os
 
 

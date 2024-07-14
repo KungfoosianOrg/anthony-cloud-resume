@@ -11,24 +11,12 @@ _RESPONSE_DEFAULT = {
     'body': 'request processed'
 }
 
-# print(os.environ['AWS_REGION'])
 
 def lambda_handler(event, context):
     try:
-        print(f'event received: {event}')
-
-        # print(f'event type {type(event)}')
-
-        print(f'event source: {event["Records"][0]}')
-
         if "Records" not in event or event["Records"][0]["EventSource"] != 'aws:sns':
             return _RESPONSE_DEFAULT
         
-
-        print('printing out event dict keys')
-        for k, v in event.items():
-            print(k, v)
-
 
         # get the SNS topic name that triggered the Lambda to pass in message send to Slack
         sns_topic_arn = event['Records'][0]['Sns']['TopicArn']
@@ -38,16 +26,12 @@ def lambda_handler(event, context):
         # finally, get the slack webhook URL from Parameter Store
         slack_url = ssm.get_parameter(Name='/SLACK_WEBHOOK_URL',WithDecryption=True)['Parameter']['Value']
         
-        print(f'got url: {slack_url}')
-
         connection_pool = urllib3.PoolManager()
         
         encoded_body = json.dumps({
             'text': f'Alarm {sns_topic_name} has been triggered'
         })
         
-        print(f'PoolManager is: {connection_pool}')
-
         urllib3.PoolManager().request()
 
         r = connection_pool.request(method='POST',
@@ -55,10 +39,6 @@ def lambda_handler(event, context):
                                   body=encoded_body,
                                   headers={'Content-Type': 'application/json'}
                                   )
-        
-        print(f'got response: {r}')
-        print(f'type of response: {type(r)}')
-
         
         # If everything went OK, Slack will response with status 200
         if r.status == 200:
