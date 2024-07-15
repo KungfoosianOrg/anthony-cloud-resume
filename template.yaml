@@ -9,6 +9,14 @@ Parameters:
     Type: String
     AllowedPattern: ".+"
 
+  SlackWebhookSsmArnParam:
+    Description: AWS ARN of Slack webhook SSM SecureString parameter for Slack integration
+    Type: String
+    
+  KmsDecryptKeyArnParam:
+    Description: AWS ARN of KMS key to decrypt SlackWebhookSsmArnParam
+    Type: String
+
 
 
 Resources:
@@ -229,15 +237,29 @@ Resources:
       # TODO: add parameter to get ARN of securestring param path, and parameter for KMS key to decrypt it
       Policies:
         - Statement:
-          - Effect: Allow
+          - Sid: LambdaAccessLogs1
+            Effect: Allow
             Action: logs:CreateLogGroup
             Resource: !Sub arn:aws:logs:${ AWS::Region }:${ AWS::AccountId }:*
-          - Effect: Allow,
+          - Sid: LambdaAccessLogs2
+            Effect: Allow,
             Action:
               - logs:CreateLogStream,
               - logs:PutLogEvents
             Resource:
-              - arn:aws:logs:us-west-1:590183800837:log-group:/aws/lambda/sendMessageToSlack:*
+              - !Sub arn:aws:logs:us-west-1:${ AWS::AccountId }:log-group:lambda/slackIntegration:*
+          - Sid: LambdaAccessSSMParam
+            Effect: Allow
+            Action:
+              - ssm:GetParameter
+            Resource:
+              - !Ref SlackWebhookSsmArnParam
+          - Sid: LambdaAccessKmsDecryptKey
+            Effect: Allow
+            Action:
+              - kms:Decrypt
+            Resource:
+              - !Ref KmsDecryptKeyArnParam
 
 
       Role: String
