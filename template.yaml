@@ -226,20 +226,27 @@ Resources:
         LogGroup: !Ref SlackIntegrationLambdaLogGroup
         SystemLogLevel: INFO
 
-      Policies: String | List | Map
-      PropagateTags: Boolean
-      ProvisionedConcurrencyConfig: ProvisionedConcurrencyConfig
-      ReservedConcurrentExecutions: Integer
+      # TODO: add parameter to get ARN of securestring param path, and parameter for KMS key to decrypt it
+      Policies:
+        - Statement:
+          - Effect: Allow
+            Action: logs:CreateLogGroup
+            Resource: !Sub arn:aws:logs:${ AWS::Region }:${ AWS::AccountId }:*
+          - Effect: Allow,
+            Action:
+              - logs:CreateLogStream,
+              - logs:PutLogEvents
+            Resource:
+              - arn:aws:logs:us-west-1:590183800837:log-group:/aws/lambda/sendMessageToSlack:*
+
+
       Role: String
       RolePath: String
       Runtime: String
       RuntimeManagementConfig: RuntimeManagementConfig
-      SnapStart: SnapStart
-      Tags: Map
       Timeout: Integer
       Tracing: String
       VersionDescription: String
-      VpcConfig: VpcConfig
 
 Outputs:
   VisitorCounterApiIdOutput:

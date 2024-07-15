@@ -31,8 +31,6 @@ def lambda_handler(event, context):
         encoded_body = json.dumps({
             'text': f'Alarm {sns_topic_name} has been triggered'
         })
-        
-        urllib3.PoolManager().request()
 
         r = connection_pool.request(method='POST',
                                   url=slack_url,
