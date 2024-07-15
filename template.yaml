@@ -63,7 +63,7 @@ Resources:
     Type: AWS::Serverless::Function
 
     Properties:
-      CodeUri: aws/visitor_counter/
+      CodeUri: aws/visitorCounter/
       Handler: lambda_function.lambda_handler
       Runtime: python3.9
       Description: interacts with DDB, increments visitor counter by 1, reset to 1 if pass 100
@@ -164,7 +164,7 @@ Resources:
         AlarmThresholdParam: 1000
 
 
-  CWAlarmApiCallExceedExpectedStack:
+  CWAlarmApiCallExceedExpectationStack:
     Type: AWS::CloudFormation::Stack
     Properties:
       TemplateURL: >-
@@ -179,6 +179,67 @@ Resources:
         StatisticCalculationMethodParam: SampleCount
         AlarmDescriptionParam: alarms when api calls exceed 100 within 1 minute
         AlarmThresholdParam: 100
+
+
+  SlackIntegrationLambdaLogGroup:
+    Type: 'AWS::Logs::LogGroup'
+
+    Properties:
+      LogGroupClass: STANDARD
+
+      LogGroupName: lambda/slackIntegration
+
+      RetentionInDays: 3
+  
+
+  SlackIntegrationFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: aws/sendSlackMessage
+
+      Description: Slack integration with Lambda, triggered by SNS
+
+      Events:
+        SnsApiResponse4xx:
+          Properties:
+            Topic: !GettAtt [ CWAlarmApiResponse4xxStack, SnsTopicArnOutput ]
+          Type: SNS
+
+        SnsApiResponse5xx:
+          Properties:
+            Topic: !GettAtt [ CWAlarmApiResponse5xxStack, SnsTopicArnOutput ]
+          Type: SNS
+
+        SnsApiResponseLatency:
+          Properties:
+            Topic: !GettAtt [ CWAlarmApiResponseLatencyStack, SnsTopicArnOutput ]
+          Type: SNS
+
+        SnsApiCallExceedExpectation:
+          Properties:
+            Topic: !GettAtt [ CWAlarmApiCallExceedExpectationStack, SnsTopicArnOutput ]
+          Type: SNS
+
+      LoggingConfig:
+        ApplicationLogLevel: INFO
+        LogFormat: JSON
+        LogGroup: !Ref SlackIntegrationLambdaLogGroup
+        SystemLogLevel: INFO
+
+      Policies: String | List | Map
+      PropagateTags: Boolean
+      ProvisionedConcurrencyConfig: ProvisionedConcurrencyConfig
+      ReservedConcurrentExecutions: Integer
+      Role: String
+      RolePath: String
+      Runtime: String
+      RuntimeManagementConfig: RuntimeManagementConfig
+      SnapStart: SnapStart
+      Tags: Map
+      Timeout: Integer
+      Tracing: String
+      VersionDescription: String
+      VpcConfig: VpcConfig
 
 Outputs:
   VisitorCounterApiIdOutput:
