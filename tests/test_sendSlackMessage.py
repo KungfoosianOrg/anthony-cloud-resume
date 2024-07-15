@@ -19,7 +19,7 @@ _RESPONSE_SUCCESS = {
 class TestSendSlackMessage(unittest.TestCase):
     
     def setUp(self):
-        # sets up parameter in SSM
+        # sets up parameter in SSM, for use throughout all tests, state is not shared between tests
         ssm = boto3.client('ssm', region_name=_REGION_DEFAULT)
         ssm.put_parameter(
             Name='/SLACK_WEBHOOK_URL',
@@ -52,6 +52,8 @@ class TestSendSlackMessage(unittest.TestCase):
     # mock urllib3 http connection pool manager
     @unittest.mock.patch('urllib3.PoolManager')
     def test_lambda_handler_correct_initiator(self, mock_PoolManager):
+        from aws.sendSlackMessage.lambda_function import lambda_handler
+
         # creating an HTTPResponse class since urllib3.PoolManager().request() expects a return variable of class HTTPResponse
         class HTTPResponse:
             def __init__(self, status):
@@ -59,7 +61,6 @@ class TestSendSlackMessage(unittest.TestCase):
 
         print('testing for correct initiator event source')
 
-        from aws.sendSlackMessage.lambda_function import lambda_handler
 
         test_event = {
             "Records": [
