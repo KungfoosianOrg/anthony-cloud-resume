@@ -134,10 +134,9 @@ Resources:
       TemplateURL: >-
         https://cf-templates-1k53axc5c0441-us-east-1.s3.amazonaws.com/components/cloudwatch-alarm.yml
       Parameters:
-        TopicNameParam: ApiResponse4xx
         SubscriberEmailParam: !Ref SubscriberEmailParam
         MeasuringMetricParam: 4xx
-        AlarmNameParam: 4xxApiResponse
+        NameParam: 4xxApiResponse
         AlarmDescriptionParam: alarms when api gateway HTTP response is 4xx
         ApiGwIdParam: !Ref SAMVisitorCounterApiGw
 
@@ -148,10 +147,9 @@ Resources:
       TemplateURL: >-
         https://cf-templates-1k53axc5c0441-us-east-1.s3.amazonaws.com/components/cloudwatch-alarm.yml
       Parameters:
-        TopicNameParam: ApiResponse5xx
         SubscriberEmailParam: !Ref SubscriberEmailParam
         MeasuringMetricParam: 5xx
-        AlarmNameParam: 5xxApiResponse
+        NameParam: 5xxApiResponse
         AlarmDescriptionParam: alarms when api gateway HTTP response is 5xx
         ApiGwIdParam: !Ref SAMVisitorCounterApiGw
 
@@ -162,10 +160,9 @@ Resources:
       TemplateURL: >-
         https://cf-templates-1k53axc5c0441-us-east-1.s3.amazonaws.com/components/cloudwatch-alarm.yml
       Parameters:
-        TopicNameParam: ApiResponseLatency
         SubscriberEmailParam: !Ref SubscriberEmailParam
         MeasuringMetricParam: Latency
-        AlarmNameParam: ApiResponseLatency
+        NameParam: ApiResponseLatency
         ApiGwIdParam: !Ref SAMVisitorCounterApiGw
         StatisticCalculationMethodParam: Maximum
         AlarmDescriptionParam: alarms when api gateway HTTP response takes more than 1 second
@@ -178,10 +175,9 @@ Resources:
       TemplateURL: >-
         https://cf-templates-1k53axc5c0441-us-east-1.s3.amazonaws.com/components/cloudwatch-alarm.yml
       Parameters:
-        TopicNameParam: ApiCallExceedExpectation
         SubscriberEmailParam: !Ref SubscriberEmailParam
         MeasuringMetricParam: Count
-        AlarmNameParam: ApiCallExceedExpectation
+        NameParam: ApiCallExceedExpectation
         ApiGwIdParam: !Ref SAMVisitorCounterApiGw
         MeasuringPeriodParam: 60
         StatisticCalculationMethodParam: SampleCount
