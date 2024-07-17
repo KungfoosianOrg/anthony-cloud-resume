@@ -214,22 +214,22 @@ Resources:
       Events:
         SnsApiResponse4xx:
           Properties:
-            Topic: !GetAtt [ CWAlarmApiResponse4xxStack, SnsTopicArnOutput ]
+            Topic: !GetAtt [ CWAlarmApiResponse4xxStack, Outputs.SnsTopicArnOutput ]
           Type: SNS
 
         SnsApiResponse5xx:
           Properties:
-            Topic: !GetAtt [ CWAlarmApiResponse5xxStack, SnsTopicArnOutput ]
+            Topic: !GetAtt [ CWAlarmApiResponse5xxStack, Outputs.SnsTopicArnOutput ]
           Type: SNS
 
         SnsApiResponseLatency:
           Properties:
-            Topic: !GetAtt [ CWAlarmApiResponseLatencyStack, SnsTopicArnOutput ]
+            Topic: !GetAtt [ CWAlarmApiResponseLatencyStack, Outputs.SnsTopicArnOutput ]
           Type: SNS
 
         SnsApiCallExceedExpectation:
           Properties:
-            Topic: !GetAtt [ CWAlarmApiCallExceedExpectationStack, SnsTopicArnOutput ]
+            Topic: !GetAtt [ CWAlarmApiCallExceedExpectationStack, Outputs.SnsTopicArnOutput ]
           Type: SNS
 
       LoggingConfig:
