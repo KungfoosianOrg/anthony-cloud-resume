@@ -205,27 +205,31 @@ Resources:
     Properties:
       CodeUri: aws/sendSlackMessage
 
+      Handler: lambda_function.lambda_handler
+      
+      Runtime: python3.9
+
       Description: Slack integration with Lambda, triggered by SNS
 
       Events:
         SnsApiResponse4xx:
           Properties:
-            Topic: !GettAtt [ CWAlarmApiResponse4xxStack, SnsTopicArnOutput ]
+            Topic: !GetAtt [ CWAlarmApiResponse4xxStack, SnsTopicArnOutput ]
           Type: SNS
 
         SnsApiResponse5xx:
           Properties:
-            Topic: !GettAtt [ CWAlarmApiResponse5xxStack, SnsTopicArnOutput ]
+            Topic: !GetAtt [ CWAlarmApiResponse5xxStack, SnsTopicArnOutput ]
           Type: SNS
 
         SnsApiResponseLatency:
           Properties:
-            Topic: !GettAtt [ CWAlarmApiResponseLatencyStack, SnsTopicArnOutput ]
+            Topic: !GetAtt [ CWAlarmApiResponseLatencyStack, SnsTopicArnOutput ]
           Type: SNS
 
         SnsApiCallExceedExpectation:
           Properties:
-            Topic: !GettAtt [ CWAlarmApiCallExceedExpectationStack, SnsTopicArnOutput ]
+            Topic: !GetAtt [ CWAlarmApiCallExceedExpectationStack, SnsTopicArnOutput ]
           Type: SNS
 
       LoggingConfig:
@@ -242,9 +246,9 @@ Resources:
             Action: logs:CreateLogGroup
             Resource: !Sub arn:aws:logs:${ AWS::Region }:${ AWS::AccountId }:*
           - Sid: LambdaAccessLogs2
-            Effect: Allow,
+            Effect: Allow
             Action:
-              - logs:CreateLogStream,
+              - logs:CreateLogStream
               - logs:PutLogEvents
             Resource:
               - !Sub arn:aws:logs:us-west-1:${ AWS::AccountId }:log-group:lambda/slackIntegration:*
@@ -260,15 +264,6 @@ Resources:
               - kms:Decrypt
             Resource:
               - !Ref KmsDecryptKeyArnParam
-
-
-      Role: String
-      RolePath: String
-      Runtime: String
-      RuntimeManagementConfig: RuntimeManagementConfig
-      Timeout: Integer
-      Tracing: String
-      VersionDescription: String
 
 Outputs:
   VisitorCounterApiIdOutput:
