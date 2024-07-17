@@ -2,7 +2,7 @@ name: Deploy Visitor Counter SAM app to AWS
 
 on:
     push:
-        branches: ["main"]
+        branches: ["main", "slack-integration"]
         paths: ["aws/visitor_counter/**"]
 
     # Allows you to run this workflow manually from the Actions tab
@@ -81,7 +81,7 @@ jobs:
       - name: deploy SAM template
         run: |
           echo Turning off telemetry
-          echo "export SAM_CLI_TELEMETRY=0" >>~/.profile
+          echo "export SAM_CLI_TELEMETRY=0" >> ~/.profile
           source ~/.profile
           
           sam deploy --parameter-overrides 'SubscriberEmailParam=${{ secrets.SNS_ALERT_EMAIL }} \

@@ -238,7 +238,6 @@ Resources:
         LogGroup: !Ref SlackIntegrationLambdaLogGroup
         SystemLogLevel: INFO
 
-      # TODO: add parameter to get ARN of securestring param path, and parameter for KMS key to decrypt it
       Policies:
         - Statement:
           - Sid: LambdaAccessLogs1
