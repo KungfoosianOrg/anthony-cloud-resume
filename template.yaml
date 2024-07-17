@@ -178,10 +178,10 @@ Resources:
       TemplateURL: >-
         https://cf-templates-1k53axc5c0441-us-east-1.s3.amazonaws.com/components/cloudwatch-alarm.yml
       Parameters:
-        TopicNameParam: ApiCallExceedExpected
+        TopicNameParam: ApiCallExceedExpectation
         SubscriberEmailParam: !Ref SubscriberEmailParam
         MeasuringMetricParam: Count
-        AlarmNameParam: ApiCallExceedExpected
+        AlarmNameParam: ApiCallExceedExpectation
         ApiGwIdParam: !Ref SAMVisitorCounterApiGw
         MeasuringPeriodParam: 60
         StatisticCalculationMethodParam: SampleCount
