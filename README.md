@@ -17,6 +17,7 @@ Folder **/.github/workflows** contains GitHub Actions workflows, and within it:
       + (before 7/12/2024, I was very lazy with documenting, still am...) validates HTML, run Jest unit testing, and sync all files in the /github folder to AWS S3
 
     - publish_visitorcounter_lambda.yml:
+      + (7/17/2024) Added integration for Slack webhook, added repo secrets for the integration, updated workflow to override SAM template parameters without using the samconfig.toml file
       + (7/12/2024) Run Python unittest for Python Lambda code in the /aws folder, create SAM app on AWS with Lambda code, updates the repository secret for API endpoint and calls the deploy-site-to-s3.yml workflow if necessary
 
 Folder **/aws** contains code for Lambda function(s) of the same name:
