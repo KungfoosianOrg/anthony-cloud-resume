@@ -2,7 +2,7 @@ name: Deploy Visitor Counter SAM app to AWS
 
 on:
     push:
-        branches: ["main", "slack-integration"]
+        branches: ["main"]
         paths: ["aws/visitor_counter/**"]
 
     # Allows you to run this workflow manually from the Actions tab
