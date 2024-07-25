@@ -25,7 +25,7 @@ Folder **/aws** contains code for Lambda function(s) of the same name:
 
     - visitorCounter: backend Lambda logic to talk to DynamoDB, updating a visitor counter that connects to front end logic, which is stored in /github/scripts 
 
-Folder **/cypress** contains everything related to Cypress JS testing, used for E2E testing
+Folder **/cypress** contains everything related to Cypress JS testing, used for E2E testings
 
 Folder **/github** contains HTML, CSS, JS for front end website
 
