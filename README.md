@@ -25,6 +25,8 @@ Folder **/aws** contains code for Lambda function(s) of the same name:
 
     - visitorCounter: backend Lambda logic to talk to DynamoDB, updating a visitor counter that connects to front end logic, which is stored in /github/scripts 
 
+Folder **/cypress** contains everything related to Cypress JS testing, used for E2E testing
+
 Folder **/github** contains HTML, CSS, JS for front end website
 
 Folder **/tests** contains all tests for code in this repo
@@ -43,13 +45,20 @@ Folder **/tests** contains all tests for code in this repo
 
 From the **root (/)** of this repo:
 
-    - Testing Javascript:
-      1. Run 'npm install' to install all dependencies
-      2. Run 'npm test'
+  - Testing Javascript:
+    1. Run 'npm install' to install all dependencies
+    2. Run 'npm test'
 
-    - Testing Python:
-      1. Run 'pip3 install -r ./tests/requirements.txt' to install test dependencies
-      2. Run 'python3 -m unittest'
+  - Testing Python:
+    1. Run 'pip3 install -r ./tests/requirements.txt' to install test dependencies
+    2. Run 'python3 -m unittest'
+
+### Running End-to-End (E2E) testing
+
+From the **root (/)** of this repo:
+
+  1. Run 'npm install' to install all dependencies
+  2. Run 'npx cypress open'
 
 
 ### Running code
