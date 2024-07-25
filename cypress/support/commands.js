@@ -23,3 +23,20 @@
 //
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
+
+
+Cypress.Commands.add('getCounter', (url) => {
+    try {
+        cy.visit(url)
+    
+        // wait 3 seconds for counter to load
+        cy.wait(3000)
+        
+        cy.get('#visitorCounter-container > div.text-white')
+          .then(element => {
+            return parseInt(element['0'].textContent)
+          })
+    } catch (error) {
+        console.error(`Something went wrong while using Cypress: ${error}`)
+    }
+})
