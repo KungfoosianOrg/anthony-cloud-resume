@@ -45,3 +45,14 @@ variable "aws_region" {
   description = "AWS region to create stack in. Must be us-east-1 for SSL to work"
   default     = "us-east-1"
 }
+
+variable "aws_profile" {
+  type    = string
+  default = ""
+}
+
+# variable "cloudfront_distribution_fqdn" {
+#   type        = string
+#   description = "FQDN of the created CloudFront distribution"
+#   default     = ""
+# }
