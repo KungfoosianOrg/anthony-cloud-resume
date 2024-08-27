@@ -1,6 +1,12 @@
-variable "fqdns" {
+variable "registered_domain_name" {
+  type        = string
+  description = "The domain name that you registered and want to route traffic for"
+  nullable    = false
+}
+
+variable "subdomains" {
   type        = list(string)
-  description = "List of subdomains you want to route traffic for, including the domain"
+  description = "List of subdomains you want to route traffic for, Usage: [\"www\",\"test\"] for FQDNs: www.example.com, test.example.com"
   default     = []
 }
 
@@ -23,6 +29,11 @@ variable "default_cloudfront_hostedzone" {
 }
 
 variable "aws_region" {
+  type    = string
+  default = ""
+}
+
+variable "aws_profile" {
   type    = string
   default = ""
 }

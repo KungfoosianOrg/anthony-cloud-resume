@@ -16,10 +16,10 @@ variable "registered_domain_name" {
   nullable    = false
 }
 
-variable "fqdns" {
+variable "subdomains" {
   type        = list(string)
-  description = "List of subdomains you want to route traffic for, including the domain"
-  nullable    = false
+  description = "List of subdomains you want to route traffic for, Usage: [\"www\",\"test\"] for FQDNs: www.example.com, test.example.com"
+  default     = []
 }
 
 variable "route53_hosted_zone_id" {
