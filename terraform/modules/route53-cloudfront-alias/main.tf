@@ -16,6 +16,10 @@ provider "aws" {
 
 # Creating IPv4 and IPv6 alias records for the domain itself
 resource "aws_route53_record" "ip4_domain_alias_record" {
+<<<<<<< HEAD
+=======
+  allow_overwrite = true
+>>>>>>> 70c9a2b (fixed git error)
   zone_id = var.route53_hosted_zone_id
   name    = var.registered_domain_name
   type    = "A"
@@ -28,6 +32,10 @@ resource "aws_route53_record" "ip4_domain_alias_record" {
 }
 
 resource "aws_route53_record" "ip6_domain_alias_record" {
+<<<<<<< HEAD
+=======
+  allow_overwrite = true
+>>>>>>> 70c9a2b (fixed git error)
   zone_id = var.route53_hosted_zone_id
   name    = var.registered_domain_name
   type    = "AAAA"
@@ -43,6 +51,7 @@ resource "aws_route53_record" "ip6_domain_alias_record" {
 resource "aws_route53_record" "ip4_subdomain_alias_records" {
   for_each = toset(var.subdomains)
 
+  allow_overwrite = true
   zone_id = var.route53_hosted_zone_id
   name    = "${each.value}.${var.registered_domain_name}"
   type    = "A"
@@ -57,6 +66,10 @@ resource "aws_route53_record" "ip4_subdomain_alias_records" {
 resource "aws_route53_record" "ip6_subdomain_alias_records" {
   for_each = toset(var.subdomains)
 
+<<<<<<< HEAD
+=======
+  allow_overwrite = true
+>>>>>>> 70c9a2b (fixed git error)
   zone_id = var.route53_hosted_zone_id
   name    = "${each.value}.${var.registered_domain_name}"
   type    = "AAAA"
