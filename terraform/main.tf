@@ -20,5 +20,5 @@ module "route53-cloudfront-alias-module" {
   registered_domain_name       = var.registered_domain_name
   subdomains                   = var.subdomains
   route53_hosted_zone_id       = var.route53_hosted_zone_id
-  cloudfront_distribution_fqdn = "" # TODO: point to outpput of SiteStack
+  cloudfront_distribution_fqdn = "" # TODO: point to output of SiteStack
 }
