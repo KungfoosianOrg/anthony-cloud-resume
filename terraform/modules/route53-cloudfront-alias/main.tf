@@ -10,8 +10,8 @@ terraform {
 # Configure the AWS Provider
 provider "aws" {
 #   region = var.aws_region
-  profile = "651706758768_AdministratorAccess"
-  region  = "us-west-1"
+  profile = "590183800837_AdministratorAccess"
+  region  = "us-east-1"
 }
 
 
