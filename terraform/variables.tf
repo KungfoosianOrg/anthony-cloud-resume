@@ -39,3 +39,9 @@ variable "apigw_endpoint_url" {
   description = "URL of AWS API Gateway endpoint, in format: <endpoint_id>.execute-api.<aws_region>.amazonaws.com[/<path>] . FIRST TIME SETUP: leave default value"
   default     = "none"
 }
+
+variable "aws_region" {
+  type        = string
+  description = "AWS region to create stack in. Must be us-east-1 for SSL to work"
+  default     = "us-east-1"
+}
