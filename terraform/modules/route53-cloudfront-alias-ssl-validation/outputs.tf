@@ -5,5 +5,5 @@ output "acm_certificate_arn" {
 
 output "route53_hostedzone_id" {
   description = "ID of AWS Route53 hosted zone created for a custom domain"
-  value = aws_route53_zone.primary.zone_id
+  value       = aws_route53_zone.primary[0].zone_id
 }

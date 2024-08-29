@@ -41,9 +41,9 @@ resource "aws_route53_zone" "primary" {
 # Creating IPv4 and IPv6 alias records for the domain itself
 resource "aws_route53_record" "ip4_domain_alias_record" {
   allow_overwrite = true
-  zone_id = var.route53_hosted_zone_id == "" ? aws_route53_zone.primary.zone_id : var.route53_hosted_zone_id
-  name    = var.registered_domain_name
-  type    = "A"
+  zone_id         = var.route53_hosted_zone_id == "" ? aws_route53_zone.primary[0].zone_id : var.route53_hosted_zone_id
+  name            = var.registered_domain_name
+  type            = "A"
 
   alias {
     name                   = var.cloudfront_distribution_fqdn
@@ -54,9 +54,9 @@ resource "aws_route53_record" "ip4_domain_alias_record" {
 
 resource "aws_route53_record" "ip6_domain_alias_record" {
   allow_overwrite = true
-  zone_id = var.route53_hosted_zone_id == "" ? aws_route53_zone.primary.zone_id : var.route53_hosted_zone_id
-  name    = var.registered_domain_name
-  type    = "AAAA"
+  zone_id         = var.route53_hosted_zone_id == "" ? aws_route53_zone.primary[0].zone_id : var.route53_hosted_zone_id
+  name            = var.registered_domain_name
+  type            = "AAAA"
 
   alias {
     name                   = var.cloudfront_distribution_fqdn
@@ -70,9 +70,9 @@ resource "aws_route53_record" "ip4_subdomain_alias_records" {
   for_each = toset(var.subdomains)
 
   allow_overwrite = true
-  zone_id = var.route53_hosted_zone_id == "" ? aws_route53_zone.primary.zone_id : var.route53_hosted_zone_id
-  name    = "${each.value}.${var.registered_domain_name}"
-  type    = "A"
+  zone_id         = var.route53_hosted_zone_id == "" ? aws_route53_zone.primary[0].zone_id : var.route53_hosted_zone_id
+  name            = "${each.value}.${var.registered_domain_name}"
+  type            = "A"
 
   alias {
     name                   = var.cloudfront_distribution_fqdn
@@ -85,9 +85,9 @@ resource "aws_route53_record" "ip6_subdomain_alias_records" {
   for_each = toset(var.subdomains)
 
   allow_overwrite = true
-  zone_id = var.route53_hosted_zone_id == "" ? aws_route53_zone.primary.zone_id : var.route53_hosted_zone_id
-  name    = "${each.value}.${var.registered_domain_name}"
-  type    = "AAAA"
+  zone_id         = var.route53_hosted_zone_id == "" ? aws_route53_zone.primary[0].zone_id : var.route53_hosted_zone_id
+  name            = "${each.value}.${var.registered_domain_name}"
+  type            = "AAAA"
 
   alias {
     name                   = var.cloudfront_distribution_fqdn
@@ -129,9 +129,9 @@ resource "aws_route53_record" "ssl_cert_validation_records" {
   #   NOTE: This way is recommended for resources whose values you won't know until creation
   for_each = tomap({
     for domain_validation_option in aws_acm_certificate.ssl_cert.domain_validation_options : domain_validation_option.domain_name => {
-      name = domain_validation_option.resource_record_name
+      name   = domain_validation_option.resource_record_name
       record = domain_validation_option.resource_record_value
-      type = domain_validation_option.resource_record_type
+      type   = domain_validation_option.resource_record_type
     }
   })
 
