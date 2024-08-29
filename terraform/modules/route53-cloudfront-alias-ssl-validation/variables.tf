@@ -24,7 +24,7 @@ variable "cloudfront_distribution_fqdn" {
 
 variable "default_cloudfront_hostedzone" {
   type        = string
-  description = "AWS-provided, hosted zone ID for all CloudFront distributions. DO NOT CHANGE UNLESS NECESSARY"
+  description = "CAUTION !!! AWS-provided, hosted zone ID for all CloudFront distributions. DO NOT CHANGE UNLESS NECESSARY"
   default     = "Z2FDTNDATAQYW2"
 }
 
