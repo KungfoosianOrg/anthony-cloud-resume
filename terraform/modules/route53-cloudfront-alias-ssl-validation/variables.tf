@@ -12,7 +12,7 @@ variable "subdomains" {
 
 variable "route53_hosted_zone_id" {
   type        = string
-  description = "ID of AWS Route53 hosted zone for your domain"
+  description = "ID of AWS Route53 hosted zone for your domain. If blank, one will be created automatically"
   default     = ""
 }
 
