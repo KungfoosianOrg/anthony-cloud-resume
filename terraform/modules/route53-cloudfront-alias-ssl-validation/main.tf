@@ -136,7 +136,7 @@ resource "aws_route53_record" "ssl_cert_validation_records" {
   })
 
   allow_overwrite = true
-  zone_id         = var.route53_hosted_zone_id
+  zone_id         = var.route53_hosted_zone_id == "" ? aws_route53_zone.primary[0].zone_id : var.route53_hosted_zone_id
   ttl             = 300
   type            = each.value.type
   name            = each.value.name
