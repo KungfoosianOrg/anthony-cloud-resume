@@ -1,4 +1,4 @@
-registered_domain_name       = "vocloudresume.click"
+registered_domain_name       = "my.domain"
 subdomains                   = ["www", "test", "resume"]
 route53_hosted_zone_id       = "TESTZONE" # leave empty string to create a zone
 cloudfront_distribution_fqdn = "something.diistribution.fqdn"
