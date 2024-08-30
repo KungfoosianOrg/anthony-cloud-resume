@@ -36,3 +36,12 @@ resource "aws_route53_zone" "primary" {
 ##### END PART #####
 
 
+resource "aws_cloudfront_response_headers_policy" "cfdistro_response_headers" {
+  name = "${}_response-header-policy"
+}
+
+resource "aws_s3_bucket" "frontend_bucket" {
+  
+}
+
+
