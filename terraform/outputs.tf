@@ -10,7 +10,7 @@ output "s3_frontend_bucket_name" {
 
 output "s3_frontend_bucket_region" {
   description = "Region of created S3 bucket for storing front end code"
-  value       = "TODO SiteStack, Outputs.ProdBucketRegionOutput"
+  value       = var.aws_region
 }
 
 output "SAM_stack_name" {
