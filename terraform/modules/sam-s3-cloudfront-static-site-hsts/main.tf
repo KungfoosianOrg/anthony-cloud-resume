@@ -35,22 +35,6 @@ resource "aws_route53_zone" "primary" {
 }
 ##### END PART #####
 
-variable "csp_parts" {
-  type = list(string)
-
-  default = [
-    "default-src 'self' https://${var.registered_domain_name} https://*.${var.registered_domain_name}",
-    "base-uri 'self' https://${var.registered_domain_name} https://*.${var.registered_domain_name}",
-    "frame-src https://${var.registered_domain_name} https://*.${var.registered_domain_name}",
-    "frame-ancestors 'self' https://${var.registered_domain_name} https://*.${var.registered_domain_name}",
-    "form-action 'none'",
-    "style-src https://${var.registered_domain_name} https://*.${var.registered_domain_name} https://cdn.jsdelivr.net",
-    "script-src https://${var.registered_domain_name} https://*.${var.registered_domain_name} https://cdn.jsdelivr.net",
-    "connect-src ${ApiEndpointUrlParam}",
-    "img-src https://${var.registered_domain_name} https://*.${var.registered_domain_name} data: w3.org/svg/2000"
-  ]
-}
-
 resource "aws_cloudfront_response_headers_policy" "cfdistro_response_headers" {
   name = "${aws_s3_bucket.frontend_bucket.id}_response-header-policy"
 
@@ -58,7 +42,17 @@ resource "aws_cloudfront_response_headers_policy" "cfdistro_response_headers" {
     content_security_policy {
       override = true
 
-      content_security_policy = join(";", var.csp_parts)
+      content_security_policy = join(";", [
+                                            "default-src 'self' https://${var.registered_domain_name} https://*.${var.registered_domain_name}",
+                                            "base-uri 'self' https://${var.registered_domain_name} https://*.${var.registered_domain_name}",
+                                            "frame-src https://${var.registered_domain_name} https://*.${var.registered_domain_name}",
+                                            "frame-ancestors 'self' https://${var.registered_domain_name} https://*.${var.registered_domain_name}",
+                                            "form-action 'none'",
+                                            "style-src https://${var.registered_domain_name} https://*.${var.registered_domain_name} https://cdn.jsdelivr.net",
+                                            "script-src https://${var.registered_domain_name} https://*.${var.registered_domain_name} https://cdn.jsdelivr.net",
+                                            "connect-src ${var.apigw_endpoint_url}",
+                                            "img-src https://${var.registered_domain_name} https://*.${var.registered_domain_name} data: w3.org/svg/2000"
+                                          ])
     }
 
     content_type_options {
@@ -76,8 +70,8 @@ resource "aws_cloudfront_response_headers_policy" "cfdistro_response_headers" {
 
 resource "aws_cloudfront_distribution" "production_distribution" {
   default_cache_behavior {
-    allowed_methods = [ "HEAD", "GET" ]
-    cached_methods = [ "HEAD", "GET" ]
+    allowed_methods = ["HEAD", "GET"]
+    cached_methods  = ["HEAD", "GET"]
 
     cache_policy_id = "658327ea-f89d-4fab-a63d-7e88639e58f6"
 
@@ -112,7 +106,7 @@ resource "aws_cloudfront_distribution" "production_distribution" {
     }
   }
 
-  aliases = concat([ var.registered_domain_name ], [ for subdomain in var.subdomains : "${subdomain}.${var.registered_domain_name}" ])
+  aliases = concat([var.registered_domain_name], [for subdomain in var.subdomains : "${subdomain}.${var.registered_domain_name}"])
 
   viewer_certificate {
     acm_certificate_arn = var.acm_certificate_arn
@@ -124,9 +118,7 @@ resource "aws_cloudfront_distribution" "production_distribution" {
 
   restrictions {
     geo_restriction {
-      restriction_type = none
-
-      locations = []
+      restriction_type = "none"
     }
   }
 }
@@ -167,20 +159,20 @@ data "aws_iam_policy_document" "allow_access_from_cloudfront" {
   version = "2012-10-17"
 
   statement {
-    sid = "AllowCloudFrontServicePrincipal"
+    sid    = "AllowCloudFrontServicePrincipal"
     effect = "Allow"
-    
+
     principals {
-      type = "Service"
-      identifiers = [ "cloudfront.amazonaws.com" ]
+      type        = "Service"
+      identifiers = ["cloudfront.amazonaws.com"]
     }
 
-    actions = [ 
+    actions = [
       "s3:GetObject"
     ]
 
     # resources = [ join("/", [ aws_s3_bucket.frontend_bucket.arn, "*" ]) ]
-    resources = [ "${aws_s3_bucket.frontend_bucket.arn}/*" ]
+    resources = ["${aws_s3_bucket.frontend_bucket.arn}/*"]
 
 
     condition {
@@ -188,7 +180,7 @@ data "aws_iam_policy_document" "allow_access_from_cloudfront" {
 
       variable = "aws:sourceArn"
 
-      values = [ "arn:aws:cloudfront::${data.aws_caller_identity.current.account_id}:distribution/${aws_cloudfront_distribution.production_distribution.id}" ]
+      values = ["arn:aws:cloudfront::${data.aws_caller_identity.current.account_id}:distribution/${aws_cloudfront_distribution.production_distribution.id}"]
     }
   }
 }
@@ -242,7 +234,7 @@ resource "aws_iam_role_policy" "ghactions_permission_policy" {
 
         Resource = "arn:aws:route53:::hostedzone/${var.route53_hosted_zone_id}"
 
-        Action = [ "route53:getHostedZone" ]
+        Action = ["route53:getHostedZone"]
       }
     ]
 
