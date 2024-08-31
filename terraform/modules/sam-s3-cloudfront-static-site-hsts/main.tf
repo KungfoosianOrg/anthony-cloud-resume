@@ -141,6 +141,111 @@ resource "aws_cloudfront_origin_access_control" "production_oac" {
   signing_protocol = "sigv4"
 }
 
-resource "aws_s3_bucket" "frontend_bucket" {
+resource "aws_s3_bucket" "frontend_bucket" {}
 
+resource "aws_s3_bucket_public_access_block" "frontend_bucket_pubaccessblock" {
+  bucket = aws_s3_bucket.frontend_bucket.id
+}
+
+resource "aws_s3_bucket_versioning" "frontend_bucket_versioning" {
+  bucket = aws_s3_bucket.frontend_bucket.id
+
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+resource "aws_s3_bucket_policy" "allow_access_from_cloudfront" {
+  bucket = aws_s3_bucket.frontend_bucket.id
+
+  policy = data.aws_iam_policy_document.allow_access_from_cloudfront.json
+}
+
+data "aws_caller_identity" "current" {}
+
+data "aws_iam_policy_document" "allow_access_from_cloudfront" {
+  version = "2012-10-17"
+
+  statement {
+    sid = "AllowCloudFrontServicePrincipal"
+    effect = "Allow"
+    
+    principals {
+      type = "Service"
+      identifiers = [ "cloudfront.amazonaws.com" ]
+    }
+
+    actions = [ 
+      "s3:GetObject"
+    ]
+
+    # resources = [ join("/", [ aws_s3_bucket.frontend_bucket.arn, "*" ]) ]
+    resources = [ "${aws_s3_bucket.frontend_bucket.arn}/*" ]
+
+
+    condition {
+      test = "StringEquals"
+
+      variable = "aws:sourceArn"
+
+      values = [ "arn:aws:cloudfront::${data.aws_caller_identity.current.account_id}:distribution/${aws_cloudfront_distribution.production_distribution.id}" ]
+    }
+  }
+}
+
+
+resource "aws_iam_role_policy" "ghactions_permission_policy" {
+  name = "PermPol_GHActions-S3"
+
+  role = var.ghactions_aws_role_arn
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+
+    Statement = [
+      {
+        Effect = "Allow"
+        Resource = [
+          "${aws_s3_bucket.frontend_bucket.arn}",
+          "${aws_s3_bucket.frontend_bucket.arn}/*"
+        ]
+
+        Action = [
+          "s3:PutObject",
+          "s3:PutObjectAcl",
+          "s3:ListBucket",
+          "s3:DeleteObject",
+          "s3:GetAccelerateConfiguration",
+          "s3:GetObject",
+          "s3:GetObjectAcl",
+          "s3:GetBucketLogging",
+          "s3:GetBucketOwnershipControls",
+          "s3:GetBucketObjectLockConfiguration",
+          "s3:GetBucketNotification",
+          "s3:GetIntelligentTieringConfiguration",
+          "s3:GetLifecycleConfiguration",
+          "s3:GetInventoryConfiguration",
+          "s3:GetEncryptionConfiguration",
+          "s3:GetAnalyticsConfiguration",
+          "s3:GetBucketCORS",
+          "s3:GetMetricsConfiguration",
+          "s3:GetReplicationConfiguration",
+          "s3:GetBucketTagging",
+          "s3:GetBucketWebsite",
+          "s3:GetBucketPublicAccessBlock",
+          "s3:GetBucketVersioning"
+        ]
+      },
+
+      {
+        Effect = "Allow"
+
+        Resource = "arn:aws:route53:::hostedzone/${var.route53_hosted_zone_id}"
+
+        Action = [ "route53:getHostedZone" ]
+      }
+    ]
+
+
+  })
 }
