@@ -17,21 +17,21 @@ variable "route53_hosted_zone_id" {
 }
 
 variable "apigw_endpoint_url" {
-  type = string
+  type        = string
   description = "URL of API Gateway endpoint, format: <endpoint_id>.execute-api.<aws_region>.amazonaws.com[/<path>] . FIRST TIME SETUP: leave default value"
-  default = "none"
+  default     = "none"
 }
 
 variable "ghactions_aws_role_arn" {
-  type = string
+  type        = string
   description = "ARN of role for GitHub Actions"
-  default = ""
+  default     = ""
 }
 
 variable "acm_certificate_arn" {
-  type = string
+  type        = string
   description = "ARN of ACM certificate for the custom domain (if custom domain name parameter is defined)"
-  default = ""
+  default     = ""
 }
 
 variable "aws_region" {

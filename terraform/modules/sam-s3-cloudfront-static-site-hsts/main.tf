@@ -38,7 +38,7 @@ resource "aws_route53_zone" "primary" {
 variable "csp_parts" {
   type = list(string)
 
-  default = [ 
+  default = [
     "default-src 'self' https://${var.registered_domain_name} https://*.${var.registered_domain_name}",
     "base-uri 'self' https://${var.registered_domain_name} https://*.${var.registered_domain_name}",
     "frame-src https://${var.registered_domain_name} https://*.${var.registered_domain_name}",
@@ -66,16 +66,81 @@ resource "aws_cloudfront_response_headers_policy" "cfdistro_response_headers" {
     }
 
     strict_transport_security {
-      override = true
-      include_subdomains = true
-      preload = true
+      override                   = true
+      include_subdomains         = true
+      preload                    = true
       access_control_max_age_sec = 31536000
     }
   }
 }
 
-resource "aws_s3_bucket" "frontend_bucket" {
-  
+resource "aws_cloudfront_distribution" "production_distribution" {
+  default_cache_behavior {
+    allowed_methods = [ "HEAD", "GET" ]
+    cached_methods = [ "HEAD", "GET" ]
+
+    cache_policy_id = "658327ea-f89d-4fab-a63d-7e88639e58f6"
+
+    compress = true
+
+    target_origin_id = aws_s3_bucket.frontend_bucket.bucket_regional_domain_name
+
+    viewer_protocol_policy = "redirect-to-https"
+
+    response_headers_policy_id = aws_cloudfront_response_headers_policy.cfdistro_response_headers.id
+  }
+
+  default_root_object = "index.html"
+
+  enabled = true
+
+  http_version = "http2"
+
+  is_ipv6_enabled = true
+
+  price_class = "PriceClass_100"
+
+  origin {
+    domain_name = aws_s3_bucket.frontend_bucket.bucket_regional_domain_name
+
+    origin_id = aws_s3_bucket.frontend_bucket.bucket_regional_domain_name
+
+    origin_access_control_id = aws_cloudfront_origin_access_control.production_oac.id
+
+    s3_origin_config {
+      origin_access_identity = ""
+    }
+  }
+
+  aliases = concat([ var.registered_domain_name ], [ for subdomain in var.subdomains : "${subdomain}.${var.registered_domain_name}" ])
+
+  viewer_certificate {
+    acm_certificate_arn = var.acm_certificate_arn
+
+    ssl_support_method = "sni-only"
+
+    minimum_protocol_version = "TLSv1.2_2021"
+  }
+
+  restrictions {
+    geo_restriction {
+      restriction_type = none
+
+      locations = []
+    }
+  }
 }
 
+resource "aws_cloudfront_origin_access_control" "production_oac" {
+  name = "oac-cf-static-page"
 
+  origin_access_control_origin_type = "s3"
+
+  signing_behavior = "always"
+
+  signing_protocol = "sigv4"
+}
+
+resource "aws_s3_bucket" "frontend_bucket" {
+
+}
