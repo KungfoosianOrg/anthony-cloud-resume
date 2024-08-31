@@ -35,9 +35,43 @@ resource "aws_route53_zone" "primary" {
 }
 ##### END PART #####
 
+variable "csp_parts" {
+  type = list(string)
+
+  default = [ 
+    "default-src 'self' https://${var.registered_domain_name} https://*.${var.registered_domain_name}",
+    "base-uri 'self' https://${var.registered_domain_name} https://*.${var.registered_domain_name}",
+    "frame-src https://${var.registered_domain_name} https://*.${var.registered_domain_name}",
+    "frame-ancestors 'self' https://${var.registered_domain_name} https://*.${var.registered_domain_name}",
+    "form-action 'none'",
+    "style-src https://${var.registered_domain_name} https://*.${var.registered_domain_name} https://cdn.jsdelivr.net",
+    "script-src https://${var.registered_domain_name} https://*.${var.registered_domain_name} https://cdn.jsdelivr.net",
+    "connect-src ${ApiEndpointUrlParam}",
+    "img-src https://${var.registered_domain_name} https://*.${var.registered_domain_name} data: w3.org/svg/2000"
+  ]
+}
 
 resource "aws_cloudfront_response_headers_policy" "cfdistro_response_headers" {
-  name = "${}_response-header-policy"
+  name = "${aws_s3_bucket.frontend_bucket.id}_response-header-policy"
+
+  security_headers_config {
+    content_security_policy {
+      override = true
+
+      content_security_policy = join(";", var.csp_parts)
+    }
+
+    content_type_options {
+      override = true
+    }
+
+    strict_transport_security {
+      override = true
+      include_subdomains = true
+      preload = true
+      access_control_max_age_sec = 31536000
+    }
+  }
 }
 
 resource "aws_s3_bucket" "frontend_bucket" {
