@@ -19,7 +19,6 @@ resource "aws_route53_zone" "primary" {
 }
 
 
-# https://developer.hashicorp.com/terraform/tutorials/modules/module
 module "route53-cloudfront-alias-w-ssl-validation" {
   source = "./modules/route53-cloudfront-alias-ssl-validation"
 
