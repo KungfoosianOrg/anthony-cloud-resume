@@ -22,12 +22,6 @@ variable "subdomains" {
   default     = []
 }
 
-variable "route53_hosted_zone_id" {
-  type        = string
-  description = "ID of AWS Route53 hosted zone for your domain"
-  nullable    = false
-}
-
 variable "SAM_stack_name" {
   type        = string
   description = "Name of SAM stack"
@@ -50,9 +44,3 @@ variable "aws_profile" {
   type    = string
   default = ""
 }
-
-# variable "cloudfront_distribution_fqdn" {
-#   type        = string
-#   description = "FQDN of the created CloudFront distribution"
-#   default     = ""
-# }

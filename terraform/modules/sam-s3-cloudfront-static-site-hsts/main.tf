@@ -43,16 +43,16 @@ resource "aws_cloudfront_response_headers_policy" "cfdistro_response_headers" {
       override = true
 
       content_security_policy = join(";", [
-                                            "default-src 'self' https://${var.registered_domain_name} https://*.${var.registered_domain_name}",
-                                            "base-uri 'self' https://${var.registered_domain_name} https://*.${var.registered_domain_name}",
-                                            "frame-src https://${var.registered_domain_name} https://*.${var.registered_domain_name}",
-                                            "frame-ancestors 'self' https://${var.registered_domain_name} https://*.${var.registered_domain_name}",
-                                            "form-action 'none'",
-                                            "style-src https://${var.registered_domain_name} https://*.${var.registered_domain_name} https://cdn.jsdelivr.net",
-                                            "script-src https://${var.registered_domain_name} https://*.${var.registered_domain_name} https://cdn.jsdelivr.net",
-                                            "connect-src ${var.apigw_endpoint_url}",
-                                            "img-src https://${var.registered_domain_name} https://*.${var.registered_domain_name} data: w3.org/svg/2000"
-                                          ])
+        "default-src 'self' https://${var.registered_domain_name} https://*.${var.registered_domain_name}",
+        "base-uri 'self' https://${var.registered_domain_name} https://*.${var.registered_domain_name}",
+        "frame-src https://${var.registered_domain_name} https://*.${var.registered_domain_name}",
+        "frame-ancestors 'self' https://${var.registered_domain_name} https://*.${var.registered_domain_name}",
+        "form-action 'none'",
+        "style-src https://${var.registered_domain_name} https://*.${var.registered_domain_name} https://cdn.jsdelivr.net",
+        "script-src https://${var.registered_domain_name} https://*.${var.registered_domain_name} https://cdn.jsdelivr.net",
+        "connect-src ${var.apigw_endpoint_url == "" ? "none" : var.apigw_endpoint_url }",
+        "img-src https://${var.registered_domain_name} https://*.${var.registered_domain_name} data: w3.org/svg/2000"
+      ])
     }
 
     content_type_options {
