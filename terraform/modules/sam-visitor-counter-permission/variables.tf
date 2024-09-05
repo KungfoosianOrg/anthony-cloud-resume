@@ -4,17 +4,30 @@ variable "ghactions_aws_role_arn" {
   default     = ""
 }
 
-variable "cfdistro_response_headers_policy_id" {
-  type = string
-  description = "CloudFront distribution's response header's id"
-  default = ""
-}
-
 variable "SAM_stack_name" {
   type        = string
   description = "Name of SAM stack"
   default     = "my-sam-stack"
 }
+
+variable "cfdistro_response_headers_policy_id" {
+  type = string
+  description = "CloudFront distribution's response header's id"
+  default = null
+}
+
+variable "cfdistro_oac_id" {
+  type = string
+  description = "Id of CloudFront distribution's Origin Access Control (OAC)"
+  default = null
+}
+
+variable "cfdistro_id" {
+  type = string
+  description = "Id of CloudFront distribution"
+  default = null
+}
+
 
 variable "aws_region" {
   type        = string
@@ -24,5 +37,5 @@ variable "aws_region" {
 
 variable "aws_profile" {
   type    = string
-  default = ""
+  default = null
 }
