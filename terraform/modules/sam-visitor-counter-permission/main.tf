@@ -69,6 +69,55 @@ data "aws_iam_policy_document" "ghactions_sam" {
   }
 
   # Continue at SAMLogGroupPermission in sam-visitor-counter-permission
+  statement {
+    effect = "Allow"
+    sid = "SAMLogGroupPermission"
+    
+    actions = [ 
+      "logs:DeleteLogGroup",
+      "logs:CreateLogGroup",
+      "logs:CreateLogStream",
+      "logs:CreateLogDelivery",
+      "logs:PutRetentionPolicy",
+      "logs:PutLogEvents",
+      "logs:PutResourcePolicy",
+      "logs:PutLogEvents",
+      "logs:PutResourcePolicy",
+      "logs:DescribeResourcePolicies",
+      "logs:DescribeLogGroups"
+    ]
+
+    resources = [ 
+      "arn:aws:logs:${var.aws_region}:${data.aws_caller_identity.current.account_id}:log-group:*"
+    ]
+  }
+
+  statement {
+    effect = "Allow"
+    sid = "SAMCreateLogDelivery"
+
+    actions = [ "logs:CreateLogDelivery" ]
+
+    resources = [ "*" ]
+  }
+
+  statement {
+    effect = "Allow"
+    sid = "SAMDynamoDBPermission"
+
+    actions = [ 
+      "dynamodb:DescribeTable",
+      "dynamodb:CreateTable",
+      "dynamodb:ListTagsOfResource",
+      "dynamodb:GetResourcePolicy",
+      "dynamodb:DescribeKinesisStreamingDestination",
+      "dynamodb:DescribeContinuousBackups",
+      "dynamodb:DescribeContributorInsights",
+      "dynamodb:DescribeTimeToLive"
+    ]
+
+    resources = [ "arn:aws:dynamodb:${var.aws_region}:${data.aws_caller_identity.current.account_id}:table/*" ]
+  }
 }
 
 resource "aws_s3_bucket" "sam_artifacts_bucket" {}
