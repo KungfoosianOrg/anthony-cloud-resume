@@ -4,11 +4,11 @@ variable "ghactions_aws_role_arn" {
   default     = ""
 }
 
-variable "SAM_stack_name" {
-  type        = string
-  description = "Name of SAM stack"
-  default     = "my-sam-stack"
-}
+# variable "SAM_stack_name" {
+#   type        = string
+#   description = "Name of SAM stack"
+#   default     = "my-sam-stack"
+# }
 
 variable "cfdistro_response_headers_policy_id" {
   type = string

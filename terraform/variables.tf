@@ -37,3 +37,9 @@ variable "aws_profile" {
   type    = string
   default = ""
 }
+
+variable "SAM_stack_name" {
+  description = "Name of SAM stack"
+  type = string
+  default = ""
+}

@@ -71,6 +71,8 @@ data "aws_iam_policy_document" "ghactions_sam" {
   # Continue at SAMLogGroupPermission in sam-visitor-counter-permission
 }
 
+resource "aws_s3_bucket" "sam_artifacts_bucket" {}
+
 resource "aws_iam_role_policy" "ghactions_sam_permission_policy" {
   role = var.ghactions_aws_role_arn
 

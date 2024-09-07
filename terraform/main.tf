@@ -43,3 +43,15 @@ module "sam-s3-cloudfront-static-site-hsts" {
   aws_region = var.aws_region
   aws_profile = var.aws_profile
 }
+
+module "sam-visitor-counter-permission" {
+  source = "./modules/sam-visitor-counter-permission"
+
+  ghactions_aws_role_arn = ""
+  cfdistro_response_headers_policy_id = module.sam-s3-cloudfront-static-site-hsts.cfdistro_response_headers_policy_id
+  cfdistro_oac_id = module.sam-s3-cloudfront-static-site-hsts.cfdistro_oac_id
+  cfdistro_id = module.sam-s3-cloudfront-static-site-hsts.cfdistro_id
+
+  aws_region = var.aws_region
+  aws_profile = var.aws_profile
+}

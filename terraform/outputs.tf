@@ -18,9 +18,14 @@ output "SAM_stack_name" {
   value       = var.SAM_stack_name
 }
 
+output "SAM_bucket_name" {
+  description = "Name of the created SAM bucket to store sam artifacts in, help w/ automation"
+  value = module.sam-visitor-counter-permission.SAM_bucket_name
+}
+
 output "route53_hosted_zone_id" {
   description = "ID of AWS Route53 hosted zone for your domain"
-  value       = var.route53_hosted_zone_id
+  value       = aws_route53_zone.primary.id
 }
 
 output "cloudfront_distribution_id" {
