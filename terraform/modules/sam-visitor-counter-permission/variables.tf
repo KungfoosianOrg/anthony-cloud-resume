@@ -11,21 +11,21 @@ variable "SAM_stack_name" {
 }
 
 variable "cfdistro_response_headers_policy_id" {
-  type = string
+  type        = string
   description = "CloudFront distribution's response header's id"
-  default = null
+  default     = null
 }
 
 variable "cfdistro_oac_id" {
-  type = string
+  type        = string
   description = "Id of CloudFront distribution's Origin Access Control (OAC)"
-  default = null
+  default     = null
 }
 
 variable "cfdistro_id" {
-  type = string
+  type        = string
   description = "Id of CloudFront distribution"
-  default = null
+  default     = null
 }
 
 
