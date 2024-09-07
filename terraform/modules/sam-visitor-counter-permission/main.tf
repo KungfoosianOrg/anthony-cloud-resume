@@ -27,8 +27,8 @@ data "aws_iam_policy_document" "ghactions_sam" {
     sid = "S3_SAMBucketAccess"
     actions = [ "s3:*" ]
     resources = [ 
-      # TODO: Get ARN of S3 bucket created by SAM to tighten security, or arn:aws:s3:::*samclisourcebucket*
-      # TODO: Get ARN of S3 bucket storing templates used (not sure if necessary with Terraform)
+      aws_s3_bucket.sam_artifacts_bucket.arn
+      # TODO (Necessary??): Get ARN of S3 bucket storing templates used (not sure if necessary with Terraform)
      ]
   }
 
@@ -68,10 +68,9 @@ data "aws_iam_policy_document" "ghactions_sam" {
     ]
   }
 
-  # Continue at SAMLogGroupPermission in sam-visitor-counter-permission
   statement {
     effect = "Allow"
-    sid = "SAMLogGroupPermission"
+    sid = "SAM_LogGroupPermission"
     
     actions = [ 
       "logs:DeleteLogGroup",
@@ -94,7 +93,7 @@ data "aws_iam_policy_document" "ghactions_sam" {
 
   statement {
     effect = "Allow"
-    sid = "SAMCreateLogDelivery"
+    sid = "SAM_CreateLogDelivery"
 
     actions = [ "logs:CreateLogDelivery" ]
 
@@ -103,7 +102,7 @@ data "aws_iam_policy_document" "ghactions_sam" {
 
   statement {
     effect = "Allow"
-    sid = "SAMDynamoDBPermission"
+    sid = "SAM_DynamoDBPermission"
 
     actions = [ 
       "dynamodb:DescribeTable",
@@ -118,8 +117,150 @@ data "aws_iam_policy_document" "ghactions_sam" {
 
     resources = [ "arn:aws:dynamodb:${var.aws_region}:${data.aws_caller_identity.current.account_id}:table/*" ]
   }
+
+  statement {
+    effect = "Allow"
+    sid = "SAM_RoleCreationPermission"
+
+    actions = [ 
+      "iam:AttachRolePolicy",
+      "iam:CreateRole",
+      "iam:CreateServiceLinkedRole",
+      "iam:DeleteRole",
+      "iam:DeleteRolePolicy",
+      "iam:DetachRolePolicy",
+      "iam:GetRole",
+      "iam:GetRolePolicy",
+      "iam:ListAttachedRolePolicies",
+      "iam:ListRolePolicies",
+      "iam:PassRole",
+      "iam:PutRolePolicy",
+      "iam:TagRole"
+    ]
+
+    resources = [ "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${var.SAM_stack_name}*" ]
+  }
+
+  statement {
+    effect = "Allow"
+    sid = "SAM_AllowCreateServiceRoles"
+
+    actions = [ 
+      "iam:CreateServiceLinkedRole"
+    ]
+
+    resources = [ 
+      "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-service-role/ops.apigateway.amazonaws.com/AWSServiceRoleForAPIGateway"
+    ]
+  }
+
+  statement {
+    effect = "Allow"
+    sid = "AllowGHRoleToGetInfoOnSelf"
+
+    actions = [
+      "iam:GetRole",
+      "iam:GetRolePolicy"
+    ]
+
+    resources = [ 
+      "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${var.ghactions_aws_role_arn}"
+    ]
+  }
+
+  statement {
+    effect = "Allow"
+    sid = "SAM_LambdaPermission"
+
+    actions = [
+      "lambda:GetFunction",
+      "lambda:CreateFunction",
+      "lambda:DeleteFunction",
+      "lambda:TagResource",
+      "lambda:AddPermission",
+      "lambda:RemovePermission",
+      "lambda:GetRuntimeManagementConfig",
+      "lambda:GetFunctionCodeSigningConfig"
+    ]
+
+    resources = [ "arn:aws:lambda:${var.aws_region}:${data.aws_caller_identity.current.account_id}:function:${var.SAM_stack_name}*" ]
+  }
+
+  statement {
+    effect = "Allow"
+    sid = "ApiGwPermission"
+
+    actions = [ 
+      "apigateway:POST",
+      "apigateway:PUT",
+      "apigateway:TagResource"
+    ]
+
+    resources = [ "arn:aws:apigateway:${var.aws_region}::*" ]
+  }
+
+  statement {
+    effect = "Allow"
+    sid = "SAM_SNSPermissions"
+
+    actions = [ 
+      "SNS:CreateTopic",
+      "sns:GetTopicAttributes",
+      "SNS:GetDataProtectionPolicy",
+      "sns:SetTopicAttributes",
+      "sns:Subscribe",
+      "SNS:ListTagsForResource",
+      "SNS:ListSubscriptionsByTopic"
+    ]
+
+    resources = [ 
+      "arn:aws:sns:${var.aws_region}:${data.aws_caller_identity.current.account_id}:*"
+    ]
+  }
+
+  statement {
+    effect = "Allow"
+    sid = "CWPermissions"
+
+    actions = [
+      "cloudwatch:DescribeAlarms",
+      "cloudwatch:PutMetricAlarm"
+    ]
+
+    resources = [ 
+      "arn:aws:cloudwatch:${var.aws_region}:${data.aws_caller_identity.current.account_id}:alarm:*"
+    ]
+  }
+
+  statement {
+    effect = "Allow"
+    sid = "CFnPermissions"
+
+    actions = [ 
+      "cloudfront:GetResponseHeadersPolicy",
+      "cloudfront:UpdateResponseHeadersPolicy"
+    ]
+
+    resources = [ 
+      "arn:aws:cloudfront::${data.aws_caller_identity.current.account_id}:response-headers-policy/${var.cfdistro_response_headers_policy_id}"
+     ]
+  }
+
+  statement {
+    effect = "Allow"
+    sid = "GetCfnDistroOAC"
+
+    actions = [ 
+      "cloudfront:GetDistribution",
+      "cloudfront:CreateInvalidation"
+    ]
+
+    resources = [ "arn:aws:cloudfront::${data.aws_caller_identity.current.account_id}:distribution/${var.cfdistro_id}" ]
+
+  } 
 }
 
+# create bucket so SAM running from GHActions can consistently store to. helps w/ automation?
 resource "aws_s3_bucket" "sam_artifacts_bucket" {}
 
 resource "aws_iam_role_policy" "ghactions_sam_permission_policy" {
