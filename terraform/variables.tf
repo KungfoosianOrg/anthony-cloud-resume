@@ -43,3 +43,9 @@ variable "SAM_stack_name" {
   type = string
   default = ""
 }
+
+variable "github_repo_full_name" {
+  description = "Full path of GitHub repository, format: <owner>/<repository name>"
+  type = string
+  default = ""
+}

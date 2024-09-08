@@ -37,7 +37,7 @@ module "sam-s3-cloudfront-static-site-hsts" {
   registered_domain_name = var.registered_domain_name
   subdomains = var.subdomains
   route53_hosted_zone_id = aws_route53_zone.primary.id
-  ghactions_aws_role_arn = "" # TODO: point to output of GitHubCICDStack
+  ghactions_aws_role_arn = module.github-ci-cd-module.ghactions_oidc_role_arn
   acm_certificate_arn = module.route53-cloudfront-alias-w-ssl-validation.acm_certificate_arn
 
   aws_region = var.aws_region
@@ -47,11 +47,20 @@ module "sam-s3-cloudfront-static-site-hsts" {
 module "sam-visitor-counter-permission" {
   source = "./modules/sam-visitor-counter-permission"
 
-  ghactions_aws_role_arn = "" # TODO: SiteStack output
+  ghactions_aws_role_arn = module.github-ci-cd-module.ghactions_oidc_role_arn
   cfdistro_response_headers_policy_id = module.sam-s3-cloudfront-static-site-hsts.cfdistro_response_headers_policy_id
   cfdistro_oac_id = module.sam-s3-cloudfront-static-site-hsts.cfdistro_oac_id
   cfdistro_id = module.sam-s3-cloudfront-static-site-hsts.cfdistro_id
   SAM_stack_name = var.SAM_stack_name
+
+  aws_region = var.aws_region
+  aws_profile = var.aws_profile
+}
+
+module "github-ci-cd-module" {
+  source = "./modules/github-ci-cd"
+  
+  github_repo_full_name = var.github_repo_full_name
 
   aws_region = var.aws_region
   aws_profile = var.aws_profile
