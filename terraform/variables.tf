@@ -1,6 +1,7 @@
 variable "aws_region" {
+  description = "Needs to be us-east-1 since AWS creates and validates SSL cert"
   type    = string
-  default = ""
+  default = "us-east-1"
 }
 
 variable "aws_profile" {
@@ -45,16 +46,3 @@ variable "route53_hosted_zone_id" {
   description = "ID of Route53 hosted zone for your domain. Might be better to manually create one to avoid being charged for multiple if zone creation is automated"
   default     = ""
 }
-
-
-# variable "ghactions_aws_role_arn" {
-#   type        = string
-#   description = "ARN of role for GitHub Actions"
-#   default     = ""
-# }
-
-# variable "acm_certificate_arn" {
-#   type        = string
-#   description = "ARN of ACM certificate for the custom domain (if custom domain name parameter is defined)"
-#   default     = ""
-# }
