@@ -20,7 +20,7 @@ output "SAM_stack_name" {
 
 output "SAM_bucket_name" {
   description = "Name of the created SAM bucket to store sam artifacts in, help w/ automation"
-  value = module.sam-visitor-counter-permission.SAM_bucket_name
+  value       = module.sam-visitor-counter-permission.SAM_bucket_name
 }
 
 output "route53_hosted_zone_id" {
