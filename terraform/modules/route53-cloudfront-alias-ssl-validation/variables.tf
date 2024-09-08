@@ -37,3 +37,9 @@ variable "aws_profile" {
   type    = string
   default = ""
 }
+
+variable "is_prod_build" {
+  type        = bool
+  description = "Sets up build for production, disables route53 zone creation. Default: true. Set to false for testing"
+  default     = true
+}

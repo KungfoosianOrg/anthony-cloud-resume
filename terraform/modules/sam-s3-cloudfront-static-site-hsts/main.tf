@@ -25,14 +25,14 @@ provider "aws" {
 
 ##### PART 1 #####
 
-# Checks if route53_hosted_zone_id is defined:
+# Checks iif isi_prod_build defined:
 #   yes: ignore this resource creation
 #   no : create hosted zone
-resource "aws_route53_zone" "primary" {
-  count = var.route53_hosted_zone_id == "" ? 1 : 0
+# resource "aws_route53_zone" "primary" {
+#   count = var.is_prod_build ? 0 : 1
 
-  name = var.registered_domain_name
-}
+#   name = var.registered_domain_name
+# }
 ##### END PART #####
 
 resource "aws_cloudfront_response_headers_policy" "cfdistro_response_headers" {
@@ -50,7 +50,7 @@ resource "aws_cloudfront_response_headers_policy" "cfdistro_response_headers" {
         "form-action 'none'",
         "style-src https://${var.registered_domain_name} https://*.${var.registered_domain_name} https://cdn.jsdelivr.net",
         "script-src https://${var.registered_domain_name} https://*.${var.registered_domain_name} https://cdn.jsdelivr.net",
-        "connect-src ${var.apigw_endpoint_url == "" ? "none" : var.apigw_endpoint_url }",
+        "connect-src ${var.apigw_endpoint_url == "" ? "none" : var.apigw_endpoint_url}",
         "img-src https://${var.registered_domain_name} https://*.${var.registered_domain_name} data: w3.org/svg/2000"
       ])
     }

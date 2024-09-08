@@ -27,20 +27,25 @@ variable "SAM_stack_name" {
 }
 
 
-variable "github_repo_full_name" {
+variable "github_repo_name_full" {
   description = "Full path of GitHub repository, format: <owner>/<repository name>"
   type        = string
   default     = ""
 }
 
 
+variable "apigw_endpoint_url" {
+  type        = string
+  description = "URL of API Gateway endpoint, format: <endpoint_id>.execute-api.<aws_region>.amazonaws.com[/<path>] . FIRST TIME SETUP: leave default value"
+  default     = ""
+}
 
+variable "route53_hosted_zone_id" {
+  type        = string
+  description = "ID of Route53 hosted zone for your domain. Might be better to manually create one to avoid being charged for multiple if zone creation is automated"
+  default     = ""
+}
 
-# variable "apigw_endpoint_url" {
-#   type        = string
-#   description = "URL of API Gateway endpoint, format: <endpoint_id>.execute-api.<aws_region>.amazonaws.com[/<path>] . FIRST TIME SETUP: leave default value"
-#   default     = ""
-# }
 
 # variable "ghactions_aws_role_arn" {
 #   type        = string

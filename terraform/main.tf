@@ -15,6 +15,8 @@ provider "aws" {
 
 
 resource "aws_route53_zone" "primary" {
+  count = var.route53_hosted_zone_id == "" ? 1 : 0
+
   name = var.registered_domain_name
 }
 
@@ -24,7 +26,7 @@ module "route53-cloudfront-alias-w-ssl-validation" {
 
   registered_domain_name       = var.registered_domain_name
   subdomains                   = var.subdomains
-  route53_hosted_zone_id       = aws_route53_zone.primary.id
+  route53_hosted_zone_id       = var.route53_hosted_zone_id == "" ? aws_route53_zone.primary[0].id : var.route53_hosted_zone_id
   cloudfront_distribution_fqdn = module.sam-s3-cloudfront-static-site-hsts.cloudfront_distribution_domain_name
 
   aws_profile = var.aws_profile
@@ -36,7 +38,7 @@ module "sam-s3-cloudfront-static-site-hsts" {
 
   registered_domain_name = var.registered_domain_name
   subdomains             = var.subdomains
-  route53_hosted_zone_id = aws_route53_zone.primary.id
+  # route53_hosted_zone_id = aws_route53_zone.primary.id
   ghactions_aws_role_arn = module.github-ci-cd-module.ghactions_oidc_role_arn
   acm_certificate_arn    = module.route53-cloudfront-alias-w-ssl-validation.acm_certificate_arn
 
@@ -60,7 +62,7 @@ module "sam-visitor-counter-permission" {
 module "github-ci-cd-module" {
   source = "./modules/github-ci-cd"
 
-  github_repo_full_name = var.github_repo_full_name
+  github_repo_full_name = var.github_repo_name_full
 
   aws_region  = var.aws_region
   aws_profile = var.aws_profile

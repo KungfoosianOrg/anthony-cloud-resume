@@ -29,7 +29,7 @@ provider "aws" {
 #   yes: ignore this resource creation
 #   no : create hosted zone
 resource "aws_route53_zone" "primary" {
-  count = var.route53_hosted_zone_id == "" ? 1 : 0
+  count = var.is_prod_build ? 0 : 1
 
   name = var.registered_domain_name
 }
@@ -41,7 +41,7 @@ resource "aws_route53_zone" "primary" {
 # Creating IPv4 and IPv6 alias records for the domain itself
 resource "aws_route53_record" "ip4_domain_alias_record" {
   allow_overwrite = true
-  zone_id         = var.route53_hosted_zone_id == "" ? aws_route53_zone.primary[0].zone_id : var.route53_hosted_zone_id
+  zone_id         = var.is_prod_build ? var.route53_hosted_zone_id : aws_route53_zone.primary[0].zone_id
   name            = var.registered_domain_name
   type            = "A"
 
@@ -54,7 +54,7 @@ resource "aws_route53_record" "ip4_domain_alias_record" {
 
 resource "aws_route53_record" "ip6_domain_alias_record" {
   allow_overwrite = true
-  zone_id         = var.route53_hosted_zone_id == "" ? aws_route53_zone.primary[0].zone_id : var.route53_hosted_zone_id
+  zone_id         = var.is_prod_build ? var.route53_hosted_zone_id : aws_route53_zone.primary[0].zone_id
   name            = var.registered_domain_name
   type            = "AAAA"
 
@@ -70,7 +70,7 @@ resource "aws_route53_record" "ip4_subdomain_alias_records" {
   for_each = toset(var.subdomains)
 
   allow_overwrite = true
-  zone_id         = var.route53_hosted_zone_id == "" ? aws_route53_zone.primary[0].zone_id : var.route53_hosted_zone_id
+  zone_id         = var.is_prod_build ? var.route53_hosted_zone_id : aws_route53_zone.primary[0].zone_id
   name            = "${each.value}.${var.registered_domain_name}"
   type            = "A"
 
@@ -85,7 +85,7 @@ resource "aws_route53_record" "ip6_subdomain_alias_records" {
   for_each = toset(var.subdomains)
 
   allow_overwrite = true
-  zone_id         = var.route53_hosted_zone_id == "" ? aws_route53_zone.primary[0].zone_id : var.route53_hosted_zone_id
+  zone_id         = var.is_prod_build ? var.route53_hosted_zone_id : aws_route53_zone.primary[0].zone_id
   name            = "${each.value}.${var.registered_domain_name}"
   type            = "AAAA"
 
@@ -136,7 +136,7 @@ resource "aws_route53_record" "ssl_cert_validation_records" {
   })
 
   allow_overwrite = true
-  zone_id         = var.route53_hosted_zone_id == "" ? aws_route53_zone.primary[0].zone_id : var.route53_hosted_zone_id
+  zone_id         = var.is_prod_build ? var.route53_hosted_zone_id : aws_route53_zone.primary[0].zone_id
   ttl             = 300
   type            = each.value.type
   name            = each.value.name

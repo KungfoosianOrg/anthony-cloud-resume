@@ -6,3 +6,4 @@ ghactions_aws_role_arn = "ARN_GHActions_Role"
 acm_certificate_arn    = "arn:aws:acm:us-east-1:094625812543:certificate/test"
 aws_region             = "us-east-1"
 aws_profile            = "123456789012_AccessRole"
+is_prod_build          = false # sets up test mode, builds own route53 zone
