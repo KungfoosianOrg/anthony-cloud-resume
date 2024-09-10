@@ -72,6 +72,9 @@ module "github-ci-cd-module" {
 
 module "visitor_counter-frontend_module" {
   source = "./modules/visitor_counter-frontend_module"
+
+  aws_region  = var.aws_region
+  aws_profile = var.aws_profile
 }
 
 module "slack_integration" {}
