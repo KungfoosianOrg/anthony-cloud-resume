@@ -20,6 +20,7 @@ Parameters:
 
 
 Resources:
+  # sam-visitor-counter
   VisitorCounterLambdaLogGroup:
     Type: 'AWS::Logs::LogGroup'
 
@@ -126,8 +127,9 @@ Resources:
       PrimaryKey:
         Name:  id
         Type: String
+  # end sam-visitor-counter
 
-
+  # devops-alarms
   CWAlarmApiResponse4xxStack:
     Type: AWS::CloudFormation::Stack
     Properties:
@@ -183,8 +185,9 @@ Resources:
         StatisticCalculationMethodParam: SampleCount
         AlarmDescriptionParam: alarms when api calls exceed 100 within 1 minute
         AlarmThresholdParam: 100
+  # end devops-alarms
 
-
+  # slack-integration
   SlackIntegrationLambdaLogGroup:
     Type: 'AWS::Logs::LogGroup'
 
@@ -259,6 +262,7 @@ Resources:
               - kms:Decrypt
             Resource:
               - !Ref KmsDecryptKeyArnParam
+  # end slack-integration
 
 Outputs:
   VisitorCounterApiIdOutput:

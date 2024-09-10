@@ -30,6 +30,11 @@ Folder **/cypress** contains everything related to Cypress JS testing, used for 
 
 Folder **/github** contains HTML, CSS, JS for front end website
 
+Folder **/terraform** contains TerraForm templates for this project, and within it:
+  - **modules** : folder, contains separate (reusable) modules that made up this project
+  - `main.tf` : file, contains Terraform code for this static site application in AWS, combining modules from the **modules** folder
+  - files, each containing: `outputs.tf` of this app, arguments `main.tf` needs to run TerraForm build (`variables.tf`), and `examples.tfvars` containing said arguments, ready to be copied, renamed, fill out with your own data, great for automation!
+
 Folder **/tests** contains all tests for code in this repo
 
 **/samconfig.toml** contains default parameters for when a SAM stack is deployed

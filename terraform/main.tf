@@ -1,3 +1,5 @@
+# This template creates the static website hosting, custom domain validation, SSL
+
 terraform {
   required_providers {
     aws = {
@@ -67,3 +69,11 @@ module "github-ci-cd-module" {
   aws_region  = var.aws_region
   aws_profile = var.aws_profile
 }
+
+module "visitor_counter-frontend_module" {
+  source = "./modules/visitor_counter-frontend_module"
+}
+
+module "slack_integration" {}
+
+module "devops-visitor_counter_alarms" {}

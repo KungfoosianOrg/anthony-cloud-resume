@@ -46,3 +46,21 @@ variable "route53_hosted_zone_id" {
   description = "ID of Route53 hosted zone for your domain. Might be better to manually create one to avoid being charged for multiple if zone creation is automated"
   default     = ""
 }
+
+variable "notification_email" {
+  type = string
+  description = "Email to send CloudWatch alarms to"
+  default = ""
+}
+
+# might not even need if making the whole app with SAM in one place
+# variable "slack_webhook-ssm_key_arn" {
+#   type = string
+#   description = "AWS ARN of Slack webhook SSM SecureString parameter for Slack integration"
+#   default = ""
+# }
+# variable "kms_decrypt_key_arn" {
+#   type = string
+#   description = "AWS ARN of KMS decrypt key for slack_webhook-ssm_key_arn"
+#   default = ""
+# }
