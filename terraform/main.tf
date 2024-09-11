@@ -70,8 +70,8 @@ module "github-ci-cd-module" {
   aws_profile = var.aws_profile
 }
 
-module "visitor_counter-frontend_module" {
-  source = "./modules/visitor_counter-frontend_module"
+module "visitor_counter-module" {
+  source = "./modules/visitor_counter"
 
   aws_region  = var.aws_region
   aws_profile = var.aws_profile
