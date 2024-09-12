@@ -8,3 +8,13 @@ variable "aws_profile" {
   type    = string
   default = ""
 }
+
+variable "lambda-log_group-name" {
+  type = string
+  default = "lambda/VisitorCounter"
+}
+
+variable "api_gw-log_group-name" {
+  type = string
+  default = "apigateway/VisitorCounter"
+}

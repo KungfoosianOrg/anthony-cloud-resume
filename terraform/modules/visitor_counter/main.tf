@@ -13,17 +13,18 @@ provider "aws" {
   profile = var.aws_profile
 }
 
+
 data "aws_caller_identity" "current" {}
 
 resource "aws_cloudwatch_log_group" "visitor_counter-lambda" {
   log_group_class = "STANDARD"
-  name = "lambda/VisitorCounter"
+  name = var.lambda-log_group-name
   retention_in_days = 3
 }
 
 resource "aws_cloudwatch_log_group" "visitor_counter-api_gw" {
   log_group_class = "STANDARD"
-  name = "apigateway/VisitorCounter"
+  name = var.api_gw-log_group-name
   retention_in_days = 3
 }
 
@@ -67,9 +68,20 @@ resource "aws_lambda_function" "visitor_counter" {
 
   filename = "../../../out/visitorCounter.zip"
 
+  package_type = "Zip"
+
+  runtime = "python3.9"
+
   handler = "lambda_function.lambda_handler"
 
-  # TODO: continue line 86 of template.yaml for SAM
+  # might not need to worry about Events section, since we can point api gateway to this
+
+  logging_config {
+    application_log_level = "INFO"
+    system_log_level = "INFO"
+    log_format = "JSON"
+    log_group = var.lambda-log_group-name
+  }
 }
 
 data "aws_iam_policy_document" "visitor_counter-lambda-policies" {
