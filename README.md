@@ -30,6 +30,8 @@ Folder **/cypress** contains everything related to Cypress JS testing, used for 
 
 Folder **/github** contains HTML, CSS, JS for front end website
 
+Folder **/out** contains any file(s) created during automation processes. Currently set to ignore any files within this folder
+
 Folder **/terraform** contains TerraForm templates for this project, and within it:
   - **modules** : folder, contains separate (reusable) modules that made up this project
   - `main.tf` : file, contains Terraform code for this static site application in AWS, combining modules from the **modules** folder

@@ -42,8 +42,34 @@ resource "aws_lambda_permission" "api_gw" {}
 
 
 # section - Lambda function
-module "visitor_counter-lambda_function" {
+data "archive_file" "visitor_counter-package" {
+  type = "zip"
 
+  source_dir = "../../../aws/visitorCounter"
+
+  output_path = "../../../out/visitorCounter.zip"
+}
+
+resource "aws_lambda_function" "visitor_counter" {
+  function_name = "VisitorCounterLambda"
+
+  role = aws_iam_role.visitor_counter-lambda_function-execution_role.arn
+
+  description = "Lambda backend code for visitor counter, handles HTTP POST requests to increase a website visitor counter"
+
+  environment {
+    variables = {
+      DDB_TABLE_REGION = var.aws_region
+
+      DDB_TABLE_ARN = "arn:aws:dynamodb:${var.aws_region}:${data.aws_caller_identity.current.account_id}:table/${aws_dynamodb_table.visitor_counter-table.id}"
+    }
+  }
+
+  filename = "../../../out/visitorCounter.zip"
+
+  handler = "lambda_function.lambda_handler"
+
+  # TODO: continue line 86 of template.yaml for SAM
 }
 
 data "aws_iam_policy_document" "visitor_counter-lambda-policies" {
@@ -96,7 +122,7 @@ data "aws_iam_policy_document" "visitor_counter-lambda-policies" {
 }
 
 
-resource "aws_iam_role" "visitor_counter-lambda_function-iam_role" {
+resource "aws_iam_role" "visitor_counter-lambda_function-execution_role" {
   name = "IAM role for visitor counter lambda"
 
   assume_role_policy = data.aws_iam_policy_document.visitor_counter-lambda-policies.json
@@ -105,6 +131,7 @@ resource "aws_iam_role" "visitor_counter-lambda_function-iam_role" {
 # END section
 
 
+# section - DynamoDB table
 resource "aws_dynamodb_table" "visitor_counter-table" {
   name =  "VisitorCounterTable"
   hash_key = "id"
@@ -114,3 +141,4 @@ resource "aws_dynamodb_table" "visitor_counter-table" {
     type = "S"
   }
 }
+# END section

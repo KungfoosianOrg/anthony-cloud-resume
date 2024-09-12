@@ -6,6 +6,8 @@ my_deployment_pkg.zip
 .aws-sam
 samconfig-test.toml
 
+out/*
+
 # Local .terraform directories
 **/.terraform/*
 

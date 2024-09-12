@@ -90,6 +90,7 @@ Resources:
               Method: post
               Path: /visitor-counter
               ApiId: !Ref SAMVisitorCounterApiGw
+              
       LoggingConfig:
         ApplicationLogLevel: INFO
         LogFormat: JSON
