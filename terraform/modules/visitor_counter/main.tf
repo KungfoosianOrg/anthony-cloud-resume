@@ -30,7 +30,18 @@ resource "aws_cloudwatch_log_group" "visitor_counter-api_gw" {
 
 
 # section - API Gateway (SAMVisitorCounterApiGw in CloudFormation SAM)
-resource "aws_apigatewayv2_api" "lambda" {}
+resource "aws_apigatewayv2_api" "visitor_counter-api" {
+  name = "visitor_counter-api"
+  protocol_type = "HTTP"
+
+  cors_configuration {
+    allow_methods = [ "POST" ]
+    allow_origins = [ "*" ] // TODO (later): change to website URL and subdomain
+    max_age = 0
+  }
+
+  # TODO: continue this
+}
 
 resource "aws_apigatewayv2_stage" "lambda" {}
 
