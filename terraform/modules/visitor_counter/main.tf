@@ -31,6 +31,7 @@ resource "aws_cloudwatch_log_group" "visitor_counter-api_gw" {
 
 # section - API Gateway (SAMVisitorCounterApiGw in CloudFormation SAM)
 resource "aws_apigatewayv2_api" "visitor_counter-api" {
+  description = "API Gateway to trigger Lambda to perform read/write on DynamoDB"
   name = "visitor_counter-api"
   protocol_type = "HTTP"
 
@@ -40,10 +41,20 @@ resource "aws_apigatewayv2_api" "visitor_counter-api" {
     max_age = 0
   }
 
-  # TODO: continue this
+  target = aws_lambda_function.visitor_counter.arn
 }
 
-resource "aws_apigatewayv2_stage" "lambda" {}
+resource "aws_apigatewayv2_stage" "visitor_counter" {
+  api_id = aws_apigatewayv2_api.visitor_counter-api.id
+  name = "$default"
+  auto_deploy = true
+
+  access_log_settings {
+    destination_arn = aws_cloudwatch_log_group.visitor_counter-api_gw.arn
+
+    format = "$context.identity.sourceIp - - [$context.requestTime] \"$context.httpMethod $context.routeKey $context.protocol\" $context.status $context.responseLength $context.requestId $context.integrationErrorMessage"
+  }
+}
 
 resource "aws_apigatewayv2_integration" "publish_book_review_api" {}
 
