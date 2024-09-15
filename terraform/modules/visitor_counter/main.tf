@@ -17,36 +17,36 @@ provider "aws" {
 data "aws_caller_identity" "current" {}
 
 resource "aws_cloudwatch_log_group" "visitor_counter-lambda" {
-  log_group_class = "STANDARD"
-  name = var.lambda-log_group-name
+  log_group_class   = "STANDARD"
+  name              = var.lambda-log_group-name
   retention_in_days = 3
 }
 
 resource "aws_cloudwatch_log_group" "visitor_counter-api_gw" {
-  log_group_class = "STANDARD"
-  name = var.api_gw-log_group-name
+  log_group_class   = "STANDARD"
+  name              = var.api_gw-log_group-name
   retention_in_days = 3
 }
 
 
 # section - API Gateway (SAMVisitorCounterApiGw in CloudFormation SAM)
 resource "aws_apigatewayv2_api" "visitor_counter-api" {
-  description = "API Gateway to trigger Lambda to perform read/write on DynamoDB"
-  name = "visitor_counter-api"
+  description   = "API Gateway to trigger Lambda to perform read/write on DynamoDB"
+  name          = "visitor_counter-api"
   protocol_type = "HTTP"
 
   cors_configuration {
-    allow_methods = [ "POST" ]
-    allow_origins = [ "*" ] // TODO (later): change to website URL and subdomain
-    max_age = 0
+    allow_methods = ["POST"]
+    allow_origins = ["*"] // TODO (later): change to website URL and subdomain
+    max_age       = 0
   }
 
   target = aws_lambda_function.visitor_counter.arn
 }
 
 resource "aws_apigatewayv2_stage" "visitor_counter" {
-  api_id = aws_apigatewayv2_api.visitor_counter-api.id
-  name = "$default"
+  api_id      = aws_apigatewayv2_api.visitor_counter-api.id
+  name        = "$default"
   auto_deploy = true
 
   access_log_settings {
@@ -57,25 +57,25 @@ resource "aws_apigatewayv2_stage" "visitor_counter" {
 }
 
 resource "aws_apigatewayv2_integration" "visitor_counter-lambda_integration" {
-  api_id = aws_apigatewayv2_api.visitor_counter-api.id
-  integration_type = "HTTP_PROXY"
-  integration_method = "POST"
-  integration_uri = aws_lambda_function.visitor_counter.qualified_invoke_arn
+  api_id                 = aws_apigatewayv2_api.visitor_counter-api.id
+  integration_type       = "HTTP_PROXY"
+  integration_method     = "POST"
+  integration_uri        = aws_lambda_function.visitor_counter.qualified_invoke_arn
   payload_format_version = "2.0"
 }
 
 resource "aws_apigatewayv2_route" "visitor_counter-api_invoke_route" {
-  api_id = aws_apigatewayv2_api.visitor_counter-api.id
-  route_key = "POST /visitor-counter"
+  api_id             = aws_apigatewayv2_api.visitor_counter-api.id
+  route_key          = "POST /visitor-counter"
   authorization_type = "NONE"
-  target = aws_apigatewayv2_integration.visitor_counter-lambda_integration.id
+  target             = aws_apigatewayv2_integration.visitor_counter-lambda_integration.id
 }
 
 resource "aws_lambda_permission" "api_gw-lambda_access_permission" {
-  action = "lambda:InvokeFunction"
+  action        = "lambda:InvokeFunction"
   function_name = var.lambda_function_name
-  principal = "apigateway.amazonaws.com"
-  source_arn = aws_apigatewayv2_api.visitor_counter-api.arn
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = aws_apigatewayv2_api.visitor_counter-api.arn
 }
 ### END section ###
 
@@ -116,9 +116,9 @@ resource "aws_lambda_function" "visitor_counter" {
 
   logging_config {
     application_log_level = "INFO"
-    system_log_level = "INFO"
-    log_format = "JSON"
-    log_group = var.lambda-log_group-name
+    system_log_level      = "INFO"
+    log_format            = "JSON"
+    log_group             = var.lambda-log_group-name
   }
 }
 
@@ -126,21 +126,21 @@ data "aws_iam_policy_document" "visitor_counter-lambda-policies" {
   version = "2012-10-17"
 
   statement {
-    sid = "trustPolicy"
-    actions = [ "sts:AssumeRole" ]
+    sid     = "trustPolicy"
+    actions = ["sts:AssumeRole"]
 
     # Why principal is defined this way? https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document#principals
     principals {
-      type = "Service"
-      identifiers = [ "lambda.amazonaws.com" ]
+      type        = "Service"
+      identifiers = ["lambda.amazonaws.com"]
     }
   }
 
   # permission policies
   statement {
-    sid = "VisitorCounterDDBPermissions"
+    sid    = "VisitorCounterDDBPermissions"
     effect = "Allow"
-    actions = [ 
+    actions = [
       "dynamodb:DeleteItem",
       "dynamodb:GetItem",
       "dynamodb:PutItem",
@@ -149,30 +149,30 @@ data "aws_iam_policy_document" "visitor_counter-lambda-policies" {
       "dynamodb:DescribeTable"
     ]
 
-    resources = [ 
+    resources = [
       "arn:aws:dynamodb:${var.aws_region}:${data.aws_caller_identity.current.account_id}:table/${aws_dynamodb_table.visitor_counter-table.id}",
       "arn:aws:dynamodb:${var.aws_region}:${data.aws_caller_identity.current.account_id}:table/${aws_dynamodb_table.visitor_counter-table.id}/index/*"
-     ]
+    ]
   }
 
   statement {
-    sid = "CopiedAWSLambdaBasicExecutionRole"
+    sid    = "CopiedAWSLambdaBasicExecutionRole"
     effect = "Allow"
 
-    actions = [ 
+    actions = [
       "logs:CreateLogGroup",
       "logs:CreateLogStream",
       "logs:PutLogEvents"
     ]
 
-    resources = [ "*" ]
+    resources = ["*"]
   }
 
 }
 
 
 resource "aws_iam_role" "visitor_counter-lambda_function-execution_role" {
-  name = "IAM role for visitor counter lambda"
+  name = "VisitorCounterLambdaExecutionRole"
 
   assume_role_policy = data.aws_iam_policy_document.visitor_counter-lambda-policies.json
 }
@@ -182,7 +182,7 @@ resource "aws_iam_role" "visitor_counter-lambda_function-execution_role" {
 
 # section - DynamoDB table
 resource "aws_dynamodb_table" "visitor_counter-table" {
-  name =  "VisitorCounterTable"
+  name     = "VisitorCounterTable"
   hash_key = "id"
 
   attribute {
