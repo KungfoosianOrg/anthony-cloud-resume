@@ -56,11 +56,27 @@ resource "aws_apigatewayv2_stage" "visitor_counter" {
   }
 }
 
-resource "aws_apigatewayv2_integration" "publish_book_review_api" {}
+resource "aws_apigatewayv2_integration" "visitor_counter-lambda_integration" {
+  api_id = aws_apigatewayv2_api.visitor_counter-api.id
+  integration_type = "HTTP_PROXY"
+  integration_method = "POST"
+  integration_uri = aws_lambda_function.visitor_counter.qualified_invoke_arn
+  payload_format_version = "2.0"
+}
 
-resource "aws_apigatewayv2_route" "publish_book_review_route" {}
+resource "aws_apigatewayv2_route" "visitor_counter-api_invoke_route" {
+  api_id = aws_apigatewayv2_api.visitor_counter-api.id
+  route_key = "POST /visitor-counter"
+  authorization_type = "NONE"
+  target = aws_apigatewayv2_integration.visitor_counter-lambda_integration.id
+}
 
-resource "aws_lambda_permission" "api_gw" {}
+resource "aws_lambda_permission" "api_gw-lambda_access_permission" {
+  action = "lambda:InvokeFunction"
+  function_name = var.lambda_function_name
+  principal = "apigateway.amazonaws.com"
+  source_arn = aws_apigatewayv2_api.visitor_counter-api.arn
+}
 ### END section ###
 
 
@@ -74,7 +90,7 @@ data "archive_file" "visitor_counter-package" {
 }
 
 resource "aws_lambda_function" "visitor_counter" {
-  function_name = "VisitorCounterLambda"
+  function_name = var.lambda_function_name
 
   role = aws_iam_role.visitor_counter-lambda_function-execution_role.arn
 
@@ -139,7 +155,6 @@ data "aws_iam_policy_document" "visitor_counter-lambda-policies" {
      ]
   }
 
-  # TODO: the rest of Lambda execution permissions
   statement {
     sid = "CopiedAWSLambdaBasicExecutionRole"
     effect = "Allow"

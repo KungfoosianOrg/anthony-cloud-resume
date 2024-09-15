@@ -18,3 +18,8 @@ variable "api_gw-log_group-name" {
   type = string
   default = "apigateway/VisitorCounter"
 }
+
+variable "lambda_function_name" {
+  type = string
+  default = "VisitorCounterLambda"
+}
