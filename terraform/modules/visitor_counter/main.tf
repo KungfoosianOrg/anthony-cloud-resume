@@ -81,6 +81,7 @@ resource "aws_lambda_permission" "api_gw-lambda_access_permission" {
 
 
 # section - Lambda function
+# converts the folder to a zip package at specified path
 data "archive_file" "visitor_counter-package" {
   type = "zip"
 
@@ -104,6 +105,7 @@ resource "aws_lambda_function" "visitor_counter" {
     }
   }
 
+  # uses the zip package output from archive_file above
   filename = "../../../out/visitorCounter.zip"
 
   package_type = "Zip"
@@ -184,6 +186,7 @@ resource "aws_iam_role" "visitor_counter-lambda_function-execution_role" {
 resource "aws_dynamodb_table" "visitor_counter-table" {
   name     = "VisitorCounterTable"
   hash_key = "id"
+  billing_mode = "PAY_PER_REQUEST"
 
   attribute {
     name = "id"
