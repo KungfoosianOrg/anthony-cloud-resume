@@ -43,7 +43,7 @@ variable "apigw_endpoint_url" {
 
 variable "route53_hosted_zone_id" {
   type        = string
-  description = "ID of Route53 hosted zone for your domain. Might be better to manually create one to avoid being charged for multiple if zone creation is automated"
+  description = "ID of Route53 hosted zone for your domain. Leave blank to have one created for you. NOTE: you'll need to delete zone manually if not used anymore, this is to keep costs low since you get charged per zone creationn"
   default     = ""
 }
 

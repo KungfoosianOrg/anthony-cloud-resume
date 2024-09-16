@@ -15,11 +15,15 @@ provider "aws" {
   profile = var.aws_profile
 }
 
-
+# if no zone id is passed in, creates the zone and keeps it in event of deletion
 resource "aws_route53_zone" "primary" {
   count = var.route53_hosted_zone_id == "" ? 1 : 0
 
   name = var.registered_domain_name
+
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
 
@@ -40,7 +44,7 @@ module "sam-s3-cloudfront-static-site-hsts" {
 
   registered_domain_name = var.registered_domain_name
   subdomains             = var.subdomains
-  # route53_hosted_zone_id = aws_route53_zone.primary.id
+  route53_hosted_zone_id = var.route53_hosted_zone_id == "" ? aws_route53_zone.primary[0].id : var.route53_hosted_zone_id
   ghactions_aws_role_arn = module.github-ci-cd-module.ghactions_oidc_role_arn
   acm_certificate_arn    = module.route53-cloudfront-alias-w-ssl-validation.acm_certificate_arn
 
