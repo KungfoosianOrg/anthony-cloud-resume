@@ -85,8 +85,10 @@ module "visitor_counter-module" {
 module "alarm-api_response_4xx" {
   source = "./modules/cloudwatch-alarm"
 
-  name = "4xxApiResponse"
   notification_subscriber_email = var.notification_subscriber_email
+  lambda_subscriber_arn = module.slack_integration.slack_integration-lambda_arn
+  
+  name = "4xxApiResponse"
   measured_metric = "4xx"
   api_gw_id = module.visitor_counter-module.apigw_id
   alarm_description = "alarms when api gateway HTTP response is 4xx"
@@ -98,8 +100,10 @@ module "alarm-api_response_4xx" {
 module "alarm-api_response_5xx" {
   source = "./modules/cloudwatch-alarm"
 
-  name = "5xxApiResponse"
   notification_subscriber_email = var.notification_subscriber_email
+  lambda_subscriber_arn = module.slack_integration.slack_integration-lambda_arn
+
+  name = "5xxApiResponse"
   measured_metric = "5xx"
   api_gw_id = module.visitor_counter-module.apigw_id
   alarm_description = "alarms when api gateway HTTP response is 4xx"
@@ -111,8 +115,10 @@ module "alarm-api_response_5xx" {
 module "alarm-api_response_latency" {
   source = "./modules/cloudwatch-alarm"
 
-  name = "ApiResponseLatency"
   notification_subscriber_email = var.notification_subscriber_email
+  lambda_subscriber_arn = module.slack_integration.slack_integration-lambda_arn
+
+  name = "ApiResponseLatency"
   measured_metric = "Latency"
   api_gw_id = module.visitor_counter-module.apigw_id
   alarm_description = "alarms when api gateway HTTP response takes more than 2 seconds"
@@ -126,8 +132,10 @@ module "alarm-api_response_latency" {
 module "alarm-api_call_exceed_expectation" {
   source = "./modules/cloudwatch-alarm"
 
-  name = "ApiCallExceedExpectation"
   notification_subscriber_email = var.notification_subscriber_email
+  lambda_subscriber_arn = module.slack_integration.slack_integration-lambda_arn
+
+  name = "ApiCallExceedExpectation"
   measured_metric = "Count"
   api_gw_id = module.visitor_counter-module.apigw_id
   statistic_calculation_method = "SampleCount"
@@ -140,4 +148,11 @@ module "alarm-api_call_exceed_expectation" {
 }
 # END devops-alarms
 
-module "slack_integration" {}
+module "slack_integration" {
+  source = "./modules/slack_integration"
+
+  slack_webhook_url = var.slack_webhook_url
+
+  aws_region  = var.aws_region
+  aws_profile = var.aws_profile
+}

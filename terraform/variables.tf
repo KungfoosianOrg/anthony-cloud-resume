@@ -64,3 +64,9 @@ variable "notification_subscriber_email" {
     type = string
     default = ""
 }
+
+variable "slack_webhook_url" {
+  description = "URL for Slack webhook"
+  type = string
+  default = ""
+}
