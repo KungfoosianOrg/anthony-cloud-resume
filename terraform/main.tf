@@ -81,6 +81,63 @@ module "visitor_counter-module" {
   aws_profile = var.aws_profile
 }
 
-module "slack_integration" {}
+# devops-alarms
+module "alarm-api_response_4xx" {
+  source = "./modules/cloudwatch-alarm"
 
-module "devops-visitor_counter_alarms" {}
+  name = "4xxApiResponse"
+  notification_subscriber_email = var.notification_subscriber_email
+  measured_metric = "4xx"
+  api_gw_id = module.visitor_counter-module.apigw_id
+  alarm_description = "alarms when api gateway HTTP response is 4xx"
+
+  aws_region  = var.aws_region
+  aws_profile = var.aws_profile
+}
+
+module "alarm-api_response_5xx" {
+  source = "./modules/cloudwatch-alarm"
+
+  name = "5xxApiResponse"
+  notification_subscriber_email = var.notification_subscriber_email
+  measured_metric = "5xx"
+  api_gw_id = module.visitor_counter-module.apigw_id
+  alarm_description = "alarms when api gateway HTTP response is 4xx"
+
+  aws_region  = var.aws_region
+  aws_profile = var.aws_profile
+}
+
+module "alarm-api_response_latency" {
+  source = "./modules/cloudwatch-alarm"
+
+  name = "ApiResponseLatency"
+  notification_subscriber_email = var.notification_subscriber_email
+  measured_metric = "Latency"
+  api_gw_id = module.visitor_counter-module.apigw_id
+  alarm_description = "alarms when api gateway HTTP response takes more than 2 seconds"
+  statistic_calculation_method = "Maximum"
+  alarm_threshold = 2000 // in ms
+
+  aws_region  = var.aws_region
+  aws_profile = var.aws_profile
+}
+
+module "alarm-api_call_exceed_expectation" {
+  source = "./modules/cloudwatch-alarm"
+
+  name = "ApiCallExceedExpectation"
+  notification_subscriber_email = var.notification_subscriber_email
+  measured_metric = "Count"
+  api_gw_id = module.visitor_counter-module.apigw_id
+  statistic_calculation_method = "SampleCount"
+  alarm_description = "alarms when api calls exceed 100 within 1 minute"
+  alarm_threshold = 100
+  measuring_period = 60 // in second
+
+  aws_region  = var.aws_region
+  aws_profile = var.aws_profile
+}
+# END devops-alarms
+
+module "slack_integration" {}

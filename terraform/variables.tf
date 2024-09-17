@@ -47,12 +47,6 @@ variable "route53_hosted_zone_id" {
   default     = ""
 }
 
-variable "notification_email" {
-  type = string
-  description = "Email to send CloudWatch alarms to"
-  default = ""
-}
-
 # might not even need if making the whole app with SAM in one place
 # variable "slack_webhook-ssm_key_arn" {
 #   type = string
@@ -64,3 +58,9 @@ variable "notification_email" {
 #   description = "AWS ARN of KMS decrypt key for slack_webhook-ssm_key_arn"
 #   default = ""
 # }
+
+variable "notification_subscriber_email" {
+    description = "Email to send SNS notifications topic"
+    type = string
+    default = ""
+}
