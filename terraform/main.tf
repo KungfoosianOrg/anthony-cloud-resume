@@ -86,11 +86,11 @@ module "alarm-api_response_4xx" {
   source = "./modules/cloudwatch-alarm"
 
   notification_subscriber_email = var.notification_subscriber_email
-  lambda_subscriber_arn = module.slack_integration.slack_integration-lambda_arn
-  
-  name = "4xxApiResponse"
-  measured_metric = "4xx"
-  api_gw_id = module.visitor_counter-module.apigw_id
+  lambda_subscriber_arn         = module.slack_integration.slack_integration-lambda_arn
+
+  name              = "4xxApiResponse"
+  measured_metric   = "4xx"
+  api_gw_id         = module.visitor_counter-module.apigw_id
   alarm_description = "alarms when api gateway HTTP response is 4xx"
 
   aws_region  = var.aws_region
@@ -101,11 +101,11 @@ module "alarm-api_response_5xx" {
   source = "./modules/cloudwatch-alarm"
 
   notification_subscriber_email = var.notification_subscriber_email
-  lambda_subscriber_arn = module.slack_integration.slack_integration-lambda_arn
+  lambda_subscriber_arn         = module.slack_integration.slack_integration-lambda_arn
 
-  name = "5xxApiResponse"
-  measured_metric = "5xx"
-  api_gw_id = module.visitor_counter-module.apigw_id
+  name              = "5xxApiResponse"
+  measured_metric   = "5xx"
+  api_gw_id         = module.visitor_counter-module.apigw_id
   alarm_description = "alarms when api gateway HTTP response is 4xx"
 
   aws_region  = var.aws_region
@@ -116,14 +116,14 @@ module "alarm-api_response_latency" {
   source = "./modules/cloudwatch-alarm"
 
   notification_subscriber_email = var.notification_subscriber_email
-  lambda_subscriber_arn = module.slack_integration.slack_integration-lambda_arn
+  lambda_subscriber_arn         = module.slack_integration.slack_integration-lambda_arn
 
-  name = "ApiResponseLatency"
-  measured_metric = "Latency"
-  api_gw_id = module.visitor_counter-module.apigw_id
-  alarm_description = "alarms when api gateway HTTP response takes more than 2 seconds"
+  name                         = "ApiResponseLatency"
+  measured_metric              = "Latency"
+  api_gw_id                    = module.visitor_counter-module.apigw_id
+  alarm_description            = "alarms when api gateway HTTP response takes more than 2 seconds"
   statistic_calculation_method = "Maximum"
-  alarm_threshold = 2000 // in ms
+  alarm_threshold              = 2000 // in ms
 
   aws_region  = var.aws_region
   aws_profile = var.aws_profile
@@ -133,15 +133,15 @@ module "alarm-api_call_exceed_expectation" {
   source = "./modules/cloudwatch-alarm"
 
   notification_subscriber_email = var.notification_subscriber_email
-  lambda_subscriber_arn = module.slack_integration.slack_integration-lambda_arn
+  lambda_subscriber_arn         = module.slack_integration.slack_integration-lambda_arn
 
-  name = "ApiCallExceedExpectation"
-  measured_metric = "Count"
-  api_gw_id = module.visitor_counter-module.apigw_id
+  name                         = "ApiCallExceedExpectation"
+  measured_metric              = "Count"
+  api_gw_id                    = module.visitor_counter-module.apigw_id
   statistic_calculation_method = "SampleCount"
-  alarm_description = "alarms when api calls exceed 100 within 1 minute"
-  alarm_threshold = 100
-  measuring_period = 60 // in second
+  alarm_description            = "alarms when api calls exceed 100 within 1 minute"
+  alarm_threshold              = 100
+  measuring_period             = 60 // in second
 
   aws_region  = var.aws_region
   aws_profile = var.aws_profile

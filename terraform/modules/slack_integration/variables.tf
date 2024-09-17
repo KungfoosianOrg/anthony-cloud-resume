@@ -26,6 +26,6 @@ variable "lambda_function_name" {
 
 variable "slack_webhook_url" {
   description = "URL for Slack webhook"
-  type = string
-  default = ""
+  type        = string
+  default     = ""
 }

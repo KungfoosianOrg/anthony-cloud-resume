@@ -124,19 +124,29 @@ resource "aws_lambda_function" "visitor_counter" {
   }
 }
 
-data "aws_iam_policy_document" "visitor_counter-lambda-policies" {
-  version = "2012-10-17"
-
+data "aws_iam_policy_document" "lambda-assume_role" {
   statement {
-    sid     = "trustPolicy"
-    actions = ["sts:AssumeRole"]
+    effect = "Allow"
 
     # Why principal is defined this way? https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document#principals
     principals {
       type        = "Service"
       identifiers = ["lambda.amazonaws.com"]
     }
+
+    actions = ["sts:AssumeRole"]
   }
+}
+
+resource "aws_iam_role" "visitor_counter-lambda_function-execution_role" {
+  name = "SlackIntegrationLambdaExecutionRole"
+
+  assume_role_policy = data.aws_iam_policy_document.lambda-assume_role.json
+}
+
+
+data "aws_iam_policy_document" "visitor_counter-lambda-policies" {
+  version = "2012-10-17"
 
   # permission policies
   statement {
@@ -157,26 +167,22 @@ data "aws_iam_policy_document" "visitor_counter-lambda-policies" {
     ]
   }
 
-  statement {
-    sid    = "CopiedAWSLambdaBasicExecutionRole"
-    effect = "Allow"
-
-    actions = [
-      "logs:CreateLogGroup",
-      "logs:CreateLogStream",
-      "logs:PutLogEvents"
-    ]
-
-    resources = ["*"]
-  }
-
 }
 
+resource "aws_iam_policy" "lambda-execution_policy" {
+  policy = data.aws_iam_policy_document.visitor_counter-lambda-policies.json
+}
 
-resource "aws_iam_role" "visitor_counter-lambda_function-execution_role" {
-  name = "VisitorCounterLambdaExecutionRole"
+resource "aws_iam_role_policy_attachment" "lambda-execution_policy_attach" {
+  role = aws_iam_role.visitor_counter-lambda_function-execution_role.name
 
-  assume_role_policy = data.aws_iam_policy_document.visitor_counter-lambda-policies.json
+  policy_arn = aws_iam_policy.lambda-execution_policy.arn
+}
+
+# attach LambdaBasicExecutionRole so Lambda can log
+resource "aws_iam_role_policy_attachment" "aws_managed_policies" {
+  role       = aws_iam_role.visitor_counter-lambda_function-execution_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
 # END section

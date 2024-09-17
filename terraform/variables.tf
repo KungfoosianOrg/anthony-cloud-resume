@@ -1,7 +1,7 @@
 variable "aws_region" {
   description = "Needs to be us-east-1 since AWS creates and validates SSL cert"
-  type    = string
-  default = "us-east-1"
+  type        = string
+  default     = "us-east-1"
 }
 
 variable "aws_profile" {
@@ -60,13 +60,13 @@ variable "route53_hosted_zone_id" {
 # }
 
 variable "notification_subscriber_email" {
-    description = "Email to send SNS notifications topic"
-    type = string
-    default = ""
+  description = "Email to send SNS notifications topic"
+  type        = string
+  default     = ""
 }
 
 variable "slack_webhook_url" {
   description = "URL for Slack webhook"
-  type = string
-  default = ""
+  type        = string
+  default     = ""
 }
