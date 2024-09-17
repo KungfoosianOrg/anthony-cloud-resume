@@ -184,8 +184,8 @@ resource "aws_iam_role" "visitor_counter-lambda_function-execution_role" {
 
 # section - DynamoDB table
 resource "aws_dynamodb_table" "visitor_counter-table" {
-  name     = "VisitorCounterTable"
-  hash_key = "id"
+  name         = "VisitorCounterTable"
+  hash_key     = "id"
   billing_mode = "PAY_PER_REQUEST"
 
   attribute {
