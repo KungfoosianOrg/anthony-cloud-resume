@@ -35,9 +35,9 @@ variable "github_repo_name_full" {
 }
 
 
-variable "apigw_endpoint_url" {
+variable "visitor_counter-apigw_invoke_url" {
   type        = string
-  description = "URL of API Gateway endpoint, format: <endpoint_id>.execute-api.<aws_region>.amazonaws.com[/<path>] . FIRST TIME SETUP: leave default value"
+  description = "URL of API Gateway endpoint for visitor counter, format: <endpoint_id>.execute-api.<aws_region>.amazonaws.com[/<path>] . FIRST TIME SETUP: leave default value"
   default     = ""
 }
 

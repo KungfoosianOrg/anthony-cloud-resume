@@ -45,27 +45,28 @@ module "sam-s3-cloudfront-static-site-hsts" {
   registered_domain_name = var.registered_domain_name
   subdomains             = var.subdomains
   route53_hosted_zone_id = var.route53_hosted_zone_id == "" ? aws_route53_zone.primary[0].id : var.route53_hosted_zone_id
-  ghactions_aws_role_arn = module.github-ci-cd-module.ghactions_oidc_role_arn
+  ghactions_aws_role_arn = module.github-ci-cd.ghactions_oidc_role_arn
   acm_certificate_arn    = module.route53-cloudfront-alias-w-ssl-validation.acm_certificate_arn
 
   aws_region  = var.aws_region
   aws_profile = var.aws_profile
 }
 
-module "sam-visitor-counter-permission" {
-  source = "./modules/sam-visitor-counter-permission"
+# might not need this since we'll be using our role with AdminAccess permissions
+# module "sam-visitor-counter-permission" {
+#   source = "./modules/sam-visitor-counter-permission"
 
-  ghactions_aws_role_arn              = module.github-ci-cd-module.ghactions_oidc_role_arn
-  cfdistro_response_headers_policy_id = module.sam-s3-cloudfront-static-site-hsts.cfdistro_response_headers_policy_id
-  cfdistro_oac_id                     = module.sam-s3-cloudfront-static-site-hsts.cfdistro_oac_id
-  cfdistro_id                         = module.sam-s3-cloudfront-static-site-hsts.cfdistro_id
-  SAM_stack_name                      = var.SAM_stack_name
+#   ghactions_aws_role_arn              = module.github-ci-cd.ghactions_oidc_role_arn
+#   cfdistro_response_headers_policy_id = module.sam-s3-cloudfront-static-site-hsts.cfdistro_response_headers_policy_id
+#   cfdistro_oac_id                     = module.sam-s3-cloudfront-static-site-hsts.cfdistro_oac_id
+#   cfdistro_id                         = module.sam-s3-cloudfront-static-site-hsts.cfdistro_id
+#   SAM_stack_name                      = var.SAM_stack_name
 
-  aws_region  = var.aws_region
-  aws_profile = var.aws_profile
-}
+#   aws_region  = var.aws_region
+#   aws_profile = var.aws_profile
+# }
 
-module "github-ci-cd-module" {
+module "github-ci-cd" {
   source = "./modules/github-ci-cd"
 
   github_repo_full_name = var.github_repo_name_full
@@ -74,7 +75,7 @@ module "github-ci-cd-module" {
   aws_profile = var.aws_profile
 }
 
-module "visitor_counter-module" {
+module "visitor_counter" {
   source = "./modules/visitor_counter"
 
   aws_region  = var.aws_region
@@ -90,7 +91,7 @@ module "alarm-api_response_4xx" {
 
   name              = "4xxApiResponse"
   measured_metric   = "4xx"
-  api_gw_id         = module.visitor_counter-module.apigw_id
+  api_gw_id         = module.visitor_counter.apigw_id
   alarm_description = "alarms when api gateway HTTP response is 4xx"
 
   aws_region  = var.aws_region
@@ -105,7 +106,7 @@ module "alarm-api_response_5xx" {
 
   name              = "5xxApiResponse"
   measured_metric   = "5xx"
-  api_gw_id         = module.visitor_counter-module.apigw_id
+  api_gw_id         = module.visitor_counter.apigw_id
   alarm_description = "alarms when api gateway HTTP response is 4xx"
 
   aws_region  = var.aws_region
@@ -120,7 +121,7 @@ module "alarm-api_response_latency" {
 
   name                         = "ApiResponseLatency"
   measured_metric              = "Latency"
-  api_gw_id                    = module.visitor_counter-module.apigw_id
+  api_gw_id                    = module.visitor_counter.apigw_id
   alarm_description            = "alarms when api gateway HTTP response takes more than 2 seconds"
   statistic_calculation_method = "Maximum"
   alarm_threshold              = 2000 // in ms
@@ -137,7 +138,7 @@ module "alarm-api_call_exceed_expectation" {
 
   name                         = "ApiCallExceedExpectation"
   measured_metric              = "Count"
-  api_gw_id                    = module.visitor_counter-module.apigw_id
+  api_gw_id                    = module.visitor_counter.apigw_id
   statistic_calculation_method = "SampleCount"
   alarm_description            = "alarms when api calls exceed 100 within 1 minute"
   alarm_threshold              = 100
