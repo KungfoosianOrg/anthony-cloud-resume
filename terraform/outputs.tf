@@ -1,6 +1,6 @@
 output "ghactions_aws_role_arn" {
   description = "ARN of AWS role for GitHub Actions to assume"
-  value       = module.github-ci-cd-module.ghactions_oidc_role_arn
+  value       = module.github-ci-cd.ghactions_oidc_role_arn
 }
 
 output "s3_frontend_bucket_name" {
@@ -18,10 +18,10 @@ output "SAM_stack_name" {
   value       = var.SAM_stack_name
 }
 
-output "SAM_bucket_name" {
-  description = "Name of the created SAM bucket to store sam artifacts in, help w/ automation"
-  value       = module.sam-visitor-counter-permission.SAM_bucket_name
-}
+# output "SAM_bucket_name" {
+#   description = "Name of the created SAM bucket to store sam artifacts in, help w/ automation"
+#   value       = module.sam-visitor-counter-permission.SAM_bucket_name
+# }
 
 output "route53_hosted_zone_id" {
   description = "ID of AWS Route53 hosted zone for your domain"
