@@ -13,10 +13,10 @@ output "s3_frontend_bucket_region" {
   value       = var.aws_region
 }
 
-output "SAM_stack_name" {
-  description = "Name of SAM stack"
-  value       = var.SAM_stack_name
-}
+# output "SAM_stack_name" {
+#   description = "Name of SAM stack"
+#   value       = var.SAM_stack_name
+# }
 
 # output "SAM_bucket_name" {
 #   description = "Name of the created SAM bucket to store sam artifacts in, help w/ automation"
