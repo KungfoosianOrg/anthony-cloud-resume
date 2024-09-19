@@ -20,15 +20,16 @@ resource "aws_sns_topic" "sns_topic" {
 }
 
 resource "aws_sns_topic_subscription" "email_subscription" {
-  count = var.notification_subscriber_email == "" ? 0 : 1
+  count = var.notification_email == "" ? 0 : 1
 
-  endpoint  = var.notification_subscriber_email
+  endpoint  = var.notification_email
   protocol  = "email"
   topic_arn = aws_sns_topic.sns_topic.arn
 }
 
 resource "aws_sns_topic_subscription" "lambda_subscription" {
-  count = var.lambda_subscriber_arn == "" ? 0 : 1
+  # count = var.lambda_subscriber_arn == "" ? 0 : 1
+  count = var.need_lambda_integration ? 1 : 0
 
   endpoint  = var.lambda_subscriber_arn
   protocol  = "lambda"

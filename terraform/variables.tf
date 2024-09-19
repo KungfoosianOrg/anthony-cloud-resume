@@ -21,11 +21,11 @@ variable "subdomains" {
   default     = []
 }
 
-variable "SAM_stack_name" {
-  description = "Name of SAM stack"
-  type        = string
-  default     = ""
-}
+# variable "SAM_stack_name" {
+#   description = "Name of SAM stack"
+#   type        = string
+#   default     = ""
+# }
 
 
 variable "github_repo_name_full" {
@@ -59,7 +59,7 @@ variable "route53_hosted_zone_id" {
 #   default = ""
 # }
 
-variable "notification_subscriber_email" {
+variable "notification_email" {
   description = "Email to send SNS notifications topic"
   type        = string
   default     = ""

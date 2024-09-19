@@ -44,10 +44,26 @@ resource "aws_apigatewayv2_api" "visitor_counter-api" {
   target = aws_lambda_function.visitor_counter.arn
 }
 
+resource "aws_apigatewayv2_deployment" "visitor_counter" {
+  api_id = aws_apigatewayv2_api.visitor_counter-api.id
+
+  triggers = {
+    redeployment = sha1(join(",", tolist([
+      jsonencode(aws_apigatewayv2_integration.visitor_counter-lambda),
+      jsonencode(aws_apigatewayv2_route.visitor_counter-api_invoke_route)
+    ])))
+  }
+  
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+# https://github.com/hashicorp/terraform-provider-aws/issues/24852
 resource "aws_apigatewayv2_stage" "visitor_counter" {
   api_id      = aws_apigatewayv2_api.visitor_counter-api.id
   name        = "$default"
-  auto_deploy = true
+  # auto_deploy = true
 
   access_log_settings {
     destination_arn = aws_cloudwatch_log_group.visitor_counter-api_gw.arn
@@ -56,11 +72,11 @@ resource "aws_apigatewayv2_stage" "visitor_counter" {
   }
 }
 
-resource "aws_apigatewayv2_integration" "visitor_counter-lambda_integration" {
+resource "aws_apigatewayv2_integration" "visitor_counter-lambda" {
   api_id                 = aws_apigatewayv2_api.visitor_counter-api.id
-  integration_type       = "HTTP_PROXY"
+  integration_type       = "AWS_PROXY"
   integration_method     = "POST"
-  integration_uri        = aws_lambda_function.visitor_counter.qualified_invoke_arn
+  integration_uri        = aws_lambda_function.visitor_counter.invoke_arn
   payload_format_version = "2.0"
 }
 
@@ -68,7 +84,7 @@ resource "aws_apigatewayv2_route" "visitor_counter-api_invoke_route" {
   api_id             = aws_apigatewayv2_api.visitor_counter-api.id
   route_key          = "POST /visitor-counter"
   authorization_type = "NONE"
-  target             = aws_apigatewayv2_integration.visitor_counter-lambda_integration.id
+  target             = "integrations/${aws_apigatewayv2_integration.visitor_counter-lambda.id}"
 }
 
 resource "aws_lambda_permission" "api_gw-lambda_access_permission" {
@@ -85,9 +101,9 @@ resource "aws_lambda_permission" "api_gw-lambda_access_permission" {
 data "archive_file" "visitor_counter-package" {
   type = "zip"
 
-  source_dir = "../../../aws/visitorCounter"
+  source_dir = "${path.module}/../../../aws/visitorCounter"
 
-  output_path = "../../../out/visitorCounter.zip"
+  output_path = "${path.module}/../../../out/visitorCounter.zip"
 }
 
 resource "aws_lambda_function" "visitor_counter" {
@@ -106,7 +122,7 @@ resource "aws_lambda_function" "visitor_counter" {
   }
 
   # uses the zip package output from archive_file above
-  filename = "../../../out/visitorCounter.zip"
+  filename = "${path.module}/../../../out/visitorCounter.zip"
 
   package_type = "Zip"
 
@@ -139,7 +155,7 @@ data "aws_iam_policy_document" "lambda-assume_role" {
 }
 
 resource "aws_iam_role" "visitor_counter-lambda_function-execution_role" {
-  name = "SlackIntegrationLambdaExecutionRole"
+  name = "VisitorCounterLambdaExecutionRole"
 
   assume_role_policy = data.aws_iam_policy_document.lambda-assume_role.json
 }

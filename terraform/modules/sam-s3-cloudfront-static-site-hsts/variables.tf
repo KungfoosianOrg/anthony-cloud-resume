@@ -22,9 +22,9 @@ variable "apigw_endpoint_url" {
   default     = "none"
 }
 
-variable "ghactions_aws_role_arn" {
+variable "ghactions_aws_role_name" {
   type        = string
-  description = "ARN of role for GitHub Actions"
+  description = "Name of role for GitHub Actions"
   default     = ""
 }
 

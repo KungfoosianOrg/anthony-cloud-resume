@@ -49,9 +49,9 @@ resource "aws_ssm_parameter" "slack_webhook_url" {
 data "archive_file" "slack_integration-package" {
   type = "zip"
 
-  source_dir = "../../../aws/sendSlackMessage"
+  source_dir = "${path.module}/../../../aws/sendSlackMessage"
 
-  output_path = "../../../out/sendSlackMessage.zip"
+  output_path = "${path.module}/../../../out/sendSlackMessage.zip"
 }
 
 resource "aws_lambda_function" "slack_integration" {
@@ -62,7 +62,7 @@ resource "aws_lambda_function" "slack_integration" {
   description = "Integration with Slack, triggered by SNS"
 
   # uses the zip package output from archive_file above
-  filename = "../../../out/sendSlackMessage.zip"
+  filename = "${path.module}/../../../out/sendSlackMessage.zip"
 
   package_type = "Zip"
 

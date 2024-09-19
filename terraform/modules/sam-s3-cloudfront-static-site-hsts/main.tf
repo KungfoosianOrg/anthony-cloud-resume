@@ -189,7 +189,7 @@ data "aws_iam_policy_document" "allow_access_from_cloudfront" {
 resource "aws_iam_role_policy" "ghactions_permission_policy" {
   name = "PermPol_GHActions-S3"
 
-  role = var.ghactions_aws_role_arn
+  role = var.ghactions_aws_role_name
 
   policy = jsonencode({
     Version = "2012-10-17"

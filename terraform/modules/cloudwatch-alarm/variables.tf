@@ -15,17 +15,24 @@ variable "name" {
   default     = "mySNSTopic"
 }
 
-variable "notification_subscriber_email" {
+variable "notification_email" {
   description = "Email to send SNS notifications topic"
   type        = string
   default     = ""
 }
 
+variable "need_lambda_integration" {
+  description = "boolean, set to 'true' to set a Lambda function as the alarm target, must also define lambda_subscriber_arn. Default: false"
+  type = bool
+  default = false
+}
+
 variable "lambda_subscriber_arn" {
-  description = "ARN of Lambda function for alarm to trigger"
+  description = "ARN of Lambda function for alarm to trigger. Must define if need_lambda_integration is true"
   type = string
   default = ""
 }
+
 
 variable "measured_metric" {
   description = "Metric to create alarm on"

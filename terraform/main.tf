@@ -1,4 +1,6 @@
 # This template creates the static website hosting, custom domain validation, SSL
+# TODO:
+#   DNSSEC for hosted zone
 
 terraform {
   required_providers {
@@ -45,7 +47,7 @@ module "sam-s3-cloudfront-static-site-hsts" {
   registered_domain_name = var.registered_domain_name
   subdomains             = var.subdomains
   route53_hosted_zone_id = var.route53_hosted_zone_id == "" ? aws_route53_zone.primary[0].id : var.route53_hosted_zone_id
-  ghactions_aws_role_arn = module.github-ci-cd.ghactions_oidc_role_arn
+  ghactions_aws_role_name = module.github-ci-cd.ghactions_oidc_role_name
   acm_certificate_arn    = module.route53-cloudfront-alias-w-ssl-validation.acm_certificate_arn
 
   aws_region  = var.aws_region
@@ -85,8 +87,9 @@ module "visitor_counter" {
 # devops-alarms
 module "alarm-api_response_4xx" {
   source = "./modules/cloudwatch-alarm"
-
-  notification_subscriber_email = var.notification_subscriber_email
+  
+  notification_email = var.notification_email
+  need_lambda_integration = true
   lambda_subscriber_arn         = module.slack_integration.slack_integration-lambda_arn
 
   name              = "4xxApiResponse"
@@ -101,7 +104,8 @@ module "alarm-api_response_4xx" {
 module "alarm-api_response_5xx" {
   source = "./modules/cloudwatch-alarm"
 
-  notification_subscriber_email = var.notification_subscriber_email
+  notification_email = var.notification_email
+  need_lambda_integration = true
   lambda_subscriber_arn         = module.slack_integration.slack_integration-lambda_arn
 
   name              = "5xxApiResponse"
@@ -116,7 +120,8 @@ module "alarm-api_response_5xx" {
 module "alarm-api_response_latency" {
   source = "./modules/cloudwatch-alarm"
 
-  notification_subscriber_email = var.notification_subscriber_email
+  notification_email = var.notification_email
+  need_lambda_integration = true
   lambda_subscriber_arn         = module.slack_integration.slack_integration-lambda_arn
 
   name                         = "ApiResponseLatency"
@@ -133,7 +138,8 @@ module "alarm-api_response_latency" {
 module "alarm-api_call_exceed_expectation" {
   source = "./modules/cloudwatch-alarm"
 
-  notification_subscriber_email = var.notification_subscriber_email
+  notification_email = var.notification_email
+  need_lambda_integration = true
   lambda_subscriber_arn         = module.slack_integration.slack_integration-lambda_arn
 
   name                         = "ApiCallExceedExpectation"
