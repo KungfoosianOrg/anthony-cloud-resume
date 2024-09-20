@@ -41,7 +41,7 @@ resource "aws_apigatewayv2_api" "visitor_counter-api" {
     max_age       = 0
   }
 
-  target = aws_lambda_function.visitor_counter.arn
+  # target = aws_lambda_function.visitor_counter.arn
 }
 
 resource "aws_apigatewayv2_deployment" "visitor_counter" {
@@ -82,7 +82,7 @@ resource "aws_apigatewayv2_integration" "visitor_counter-lambda" {
 
 resource "aws_apigatewayv2_route" "visitor_counter-api_invoke_route" {
   api_id             = aws_apigatewayv2_api.visitor_counter-api.id
-  route_key          = "POST /visitor-counter"
+  route_key          = "POST /${var.api_route_key}"
   authorization_type = "NONE"
   target             = "integrations/${aws_apigatewayv2_integration.visitor_counter-lambda.id}"
 }

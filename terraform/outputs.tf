@@ -38,7 +38,7 @@ output "cloudformation_root_stack_id" {
   value       = "TODO !Ref AWS::StackId"
 }
 
-output "visitor_counter-apigw_invoke_url" {
-  description = "Invoke URL for visitor counter API"
-  value = module.visitor_counter.visitor_counter-apigw_invoke_url
+output "visitor_counter-api_invoke_url" {
+  description = "ID of deployed stage for visitor counter API"
+  value = module.visitor_counter.visitor_counter-api_invoke_url
 }

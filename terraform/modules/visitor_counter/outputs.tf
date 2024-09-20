@@ -3,7 +3,7 @@ output "apigw_id" {
   value       = aws_apigatewayv2_api.visitor_counter-api.id
 }
 
-output "visitor_counter-apigw_invoke_url" {
-  description = "Invoke URL for visitor counter API"
+output "visitor_counter-api_invoke_url" {
+  description = "ID of deployed stage for visitor counter API"
   value = aws_apigatewayv2_api.visitor_counter-api.api_endpoint
 }
