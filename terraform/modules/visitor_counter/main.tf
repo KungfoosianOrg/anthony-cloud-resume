@@ -41,7 +41,7 @@ resource "aws_apigatewayv2_api" "visitor_counter-api" {
     max_age       = 0
   }
 
-  # target = aws_lambda_function.visitor_counter.arn
+  # target = aws_lambda_function.visitor_counter.arn # leave this in would interfere with our own api $default stage resource
 }
 
 resource "aws_apigatewayv2_deployment" "visitor_counter" {
@@ -63,7 +63,7 @@ resource "aws_apigatewayv2_deployment" "visitor_counter" {
 resource "aws_apigatewayv2_stage" "visitor_counter" {
   api_id      = aws_apigatewayv2_api.visitor_counter-api.id
   name        = "$default"
-  # auto_deploy = true
+  auto_deploy = true
 
   access_log_settings {
     destination_arn = aws_cloudwatch_log_group.visitor_counter-api_gw.arn
@@ -89,7 +89,8 @@ resource "aws_apigatewayv2_route" "visitor_counter-api_invoke_route" {
 
 resource "aws_lambda_permission" "api_gw-lambda_access_permission" {
   action        = "lambda:InvokeFunction"
-  function_name = var.lambda_function_name
+  # function_name = var.lambda_function_name
+  function_name = aws_lambda_function.visitor_counter.arn
   principal     = "apigateway.amazonaws.com"
   source_arn    = aws_apigatewayv2_api.visitor_counter-api.arn
 }
