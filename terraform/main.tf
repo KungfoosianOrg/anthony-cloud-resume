@@ -80,6 +80,10 @@ module "github-ci-cd" {
 module "visitor_counter" {
   source = "./modules/visitor_counter"
 
+  # triggers API for HTTP POST requests to /visitor-counter
+  api_trigger_method = "POST"
+  api_route_key = "visitor-counter"
+
   aws_region  = var.aws_region
   aws_profile = var.aws_profile
 }

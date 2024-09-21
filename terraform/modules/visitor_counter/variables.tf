@@ -24,8 +24,14 @@ variable "lambda_function_name" {
   default = "VisitorCounterLambda"
 }
 
+variable "api_trigger_method" {
+  type = string
+  description = "HTTP method to trigger API, leave blank for ANY"
+  default = ""
+}
+
 variable "api_route_key" {
   type = string
   description = "route to trigger API, leave blank for root path. E.g: my-api -> /my-api"
-  default = "visitor-counter"
+  default = ""
 }

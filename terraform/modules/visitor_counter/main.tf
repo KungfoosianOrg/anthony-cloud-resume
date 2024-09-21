@@ -82,17 +82,19 @@ resource "aws_apigatewayv2_integration" "visitor_counter-lambda" {
 
 resource "aws_apigatewayv2_route" "visitor_counter-api_invoke_route" {
   api_id             = aws_apigatewayv2_api.visitor_counter-api.id
-  route_key          = "POST /${var.api_route_key}"
+  route_key          = "${var.api_trigger_method != "" ? var.api_trigger_method : "ANY"} /${var.api_route_key}"
   authorization_type = "NONE"
   target             = "integrations/${aws_apigatewayv2_integration.visitor_counter-lambda.id}"
 }
 
 resource "aws_lambda_permission" "api_gw-lambda_access_permission" {
   action        = "lambda:InvokeFunction"
-  # function_name = var.lambda_function_name
+  # function_name = aws_lambda_function.visitor_counter.function_name
   function_name = aws_lambda_function.visitor_counter.arn
   principal     = "apigateway.amazonaws.com"
-  source_arn    = aws_apigatewayv2_api.visitor_counter-api.arn
+
+  # allows all stages of API deployment (first *) to call the Lambda, and specifies exact method or route key defined for triggering of Lambda 
+  source_arn    = "${aws_apigatewayv2_api.visitor_counter-api.execution_arn}/*/${var.api_trigger_method != "" ? var.api_trigger_method : "ANY"}/${var.api_route_key != "" ? var.api_route_key : "*"}"
 }
 ### END section ###
 
@@ -102,6 +104,7 @@ resource "aws_lambda_permission" "api_gw-lambda_access_permission" {
 data "archive_file" "visitor_counter-package" {
   type = "zip"
 
+  # path.module gets the system path to the folder containing this module
   source_dir = "${path.module}/../../../aws/visitorCounter"
 
   output_path = "${path.module}/../../../out/visitorCounter.zip"
