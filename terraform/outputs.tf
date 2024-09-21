@@ -33,12 +33,12 @@ output "cloudfront_distribution_id" {
   value       = module.sam-s3-cloudfront-static-site-hsts.cfdistro_id
 }
 
-output "cloudformation_root_stack_id" {
-  description = "ID of the AWS CloudFormation root stack"
-  value       = "TODO !Ref AWS::StackId"
-}
+# output "cloudformation_root_stack_id" {
+#   description = "ID of the AWS CloudFormation root stack"
+#   value       = "TODO !Ref AWS::StackId"
+# }
 
 output "visitor_counter-api_invoke_url" {
-  description = "ID of deployed stage for visitor counter API"
-  value = module.visitor_counter.visitor_counter-api_invoke_url
+  description = "API endpoint URL to trigger visitor counter API"
+  value = "${module.visitor_counter.visitor_counter-api_invoke_url}/${var.visitor_counter-api_route_key}"
 }

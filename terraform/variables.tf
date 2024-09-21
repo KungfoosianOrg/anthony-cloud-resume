@@ -35,11 +35,11 @@ variable "github_repo_name_full" {
 }
 
 
-variable "visitor_counter-apigw_invoke_url" {
-  type        = string
-  description = "URL of API Gateway endpoint for visitor counter, format: <endpoint_id>.execute-api.<aws_region>.amazonaws.com[/<path>] . FIRST TIME SETUP: leave default value"
-  default     = ""
-}
+# variable "visitor_counter-apigw_invoke_url" {
+#   type        = string
+#   description = "URL of API Gateway endpoint for visitor counter, format: <endpoint_id>.execute-api.<aws_region>.amazonaws.com[/<path>] . FIRST TIME SETUP: leave default value"
+#   default     = ""
+# }
 
 variable "route53_hosted_zone_id" {
   type        = string
@@ -69,4 +69,16 @@ variable "slack_webhook_url" {
   description = "URL for Slack webhook"
   type        = string
   default     = ""
+}
+
+variable "visitor_counter-api_trigger_method" {
+  type = string
+  description = "HTTP method to trigger visitor counter API, leave blank for ANY"
+  default = ""
+}
+
+variable "visitor_counter-api_route_key" {
+  type = string
+  description = "route to trigger visitor counter API, leave blank for root path. E.g: my-api -> /my-api"
+  default = ""
 }
