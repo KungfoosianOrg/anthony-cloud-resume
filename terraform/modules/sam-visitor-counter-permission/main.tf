@@ -1,6 +1,6 @@
 # This module sets up AWS IAM permission policy for the visitor counter module
 # , and attach it to a pre-created role for GitHub Actions
-
+# https://aws.amazon.com/blogs/apn/simplify-and-secure-terraform-workflows-on-aws-with-dynamic-provider-credentials/
 
 terraform {
   required_providers {
