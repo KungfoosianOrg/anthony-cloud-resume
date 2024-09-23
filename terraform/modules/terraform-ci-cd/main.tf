@@ -35,8 +35,8 @@ data "aws_iam_policy_document" "oidcprovider_assume_role" {
 
     condition {
       test     = "StringLike"
-      variable = "token.actions.githubusercontent.com:sub"
-      # values   = ["organization:my-tfc-org:project:*:workspace:*:run_phase:*"]  # TODO: find the correct Terraform org to fill out 
+      variable = "app.terraform.io:sub"
+      values   = ["organization:KungfoosianOrg:project:vocloudresume:workspace:sandbox:run_phase:*"]
     }
 
   }
