@@ -3,7 +3,7 @@ name: Deploy Visitor Counter SAM app to AWS
 on:
     push:
         # branches: ["main"]
-        branches: ["main"]
+        branches: ["terraform"]
         paths: ["aws/visitor_counter/**"]
 
     # Allows you to run this workflow manually from the Actions tab

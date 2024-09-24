@@ -1,11 +1,5 @@
-terraform {
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 5.0"
-    }
-  }
-}
+
+
 
 # Configure the AWS Provider
 provider "aws" {
@@ -36,7 +30,7 @@ data "aws_iam_policy_document" "oidcprovider_assume_role" {
     condition {
       test     = "StringLike"
       variable = "app.terraform.io:sub"
-      values   = ["organization:KungfoosianOrg:project:vocloudresume:workspace:sandbox:run_phase:*"]
+      values   = ["organization:${var.my_terraform_org}:project:${var.terraform_project_name}:workspace:${var.terraform_workspace}:run_phase:${var.terraform_workspace-run_phase}"]
     }
 
   }

@@ -68,7 +68,7 @@ resource "aws_cloudfront_response_headers_policy" "cfdistro_response_headers" {
   }
 }
 
-resource "aws_cloudfront_distribution" "production_distribution" {
+resource "aws_cloudfront_distribution" "prod" {
   default_cache_behavior {
     allowed_methods = ["HEAD", "GET"]
     cached_methods  = ["HEAD", "GET"]
@@ -180,7 +180,7 @@ data "aws_iam_policy_document" "allow_access_from_cloudfront" {
 
       variable = "aws:sourceArn"
 
-      values = ["arn:aws:cloudfront::${data.aws_caller_identity.current.account_id}:distribution/${aws_cloudfront_distribution.production_distribution.id}"]
+      values = ["arn:aws:cloudfront::${data.aws_caller_identity.current.account_id}:distribution/${aws_cloudfront_distribution.prod.id}"]
     }
   }
 }

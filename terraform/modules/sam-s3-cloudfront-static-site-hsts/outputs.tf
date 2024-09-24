@@ -1,6 +1,6 @@
 output "cloudfront_distribution_domain_name" {
   description = "Domain name generated from creation of CloudFront distribution"
-  value       = aws_cloudfront_distribution.production_distribution.domain_name
+  value       = aws_cloudfront_distribution.prod.domain_name
 }
 
 output "s3_frontend_bucket_name" {
@@ -20,5 +20,5 @@ output "cfdistro_oac_id" {
 
 output "cfdistro_id" {
   description = "CloudFront distribution's id"
-  value       = aws_cloudfront_distribution.production_distribution.id
+  value       = aws_cloudfront_distribution.prod.id
 }
