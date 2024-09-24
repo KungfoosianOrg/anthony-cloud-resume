@@ -19,6 +19,9 @@ out/*
 # any test terraform files
 test*.tf
 
+# and any prod terraform files
+prod*.tf
+
 # Crash log files
 crash.log
 crash.*.log

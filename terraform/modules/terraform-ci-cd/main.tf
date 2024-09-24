@@ -1,12 +1,3 @@
-
-
-
-# Configure the AWS Provider
-provider "aws" {
-  region  = var.aws_region
-  profile = var.aws_profile
-}
-
 data "aws_caller_identity" "current" {}
 
 data "aws_iam_policy_document" "oidcprovider_assume_role" {
@@ -18,7 +9,7 @@ data "aws_iam_policy_document" "oidcprovider_assume_role" {
 
     principals {
       type        = "Federated"
-      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current}:oidc-provider/app.terraform.io"]
+      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/app.terraform.io"]
     }
 
     condition {
@@ -44,3 +35,20 @@ resource "aws_iam_role" "terraform_oidc_aws_provider" {
 }
 
 # TODO: copy permissions used in TerraformAdminAccess role for permission policy
+data "aws_iam_policy_document" "terraform_oidc_permissions" {
+  version = "2012-10-17"
+
+  statement {
+  }
+}
+
+
+resource "aws_iam_policy" "terraform_oidc" {
+  policy = data.aws_iam_policy_document.terraform_oidc_permissions.json
+}
+
+resource "aws_iam_role_policy_attachment" "name" {
+  role = aws_iam_role.terraform_oidc_aws_provider.name
+
+  policy_arn = aws_iam_policy.terraform_oidc.arn
+}

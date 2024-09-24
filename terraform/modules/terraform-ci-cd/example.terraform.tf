@@ -1,16 +1,24 @@
-terraform {
-    cloud {
-      organization = "test-terraform-org"
+# Copy to your own terraform.tf, un-comment, and edit as neccesary
 
-      workspaces {
-        name = "test-terraform-workspace"
-      }
-    }
+# terraform {
+#     cloud {
+#       organization = "test-terraform-org"
 
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 5.0"
-    }
-  }
-}
+#       workspaces {
+#         name = "test-terraform-workspace"
+#       }
+#     }
+
+#   required_providers {
+#     aws = {
+#       source  = "hashicorp/aws"
+#       version = "~> 5.0"
+#     }
+#   }
+# }
+
+# Configure the AWS Provider
+# provider "aws" {
+#   region  = var.aws_region
+#   profile = var.aws_profile
+# }
