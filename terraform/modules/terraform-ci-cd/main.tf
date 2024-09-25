@@ -39,6 +39,32 @@ data "aws_iam_policy_document" "terraform_oidc_permissions" {
   version = "2012-10-17"
 
   statement {
+    sid = "Statement1"
+    effect = "Allow"
+    actions = [
+      "route53:GetHostedZone",
+      "route53:ListResourceRecordSets",
+      "route53:ListQueryLoggingConfigs",
+      "route53:GetHostedZoneCount",
+      "route53:ListHostedZonesByName",
+      "route53:GetHealthCheckCount",
+      "route53:ListTrafficPolicies"
+    ]
+
+    resources = ["*"] # TODO: narrow down resource
+  }
+		{
+			"Sid": "Statement2",
+			"Effect": "Allow",
+			"Action": [
+				"dynamodb:DescribeTable",
+				"dynamodb:DeleteTable",
+				"dynamodb:DescribeTimeToLive",
+				"dynamodb:DescribeContinuousBackups",
+				"dynamodb:CreateTable"
+			],
+			"Resource": []
+		}
   }
 }
 
