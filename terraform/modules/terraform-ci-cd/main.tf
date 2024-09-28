@@ -40,24 +40,24 @@ resource "aws_iam_role" "terraform_oidc_aws_provider" {
 data "aws_iam_policy_document" "terraform_oidc_permissions" {
   version = "2012-10-17"
 
-  statement {
-    sid = "Statement1"
-    effect = "Allow"
-    actions = [
-      "route53:GetChange",
-      "route53:ChangeResourceRecordSets",
-      "route53:GetHostedZone",
-      "route53:ListResourceRecordSets",
-      "route53:ListQueryLoggingConfigs",
-      "route53:GetHostedZoneCount",
-      "route53:ListHostedZonesByName",
-      "route53:GetHealthCheckCount",
-      "route53:GetTrafficPolicyInstanceCount",
-      "route53:ListTrafficPolicies"
-    ]
+  # statement {
+  #   sid = "Statement1"
+  #   effect = "Allow"
+  #   actions = [
+  #     "route53:GetChange",
+  #     "route53:ChangeResourceRecordSets",
+  #     "route53:GetHostedZone",
+  #     "route53:ListResourceRecordSets",
+  #     "route53:ListQueryLoggingConfigs",
+  #     "route53:GetHostedZoneCount",
+  #     "route53:ListHostedZonesByName",
+  #     "route53:GetHealthCheckCount",
+  #     "route53:GetTrafficPolicyInstanceCount",
+  #     "route53:ListTrafficPolicies"
+  #   ]
 
-    resources = ["*"] # TODO: narrow down resource
-  }
+  #   resources = ["*"] # TODO: narrow down resource
+  # }
 	
   statement	{
     sid = "Statement2"
@@ -72,31 +72,31 @@ data "aws_iam_policy_document" "terraform_oidc_permissions" {
     resources = []
   }
 
-  statement {
-    sid = "statement3"
-    effect = "Allow"
-    actions = [
-      "s3:DeleteBucket",
-      "s3:GetBucketPolicy",
-      "s3:DeleteBucketPolicy",
-      "s3:PutBucketPublicAccessBlock",
-      "s3:GetBucketPublicAccessBlock",
-      "s3:GetBucketVersioning",
-      "s3:PutBucketVersioning",
-      "s3:GetBucketLogging",
-      "s3:GetBucketObjectLockConfiguration",
-      "s3:GetEncryptionConfiguration",
-      "s3:GetLifecycleConfiguration",
-      "s3:GetReplicationConfiguration",
-      "s3:GetAccelerateConfiguration",
-      "s3:GetBucketAcl",
-      "s3:GetBucketCORS",
-      "s3:GetBucketRequestPayment",
-      "s3:GetBucketWebsite",
-      "s3:PutBucketPolicy",
-      "s3:CreateBucket"
-    ]
-  }
+  # statement {
+  #   sid = "statement3"
+  #   effect = "Allow"
+  #   actions = [
+  #     "s3:DeleteBucket",
+  #     "s3:GetBucketPolicy",
+  #     "s3:DeleteBucketPolicy",
+  #     "s3:PutBucketPublicAccessBlock",
+  #     "s3:GetBucketPublicAccessBlock",
+  #     "s3:GetBucketVersioning",
+  #     "s3:PutBucketVersioning",
+  #     "s3:GetBucketLogging",
+  #     "s3:GetBucketObjectLockConfiguration",
+  #     "s3:GetEncryptionConfiguration",
+  #     "s3:GetLifecycleConfiguration",
+  #     "s3:GetReplicationConfiguration",
+  #     "s3:GetAccelerateConfiguration",
+  #     "s3:GetBucketAcl",
+  #     "s3:GetBucketCORS",
+  #     "s3:GetBucketRequestPayment",
+  #     "s3:GetBucketWebsite",
+  #     "s3:PutBucketPolicy",
+  #     "s3:CreateBucket"
+  #   ]
+  # }
   
   statement {
     sid = "Statement4"
@@ -106,20 +106,23 @@ data "aws_iam_policy_document" "terraform_oidc_permissions" {
       "acm:DescribeCertificate",
       "acm:RequestCertificate"
     ]
-  
   }
 
-  statement {
-    sid = "Statement5"
-    effect = "Allow"
-    actions = [
+   statement {
+     sid = "Statement5"
+     effect = "Allow"
+     actions = [
+      "cloudfront:CreateOriginAccessControl",
+      "cloudfront:CreateResponseHeadersPolicy",
+      "cloudfront:DeleteOriginAccessControl",
+      "cloudfront:DeleteDistribution",
+      "cloudfront:GetOriginAccessControl",
       "cloudfront:DeleteResponseHeadersPolicy",
       "cloudfront:GetResponseHeadersPolicy",
-      "cloudfront:CreateResponseHeadersPolicy",
-      "cloudfront:DeleteDistribution",
       "cloudfront:UpdateDistribution",
-      "cloudfront:GetOriginAccessControl",
-      "cloudfront:CreateOriginAccessControl"
+      "cloudwatch:DeleteAlarms",
+      "cloudwatch:DescribeAlarms",
+      "cloudwatch:PutMetricAlarm"
     ]
   }
 
@@ -127,39 +130,28 @@ data "aws_iam_policy_document" "terraform_oidc_permissions" {
     sid = "CreateRolesForGitHubActionsAndTerraform"
     effect = "Allow"
     actions = [
-      "iam:DeleteOpenIDConnectProvider",
-      "iam:ListAttachedRolePolicies",
-      "iam:ListInstanceProfilesForRole",
-      "iam:ListRolePolicies",
-      "iam:DeletePolicy",
-      "iam:ListPolicyVersions",
-      "iam:DeleteRolePolicy",
-      "iam:DetachRolePolicy",
-      "iam:GetRolePolicy",
-      "iam:GetPolicyVersion",
-      "iam:GetPolicy",
-      "iam:GetRole",
-      "iam:GetOpenIDConnectProvider",
-      "iam:AttachRolePolicy",
-      "iam:CreatePolicy",
-      "iam:PutRolePolicy",
-      "iam:CreateRole",
-      "iam:CreateOpenIDConnectProvider",
-      "iam:CreateServiceLinkedRole",
-      "iam:ListPolicies",
-      "iam:GetAccountSummary",
-      "iam:ListPoliciesGrantingServiceAccess",
-      "iam:GetServiceLastAccessedDetails",
-      "iam:ListGroups",
-      "iam:ListRoles",
-      "iam:ListUsers",
-      "iam:GenerateServiceLastAccessedDetails",
-      "iam:ListAccountAliases",
-      "iam:ListAccessKeys"
+    "iam:CreateOpenIDConnectProvider",
+    "iam:CreateServiceLinkedRole",
+    "iam:DeleteOpenIDConnectProvider",
+    "iam:DeletePolicy",
+    "iam:CreateRole",
+    "iam:DeleteRole",
+    "iam:CreatePolicy",
+    "iam:DetachRolePolicy",
+    "iam:GetPolicy",
+    "iam:GetPolicyVersion",
+    "iam:GetOpenIDConnectProvider",
+    "iam:DeleteRolePolicy",
+    "iam:GetRole",
+    "iam:ListAttachedRolePolicies",
+    "iam:GetRolePolicy",
+    "iam:ListRolePolicies",
+    "iam:ListInstanceProfilesForRole",
+    "iam:AttachRolePolicy",
+    "iam:PutRolePolicy",
+    "iam:ListPolicyVersions"
     ]
   }
-  
-
 }
 
 
