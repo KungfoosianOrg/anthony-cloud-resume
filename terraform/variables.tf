@@ -9,6 +9,12 @@ variable "aws_profile" {
   default = ""
 }
 
+variable "aws_role_arn" {
+  description = "ARN of AWS IAM role for Terraform to assume in order to create the infrastructure"
+  type    = string
+  default = ""
+}
+
 variable "registered_domain_name" {
   type        = string
   description = "The domain name that you registered and want to route traffic for"

@@ -12,9 +12,17 @@ terraform {
 }
 
 # Configure the AWS Provider
+# provider "aws" {
+#   region  = var.aws_region
+#   profile = var.aws_profile
+# }
 provider "aws" {
-  region  = var.aws_region
-  profile = var.aws_profile
+  region = var.aws_region
+  
+  assume_role {
+    role_arn = var.aws_role_arn
+    session_name = "terraform"
+  }
 }
 
 # if no zone id is passed in, creates the zone and keeps it in event of deletion
