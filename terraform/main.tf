@@ -1,6 +1,7 @@
 # This template creates the static website hosting, custom domain validation, SSL
 # TODO:
 #   DNSSEC for hosted zone
+#   https://www.hashicorp.com/blog/access-aws-from-hcp-terraform-with-oidc-federation
 
 
 
