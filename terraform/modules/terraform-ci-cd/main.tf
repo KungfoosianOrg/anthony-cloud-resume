@@ -2,6 +2,26 @@
 
 data "aws_caller_identity" "current" {}
 
+
+##### SECTION - Setting up the OIDC provider (Terraform)
+data "tls_certificate" "provider" {
+  url = "https://app.terraform.io"
+}
+ 
+resource "aws_iam_openid_connect_provider" "hcp_terraform" {
+  url = "https://app.terraform.io"
+ 
+  client_id_list = [
+    "aws.workload.identity", # Default audience in HCP Terraform for AWS.
+  ]
+ 
+  thumbprint_list = [
+    data.tls_certificate.provider.certificates[0].sha1_fingerprint,
+  ]
+}
+##### END SECTION #####
+
+
 data "aws_iam_policy_document" "oidcprovider_assume_role" {
   version = "2012-10-17"
 
@@ -11,7 +31,7 @@ data "aws_iam_policy_document" "oidcprovider_assume_role" {
 
     principals {
       type        = "Federated"
-      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/app.terraform.io"]
+      identifiers = [aws_iam_openid_connect_provider.hcp_terraform.arn]
     }
 
     condition {
