@@ -46,7 +46,7 @@ variable "aws_region" {
 
 variable "aws_role_arn" {
   type = string
-  description = "ARN of AWS IAM role for Terraform to assume in order to create the rest of the app"
+  description = "ARN of AWS IAM role for Terraform to assume in order to create the infrastructure"
   default = "aws:arn:change:me"
 }
 
