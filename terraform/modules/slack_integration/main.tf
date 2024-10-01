@@ -1,19 +1,3 @@
-terraform {
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 5.0"
-    }
-  }
-}
-
-# Configure the AWS Provider
-provider "aws" {
-  region  = var.aws_region
-  profile = var.aws_profile
-}
-
-
 data "aws_caller_identity" "current" {}
 
 resource "aws_cloudwatch_log_group" "slack_integration-lambda" {

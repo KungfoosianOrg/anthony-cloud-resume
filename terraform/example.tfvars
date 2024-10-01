@@ -11,4 +11,5 @@ visitor_counter-api_trigger_method = "GET"
 visitor_counter-api_route_key = "my-api-route"
 
 aws_region  = "us-east-1" # need to be us-east-1 (default) sinice there will be SSL cert hosting
-aws_profile = "1263574337_AWSAccess"
+# aws_profile = "1263574337_AWSAccess"
+aws_role_arn = "aws:arn:1234:abcd"

@@ -2,28 +2,7 @@
 # TODO:
 #   DNSSEC for hosted zone
 
-terraform {
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 5.0"
-    }
-  }
-}
 
-# Configure the AWS Provider
-# provider "aws" {
-#   region  = var.aws_region
-#   profile = var.aws_profile
-# }
-provider "aws" {
-  region = var.aws_region
-  
-  assume_role {
-    role_arn = var.aws_role_arn
-    session_name = "terraform"
-  }
-}
 
 # if no zone id is passed in, creates the zone and keeps it in event of deletion
 resource "aws_route53_zone" "primary" {
@@ -45,8 +24,9 @@ module "route53-cloudfront-alias-w-ssl-validation" {
   route53_hosted_zone_id       = var.route53_hosted_zone_id == "" ? aws_route53_zone.primary[0].id : var.route53_hosted_zone_id
   cloudfront_distribution_fqdn = module.sam-s3-cloudfront-static-site-hsts.cloudfront_distribution_domain_name
 
-  aws_profile = var.aws_profile
+  # aws_profile = var.aws_profile
   aws_region  = var.aws_region
+  aws_role_arn = var.aws_role_arn
 }
 
 module "sam-s3-cloudfront-static-site-hsts" {
@@ -59,7 +39,7 @@ module "sam-s3-cloudfront-static-site-hsts" {
   acm_certificate_arn    = module.route53-cloudfront-alias-w-ssl-validation.acm_certificate_arn
 
   aws_region  = var.aws_region
-  aws_profile = var.aws_profile
+  # aws_profile = var.aws_profile
 }
 
 # might not need this since we'll be using our role with AdminAccess permissions
@@ -82,7 +62,8 @@ module "github-ci-cd" {
   github_repo_full_name = var.github_repo_name_full
 
   aws_region  = var.aws_region
-  aws_profile = var.aws_profile
+  # aws_profile = var.aws_profile
+  aws_role_arn = var.aws_role_arn
 }
 
 module "visitor_counter" {
@@ -93,7 +74,8 @@ module "visitor_counter" {
   api_route_key = "visitor-counter"
 
   aws_region  = var.aws_region
-  aws_profile = var.aws_profile
+  # aws_profile = var.aws_profile
+  aws_role_arn = var.aws_role_arn
 }
 
 # devops-alarms
@@ -110,7 +92,8 @@ module "alarm-api_response_4xx" {
   alarm_description = "alarms when api gateway HTTP response is 4xx"
 
   aws_region  = var.aws_region
-  aws_profile = var.aws_profile
+  # aws_profile = var.aws_profile
+  aws_role_arn = var.aws_role_arn
 }
 
 module "alarm-api_response_5xx" {
@@ -126,7 +109,8 @@ module "alarm-api_response_5xx" {
   alarm_description = "alarms when api gateway HTTP response is 4xx"
 
   aws_region  = var.aws_region
-  aws_profile = var.aws_profile
+  # aws_profile = var.aws_profile
+  aws_role_arn = var.aws_role_arn
 }
 
 module "alarm-api_response_latency" {
@@ -144,7 +128,8 @@ module "alarm-api_response_latency" {
   alarm_threshold              = 2000 // in ms
 
   aws_region  = var.aws_region
-  aws_profile = var.aws_profile
+  # aws_profile = var.aws_profile
+  aws_role_arn = var.aws_role_arn
 }
 
 module "alarm-api_call_exceed_expectation" {
@@ -163,7 +148,8 @@ module "alarm-api_call_exceed_expectation" {
   measuring_period             = 60 // in second
 
   aws_region  = var.aws_region
-  aws_profile = var.aws_profile
+  # aws_profile = var.aws_profile
+  aws_role_arn = var.aws_role_arn
 }
 # END devops-alarms
 
@@ -173,5 +159,6 @@ module "slack_integration" {
   slack_webhook_url = var.slack_webhook_url
 
   aws_region  = var.aws_region
-  aws_profile = var.aws_profile
+  # aws_profile = var.aws_profile
+  aws_role_arn = var.aws_role_arn
 }

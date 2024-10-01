@@ -3,9 +3,15 @@ variable "aws_region" {
   default = ""
 }
 
-variable "aws_profile" {
-  type    = string
-  default = ""
+# variable "aws_profile" {
+#   type    = string
+#   default = ""
+# }
+
+variable "aws_role_arn" {
+  type = string
+  description = "ARN of AWS IAM role for Terraform to assume in order to create the rest of the app"
+  default = "aws:arn:change:me"
 }
 
 variable "my_terraform_org" {
@@ -17,12 +23,12 @@ variable "my_terraform_org" {
 variable "terraform_workspace" {
   description = "Name of Terraform workspace to run this module in"
   type        = string
-  default     = ""
+  default     = "*"
 }
 
 variable "terraform_project_name" {
   type    = string
-  default = ""
+  default = "*"
 }
 
 variable "terraform_workspace-run_phase" {

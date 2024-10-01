@@ -1,5 +1,6 @@
 aws_region  = "aws-region-1"
-aws_profile = "12345_Admin"
+# aws_profile = "12345_Admin"
+aws_role_arn = "aws:arn:1234:abcd"
 
 name                          = "My alarm name"
 notification_subscriber_email = "email@mail.com"

@@ -1,20 +1,5 @@
 # This templates create a CloudWatch alarm
 
-terraform {
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 5.0"
-    }
-  }
-}
-
-# Configure the AWS Provider
-provider "aws" {
-  region  = var.aws_region
-  profile = var.aws_profile
-}
-
 resource "aws_sns_topic" "sns_topic" {
   name = var.name
 }

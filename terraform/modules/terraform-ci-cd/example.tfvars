@@ -1,5 +1,6 @@
 aws_region             = "us-east-1"
-aws_profile            = "123456_MyAccessProfiile"
+# aws_profile            = "123456_MyAccessProfiile"
+aws_role_arn = "aws:arn:1234:abcd"
 my_terraform_org       = "TerraformOrgName"
 terraform_workspace    = "tf-workspace"
 terraform_project_name = "test-project"

@@ -16,7 +16,7 @@ data "aws_iam_policy_document" "oidcprovider_assume_role" {
 
     condition {
       test     = "StringEquals"
-      variable = "token.actions.githubusercontent.com:aud"
+      variable = "app.terraform.io:aud"
       values   = ["aws.workload.identity"]
     }
 

@@ -1,18 +1,3 @@
-terraform {
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 5.0"
-    }
-  }
-}
-
-# Configure the AWS Provider
-provider "aws" {
-  region  = var.aws_region
-  profile = var.aws_profile
-}
-
 resource "aws_iam_openid_connect_provider" "OIDCProviderGitHub" {
   url = "https://token.actions.githubusercontent.com"
 
