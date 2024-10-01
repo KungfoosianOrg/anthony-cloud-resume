@@ -22,6 +22,7 @@ resource "aws_iam_openid_connect_provider" "hcp_terraform" {
 ##### END SECTION #####
 
 
+##### SECTION - Create role that Terraform will assume at runtime
 data "aws_iam_policy_document" "oidcprovider_assume_role" {
   version = "2012-10-17"
 
@@ -43,12 +44,11 @@ data "aws_iam_policy_document" "oidcprovider_assume_role" {
     condition {
       test     = "StringLike"
       variable = "app.terraform.io:sub"
-      values   = ["organization:${var.my_terraform_org}:project:${var.terraform_project_name}:workspace:${var.terraform_workspace}:run_phase:${var.terraform_workspace-run_phase}"]
+      values   = ["organization:${var.my_terraform_org}:project:${var.terraform_project_name}:workspace:${var.terraform_deploy_workspace}:run_phase:${var.terraform_workspace-run_phase}"]
     }
 
   }
 }
-
 
 resource "aws_iam_role" "terraform_oidc_aws_provider" {
   description = "for GitHub Actions to assume role and run custom event"
@@ -56,7 +56,7 @@ resource "aws_iam_role" "terraform_oidc_aws_provider" {
   assume_role_policy = data.aws_iam_policy_document.oidcprovider_assume_role.json
 }
 
-# TODO: copy permissions used in TerraformAdminAccess role for permission policy
+# Adding permissions
 data "aws_iam_policy_document" "terraform_oidc_permissions" {
   version = "2012-10-17"
 
@@ -280,13 +280,44 @@ data "aws_iam_policy_document" "terraform_oidc_permissions" {
   }
 }
 
-
 resource "aws_iam_policy" "terraform_oidc" {
   policy = data.aws_iam_policy_document.terraform_oidc_permissions.json
 }
 
-resource "aws_iam_role_policy_attachment" "name" {
+resource "aws_iam_role_policy_attachment" "terraform_permissions" {
   role = aws_iam_role.terraform_oidc_aws_provider.name
 
   policy_arn = aws_iam_policy.terraform_oidc.arn
+}
+##### END SECTION #####
+
+
+##### SECTION - Create the workspace for infrastructure deployment
+data "tfe_project" "tfc_project" {
+  name         = var.terraform_project_name
+  organization = var.my_terraform_org
+}
+
+resource "tfe_workspace" "my_workspace" {
+  name         = var.terraform_deploy_workspace
+  organization = var.my_terraform_org
+  project_id   = data.tfe_project.tfc_project.id
+}
+#### END SECTION #####
+
+
+##### SECTION - Passing env to another workspace so it can use OIDC federation #####
+resource "tfe_variable" "tfc_aws_provider_auth" {
+  key          = "TFC_AWS_PROVIDER_AUTH"
+  value        = "true"
+  category     = "env"
+  workspace_id = tfe_workspace.my_workspace.id
+}
+ 
+resource "tfe_variable" "tfc_example_role_arn" {
+  sensitive    = true
+  key          = "TFC_AWS_RUN_ROLE_ARN"
+  value        = aws_iam_role.terraform_oidc_aws_provider.arn
+  category     = "env"
+  workspace_id = tfe_workspace.my_workspace.id
 }

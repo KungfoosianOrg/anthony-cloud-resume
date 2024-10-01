@@ -4,6 +4,25 @@
 #   https://www.hashicorp.com/blog/access-aws-from-hcp-terraform-with-oidc-federation
 
 
+##### SECTION - Use OIDC federation
+resource "tfe_variable" "tfc_aws_provider_auth" {
+  key          = "TFC_AWS_PROVIDER_AUTH"
+  value        = "true"
+  category     = "env"
+  # workspace_id = tfe_workspace.example.id
+  workspace_id = var.terraform_workspace_id
+}
+ 
+resource "tfe_variable" "tfc_example_role_arn" {
+  sensitive    = true
+  key          = "TFC_AWS_RUN_ROLE_ARN"
+  value        = var.aws_role_arn
+  category     = "env"
+  # workspace_id = tfe_workspace.example.id
+  workspace_id = var.terraform_workspace_id
+}
+##### END SECTION #####
+
 
 # if no zone id is passed in, creates the zone and keeps it in event of deletion
 resource "aws_route53_zone" "primary" {
