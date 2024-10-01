@@ -38,11 +38,11 @@ variable "aws_region" {
 #   default = ""
 # }
 
-variable "aws_role_arn" {
-  type = string
-  description = "ARN of AWS IAM role for Terraform to assume in order to create the infrastructure"
-  default = "aws:arn:change:me"
-}
+# variable "aws_role_arn" {
+#   type = string
+#   description = "ARN of AWS IAM role for Terraform to assume in order to create the infrastructure"
+#   default = "aws:arn:change:me"
+# }
 
 variable "is_prod_build" {
   type        = bool

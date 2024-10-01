@@ -4,26 +4,6 @@
 #   https://www.hashicorp.com/blog/access-aws-from-hcp-terraform-with-oidc-federation
 
 
-##### SECTION - Use OIDC federation
-resource "tfe_variable" "tfc_aws_provider_auth" {
-  key          = "TFC_AWS_PROVIDER_AUTH"
-  value        = "true"
-  category     = "env"
-  # workspace_id = tfe_workspace.example.id
-  workspace_id = var.terraform_workspace_id
-}
- 
-resource "tfe_variable" "tfc_example_role_arn" {
-  sensitive    = true
-  key          = "TFC_AWS_RUN_ROLE_ARN"
-  value        = var.aws_role_arn
-  category     = "env"
-  # workspace_id = tfe_workspace.example.id
-  workspace_id = var.terraform_workspace_id
-}
-##### END SECTION #####
-
-
 # if no zone id is passed in, creates the zone and keeps it in event of deletion
 resource "aws_route53_zone" "primary" {
   count = var.route53_hosted_zone_id == "" ? 1 : 0
@@ -46,7 +26,7 @@ module "route53-cloudfront-alias-w-ssl-validation" {
 
   # aws_profile = var.aws_profile
   aws_region  = var.aws_region
-  aws_role_arn = var.aws_role_arn
+  # aws_role_arn = var.aws_role_arn
 }
 
 module "sam-s3-cloudfront-static-site-hsts" {
@@ -83,7 +63,7 @@ module "github-ci-cd" {
 
   aws_region  = var.aws_region
   # aws_profile = var.aws_profile
-  aws_role_arn = var.aws_role_arn
+  # aws_role_arn = var.aws_role_arn
 }
 
 module "visitor_counter" {
@@ -95,7 +75,7 @@ module "visitor_counter" {
 
   aws_region  = var.aws_region
   # aws_profile = var.aws_profile
-  aws_role_arn = var.aws_role_arn
+  # aws_role_arn = var.aws_role_arn
 }
 
 # devops-alarms
@@ -113,7 +93,7 @@ module "alarm-api_response_4xx" {
 
   aws_region  = var.aws_region
   # aws_profile = var.aws_profile
-  aws_role_arn = var.aws_role_arn
+  # aws_role_arn = var.aws_role_arn
 }
 
 module "alarm-api_response_5xx" {
@@ -130,7 +110,7 @@ module "alarm-api_response_5xx" {
 
   aws_region  = var.aws_region
   # aws_profile = var.aws_profile
-  aws_role_arn = var.aws_role_arn
+  # aws_role_arn = var.aws_role_arn
 }
 
 module "alarm-api_response_latency" {
@@ -149,7 +129,7 @@ module "alarm-api_response_latency" {
 
   aws_region  = var.aws_region
   # aws_profile = var.aws_profile
-  aws_role_arn = var.aws_role_arn
+  # aws_role_arn = var.aws_role_arn
 }
 
 module "alarm-api_call_exceed_expectation" {
@@ -169,7 +149,7 @@ module "alarm-api_call_exceed_expectation" {
 
   aws_region  = var.aws_region
   # aws_profile = var.aws_profile
-  aws_role_arn = var.aws_role_arn
+  # aws_role_arn = var.aws_role_arn
 }
 # END devops-alarms
 
@@ -180,5 +160,5 @@ module "slack_integration" {
 
   aws_region  = var.aws_region
   # aws_profile = var.aws_profile
-  aws_role_arn = var.aws_role_arn
+  # aws_role_arn = var.aws_role_arn
 }
