@@ -15,3 +15,5 @@ aws_region  = "us-east-1" # need to be us-east-1 (default) sinice there will be 
 # aws_role_arn = "aws:arn:1234:abcd"
 
 terraform_workspace_id = "123456abcd"
+
+slack_integration-source_relative_path = "path/to/slack_integration/source_code"

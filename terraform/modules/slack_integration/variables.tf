@@ -35,3 +35,9 @@ variable "slack_webhook_url" {
   type        = string
   default     = ""
 }
+
+variable "source_relative_path" {
+  description = "Path to local file or directory containing your Lambda source code, relative to where 'terraform apply' is run"
+  type = string
+  default = ""
+}

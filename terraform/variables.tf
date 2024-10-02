@@ -9,11 +9,11 @@ variable "aws_region" {
 #   default = ""
 # }
 
-variable "terraform_workspace_id" {
-  description = "ID of Terraform workspace to create this app in. NOTE: can be automated"
-  type = string
-  default = ""
-}
+# variable "terraform_workspace_id" {
+#   description = "ID of Terraform workspace to create this app in. NOTE: can be automated"
+#   type = string
+#   default = ""
+# }
 # variable "aws_role_arn" {
 #   type = string
 #   description = "ARN of AWS IAM role for Terraform to assume in order to create the infrastructure"
@@ -91,5 +91,11 @@ variable "visitor_counter-api_trigger_method" {
 variable "visitor_counter-api_route_key" {
   type = string
   description = "route to trigger visitor counter API, leave blank for root path. E.g: my-api -> /my-api"
+  default = ""
+}
+
+variable "slack_integration-source_relative_path" {
+  type = string
+  description = "relative path to Lambda source code for Slack integration"
   default = ""
 }

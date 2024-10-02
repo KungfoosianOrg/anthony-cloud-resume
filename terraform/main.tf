@@ -157,7 +157,7 @@ module "slack_integration" {
   source = "./modules/slack_integration"
 
   slack_webhook_url = var.slack_webhook_url
-
+  source_relative_path = var.slack_integration-source_relative_path
   aws_region  = var.aws_region
   # aws_profile = var.aws_profile
   # aws_role_arn = var.aws_role_arn

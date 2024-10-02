@@ -30,36 +30,58 @@ resource "aws_ssm_parameter" "slack_webhook_url" {
 
 
 # converts the folder to a zip package at specified path
-data "archive_file" "slack_integration-package" {
-  type = "zip"
+# data "archive_file" "slack_integration-package" {
+#   type = "zip"
 
-  source_dir = "${path.module}/../../../aws/sendSlackMessage"
+#   source_dir = "${path.module}/../../../aws/sendSlackMessage"
 
-  output_path = "${path.module}/../../../out/sendSlackMessage.zip"
-}
+#   output_path = "${path.module}/../../../out/sendSlackMessage.zip"
+# }
 
-resource "aws_lambda_function" "slack_integration" {
+# resource "aws_lambda_function" "slack_integration" {
+#   function_name = var.lambda_function_name
+
+#   role = aws_iam_role.slack_integration-lambda_function-execution_role.arn
+
+#   description = "Integration with Slack, triggered by SNS"
+
+#   # uses the zip package output from archive_file above
+#   filename = "${path.module}/../../../out/sendSlackMessage.zip"
+
+#   package_type = "Zip"
+
+#   runtime = "python3.9"
+
+#   handler = "lambda_function.lambda_handler"
+
+#   logging_config {
+#     application_log_level = "INFO"
+#     system_log_level      = "INFO"
+#     log_format            = "JSON"
+#     log_group             = var.lambda-log_group-name
+#   }
+# }
+module "slack_integration-lambda" {
+  putin_khuylo = true
+
+  source = "terraform-aws-modules/lambda/aws"
+
   function_name = var.lambda_function_name
-
-  role = aws_iam_role.slack_integration-lambda_function-execution_role.arn
 
   description = "Integration with Slack, triggered by SNS"
 
-  # uses the zip package output from archive_file above
-  filename = "${path.module}/../../../out/sendSlackMessage.zip"
-
-  package_type = "Zip"
+  handler = "lambda_function.lambda_handler"
 
   runtime = "python3.9"
 
-  handler = "lambda_function.lambda_handler"
+  source_path = var.source_relative_path
 
-  logging_config {
-    application_log_level = "INFO"
-    system_log_level      = "INFO"
-    log_format            = "JSON"
-    log_group             = var.lambda-log_group-name
-  }
+  role_name = aws_iam_role.slack_integration-lambda_function-execution_role.name
+
+  logging_log_format = "JSON"
+  logging_application_log_level = "INFO"
+  logging_system_log_level = "INFO"
+  logging_log_group = var.lambda-log_group-name
 }
 
 data "aws_iam_policy_document" "lambda-assume_role" {

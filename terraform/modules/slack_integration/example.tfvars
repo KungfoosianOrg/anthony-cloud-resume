@@ -3,3 +3,4 @@ aws_region  = "region"
 # aws_role_arn = "aws:arn:1234:abcd"
 
 slack_webhook_url = "slackwebhook.url"
+source_relative_path = "../path/to/code"
