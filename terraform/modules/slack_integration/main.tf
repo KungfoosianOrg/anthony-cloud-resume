@@ -61,6 +61,7 @@ resource "aws_ssm_parameter" "slack_webhook_url" {
 #     log_group             = var.lambda-log_group-name
 #   }
 # }
+
 module "slack_integration-lambda" {
   putin_khuylo = true
 
