@@ -81,9 +81,11 @@ data "aws_iam_policy_document" "terraform_oidc_permissions" {
       "dynamodb:DeleteTable",
       "dynamodb:DescribeTimeToLive",
       "dynamodb:DescribeContinuousBackups",
-      "dynamodb:CreateTable"
+      "dynamodb:CreateTable",
+      "dynamodb:ListTagsOfResource"
     ]
     resources = ["*"]
+    # arn:aws:dynamodb:<region>:<acct id>:table/VisitorCounterTable 
   }
 
   statement {
@@ -112,6 +114,8 @@ data "aws_iam_policy_document" "terraform_oidc_permissions" {
     ]
 
     resources = ["*"]
+    # arn's of possibly multiple:
+    #   module.sam-s3-cloudfront-static-site-hsts.aws_s3_bucket.frontend_bucket
   }
 
   statement {
@@ -120,10 +124,12 @@ data "aws_iam_policy_document" "terraform_oidc_permissions" {
     actions = [
       "acm:DeleteCertificate",
       "acm:DescribeCertificate",
-      "acm:RequestCertificate"
+      "acm:RequestCertificate",
+      "acm:ListTagsForCertificate"
     ]
 
     resources = ["*"]
+    # awn of module.route53-cloudfront-alias-w-ssl-validation.aws_acm_certificate.ssl_cert
   }
 
   statement {
@@ -176,6 +182,7 @@ data "aws_iam_policy_document" "terraform_oidc_permissions" {
     ]
 
     resources = ["*"]
+    # arn:aws:logs:us-east-1:651706758768:log-group::log-stream:(* ? not sure)
   }
 
   statement {
@@ -197,16 +204,19 @@ data "aws_iam_policy_document" "terraform_oidc_permissions" {
       "ssm:DeleteParameter",
       "ssm:DescribeParameters",
       "ssm:GetParameter",
-      "ssm:PutParameter"
+      "ssm:PutParameter",
+      "ssm:ListTagsForResource"
     ]
 
     resources = ["*"]
+    # arn:aws:ssm:<aws-region>:<acct id>:parameter/SLACK_WEBHOOK_URL
   }
 
   statement {
     sid    = "Statement11"
     effect = "Allow"
     actions = [
+      "sns:CreateTopic",
       "sns:DeleteTopic",
       "sns:GetSubscriptionAttributes",
       "sns:Unsubscribe"
@@ -214,6 +224,7 @@ data "aws_iam_policy_document" "terraform_oidc_permissions" {
 
     resources = [
       "arn:aws:sns:${var.aws_region}:${data.aws_caller_identity.current.account_id}:*"
+      # arn:aws:sns:<region>:<acct id>:[5xxApiResponse, 4xxApiResponse, ...need to populate]
     ]
   }
 
