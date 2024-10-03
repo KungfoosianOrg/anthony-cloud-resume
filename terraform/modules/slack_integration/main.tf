@@ -1,18 +1,5 @@
 data "aws_caller_identity" "current" {}
 
-resource "aws_cloudwatch_log_group" "slack_integration-lambda" {
-  log_group_class   = "STANDARD"
-  name              = var.lambda-log_group-name
-  retention_in_days = 3
-}
-
-resource "aws_cloudwatch_log_group" "slack_integration-api_gw" {
-  log_group_class   = "STANDARD"
-  name              = var.api_gw-log_group-name
-  retention_in_days = 3
-}
-
-
 # section - Lambda function
 # creates a securestring parameter for storing Slack's webhook URL
 data "aws_kms_alias" "default_ssm_key" {
@@ -77,7 +64,11 @@ module "slack_integration-lambda" {
 
   source_path = var.source_relative_path
 
+  create_role = false
   role_name = aws_iam_role.slack_integration-lambda_function-execution_role.name
+
+  cloudwatch_logs_retention_in_days = 3
+  cloudwatch_logs_log_group_class = "STANDARD"
 
   logging_log_format = "JSON"
   logging_application_log_level = "INFO"

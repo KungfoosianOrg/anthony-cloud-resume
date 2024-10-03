@@ -1,10 +1,12 @@
+# TODO: look into full example for how to attach lambda execution  and permission policies (for other services to interact w/ Lambda)
+
 data "aws_caller_identity" "current" {}
 
-resource "aws_cloudwatch_log_group" "visitor_counter-lambda" {
-  log_group_class   = "STANDARD"
-  name              = var.lambda-log_group-name
-  retention_in_days = 3
-}
+# resource "aws_cloudwatch_log_group" "visitor_counter-lambda" {
+#   log_group_class   = "STANDARD"
+#   name              = var.lambda-log_group-name
+#   retention_in_days = 3
+# }
 
 resource "aws_cloudwatch_log_group" "visitor_counter-api_gw" {
   log_group_class   = "STANDARD"
@@ -135,6 +137,7 @@ module "visitor_counter-lambda" {
 
   function_name = var.lambda_function_name
 
+  create_role = false
   role_name = aws_iam_role.visitor_counter-lambda_function-execution_role.name
 
   description = "Lambda backend code for visitor counter, handles HTTP POST requests to increase a website visitor counter"
@@ -150,6 +153,9 @@ module "visitor_counter-lambda" {
   runtime = "python3.9"
 
   handler = "lambda_function.lambda_handler"
+
+  cloudwatch_logs_retention_in_days = 3
+  cloudwatch_logs_log_group_class = "STANDARD"
 
   logging_log_format = "JSON"
   logging_application_log_level = "INFO"
