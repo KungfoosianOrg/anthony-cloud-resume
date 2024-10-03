@@ -135,8 +135,26 @@ module "visitor_counter-lambda" {
 
   function_name = var.lambda_function_name
 
+  role_name = aws_iam_role.visitor_counter-lambda_function-execution_role.name
+
   description = "Lambda backend code for visitor counter, handles HTTP POST requests to increase a website visitor counter"
-  
+
+  environment_variables = {
+    DDB_TABLE_REGION = "${var.aws_region}"
+
+    DDB_TABLE_ARN = "arn:aws:dynamodb:${var.aws_region}:${data.aws_caller_identity.current.account_id}:table/${aws_dynamodb_table.visitor_counter-table.id}"
+  }
+
+  source_path = var.source_relative_path
+
+  runtime = "python3.9"
+
+  handler = "lambda_function.lambda_handler"
+
+  logging_log_format = "JSON"
+  logging_application_log_level = "INFO"
+  logging_system_log_level = "INFO"
+  logging_log_group = var.lambda-log_group-name
 }
 
 data "aws_iam_policy_document" "lambda-assume_role" {
