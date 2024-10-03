@@ -60,7 +60,7 @@ resource "aws_apigatewayv2_integration" "visitor_counter-lambda" {
   api_id                 = aws_apigatewayv2_api.visitor_counter-api.id
   integration_type       = "AWS_PROXY"
   integration_method     = "POST"
-  integration_uri        = module.visitor_counter-lambda.invoke_arn
+  integration_uri        = module.visitor_counter-lambda.lambda_function_invoke_arn
   payload_format_version = "2.0"
 }
 
@@ -74,7 +74,7 @@ resource "aws_apigatewayv2_route" "visitor_counter-api_invoke_route" {
 resource "aws_lambda_permission" "api_gw-lambda_access_permission" {
   action        = "lambda:InvokeFunction"
   # function_name = aws_lambda_function.visitor_counter.function_name
-  function_name = module.visitor_counter-lambda.arn
+  function_name = module.visitor_counter-lambda.lambda_function_arn
   principal     = "apigateway.amazonaws.com"
 
   # allows all stages of API deployment (first *) to call the Lambda, and specifies exact method or route key defined for triggering of Lambda 

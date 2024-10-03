@@ -170,7 +170,7 @@ data "aws_iam_policy_document" "terraform_oidc_permissions" {
     effect = "Allow"
     actions = [
       "logs:DeleteLogGroup",
-      "logs:DescribeLogGroup",
+      "logs:DescribeLogGroups",
       "logs:CreateLogGroup",
       "logs:PutRetentionPolicy",
     ]
