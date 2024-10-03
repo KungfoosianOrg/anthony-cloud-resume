@@ -1,3 +1,7 @@
+################
+# General Info #
+################
+
 variable "aws_region" {
   description = "Needs to be us-east-1 since AWS creates and validates SSL cert"
   type        = string
@@ -30,10 +34,20 @@ variable "lambda_function_name" {
   default = "VisitorCounterLambda"
 }
 
+variable "source_relative_path" {
+  description = "Path to local file or directory containing your Lambda source code, relative to where 'terraform apply' is run"
+  type = string
+}
+
+
+###################
+# Visitor Counter #
+###################
+
 variable "api_trigger_method" {
   type = string
   description = "HTTP method to trigger API, leave blank for ANY"
-  default = ""
+  default = "ANY"
 }
 
 variable "api_route_key" {

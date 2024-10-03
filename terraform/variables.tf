@@ -94,8 +94,8 @@ variable "visitor_counter-api_route_key" {
   default = ""
 }
 
-variable "slack_integration-source_relative_path" {
+variable "lambda_placeholder-source_relative_path" {
   type = string
-  description = "relative path to Lambda source code for Slack integration"
+  description = "relative path to placeholder code for Lambda"
   default = ""
 }

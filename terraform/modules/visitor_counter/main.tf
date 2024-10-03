@@ -60,13 +60,13 @@ resource "aws_apigatewayv2_integration" "visitor_counter-lambda" {
   api_id                 = aws_apigatewayv2_api.visitor_counter-api.id
   integration_type       = "AWS_PROXY"
   integration_method     = "POST"
-  integration_uri        = aws_lambda_function.visitor_counter.invoke_arn
+  integration_uri        = module.visitor_counter-lambda.invoke_arn
   payload_format_version = "2.0"
 }
 
 resource "aws_apigatewayv2_route" "visitor_counter-api_invoke_route" {
   api_id             = aws_apigatewayv2_api.visitor_counter-api.id
-  route_key          = "${var.api_trigger_method != "" ? var.api_trigger_method : "ANY"} /${var.api_route_key}"
+  route_key          = "${var.api_trigger_method} /${var.api_route_key}"
   authorization_type = "NONE"
   target             = "integrations/${aws_apigatewayv2_integration.visitor_counter-lambda.id}"
 }
@@ -74,58 +74,69 @@ resource "aws_apigatewayv2_route" "visitor_counter-api_invoke_route" {
 resource "aws_lambda_permission" "api_gw-lambda_access_permission" {
   action        = "lambda:InvokeFunction"
   # function_name = aws_lambda_function.visitor_counter.function_name
-  function_name = aws_lambda_function.visitor_counter.arn
+  function_name = module.visitor_counter-lambda.arn
   principal     = "apigateway.amazonaws.com"
 
   # allows all stages of API deployment (first *) to call the Lambda, and specifies exact method or route key defined for triggering of Lambda 
-  source_arn    = "${aws_apigatewayv2_api.visitor_counter-api.execution_arn}/*/${var.api_trigger_method != "" ? var.api_trigger_method : "ANY"}/${var.api_route_key != "" ? var.api_route_key : "*"}"
+  source_arn    = "${aws_apigatewayv2_api.visitor_counter-api.execution_arn}/*/${var.api_trigger_method}/${var.api_route_key != "" ? var.api_route_key : "*"}"
 }
 ### END section ###
 
 
 # section - Lambda function
 # converts the folder to a zip package at specified path
-data "archive_file" "visitor_counter-package" {
-  type = "zip"
+# data "archive_file" "visitor_counter-package" {
+#   type = "zip"
 
-  # path.module gets the system path to the folder containing this module
-  source_dir = "${path.module}/../../../aws/visitorCounter"
+#   # path.module gets the system path to the folder containing this module
+#   source_dir = "${path.module}/../../../aws/visitorCounter"
 
-  output_path = "${path.module}/../../../out/visitorCounter.zip"
-}
+#   output_path = "${path.module}/../../../out/visitorCounter.zip"
+# }
 
-resource "aws_lambda_function" "visitor_counter" {
+# resource "aws_lambda_function" "visitor_counter" {
+#   function_name = var.lambda_function_name
+
+#   role = aws_iam_role.visitor_counter-lambda_function-execution_role.arn
+
+#   description = "Lambda backend code for visitor counter, handles HTTP POST requests to increase a website visitor counter"
+
+#   environment {
+#     variables = {
+#       DDB_TABLE_REGION = var.aws_region
+
+#       DDB_TABLE_ARN = "arn:aws:dynamodb:${var.aws_region}:${data.aws_caller_identity.current.account_id}:table/${aws_dynamodb_table.visitor_counter-table.id}"
+#     }
+#   }
+
+#   # uses the zip package output from archive_file above
+#   filename = "${path.module}/../../../out/visitorCounter.zip"
+
+#   package_type = "Zip"
+
+#   runtime = "python3.9"
+
+#   handler = "lambda_function.lambda_handler"
+
+#   # might not need to worry about Events section, since we can point api gateway to this
+
+#   logging_config {
+#     application_log_level = "INFO"
+#     system_log_level      = "INFO"
+#     log_format            = "JSON"
+#     log_group             = var.lambda-log_group-name
+#   }
+# }
+
+module "visitor_counter-lambda" {
+  putin_khuylo = true
+
+  source = "terraform-aws-modules/lambda/aws"
+
   function_name = var.lambda_function_name
 
-  role = aws_iam_role.visitor_counter-lambda_function-execution_role.arn
-
   description = "Lambda backend code for visitor counter, handles HTTP POST requests to increase a website visitor counter"
-
-  environment {
-    variables = {
-      DDB_TABLE_REGION = var.aws_region
-
-      DDB_TABLE_ARN = "arn:aws:dynamodb:${var.aws_region}:${data.aws_caller_identity.current.account_id}:table/${aws_dynamodb_table.visitor_counter-table.id}"
-    }
-  }
-
-  # uses the zip package output from archive_file above
-  filename = "${path.module}/../../../out/visitorCounter.zip"
-
-  package_type = "Zip"
-
-  runtime = "python3.9"
-
-  handler = "lambda_function.lambda_handler"
-
-  # might not need to worry about Events section, since we can point api gateway to this
-
-  logging_config {
-    application_log_level = "INFO"
-    system_log_level      = "INFO"
-    log_format            = "JSON"
-    log_group             = var.lambda-log_group-name
-  }
+  
 }
 
 data "aws_iam_policy_document" "lambda-assume_role" {

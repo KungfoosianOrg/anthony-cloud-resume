@@ -74,6 +74,8 @@ module "visitor_counter" {
   api_route_key = "visitor-counter"
 
   aws_region  = var.aws_region
+  source_relative_path = var.lambda_placeholder-source_relative_path
+
   # aws_profile = var.aws_profile
   # aws_role_arn = var.aws_role_arn
 }
@@ -145,7 +147,7 @@ module "alarm-api_call_exceed_expectation" {
   statistic_calculation_method = "SampleCount"
   alarm_description            = "alarms when api calls exceed 100 within 1 minute"
   alarm_threshold              = 100
-  measuring_period             = 60 // in second
+  measuring_period             = 60 // seconds
 
   aws_region  = var.aws_region
   # aws_profile = var.aws_profile
@@ -156,9 +158,10 @@ module "alarm-api_call_exceed_expectation" {
 module "slack_integration" {
   source = "./modules/slack_integration"
 
-  slack_webhook_url = var.slack_webhook_url
-  source_relative_path = var.slack_integration-source_relative_path
+  source_relative_path = var.lambda_placeholder-source_relative_path
   aws_region  = var.aws_region
+
+  slack_webhook_url = var.slack_webhook_url
   # aws_profile = var.aws_profile
   # aws_role_arn = var.aws_role_arn
 }
