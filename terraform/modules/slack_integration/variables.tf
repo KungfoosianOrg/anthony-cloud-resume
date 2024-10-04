@@ -40,6 +40,13 @@ variable "source_relative_path" {
   default = ""
 }
 
+variable "lambda_role_name" {
+  description = "Name for lambda execution role"
+  type = string
+  default = "SlackIntegrationLambdaExecutionRole"
+  
+}
+
 
 #####################
 # Slack Integration #

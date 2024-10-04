@@ -64,8 +64,8 @@ module "slack_integration-lambda" {
 
   source_path = var.source_relative_path
 
-  create_role = false
-  role_name = aws_iam_role.slack_integration-lambda_function-execution_role.name
+  # create_role = false
+  role_name = var.lambda_role_name
 
   cloudwatch_logs_retention_in_days = 3
   cloudwatch_logs_log_group_class = "STANDARD"
@@ -74,65 +74,78 @@ module "slack_integration-lambda" {
   logging_application_log_level = "INFO"
   logging_system_log_level = "INFO"
   logging_log_group = var.lambda-log_group-name
-}
 
-data "aws_iam_policy_document" "lambda-assume_role" {
-  statement {
-    effect = "Allow"
+  # lambda execution role
 
-    # Why principal is defined this way? https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document#principals
-    principals {
-      type        = "Service"
-      identifiers = ["lambda.amazonaws.com"]
+  # lambda triggers (creates lambda access role?)
+  allowed_triggers = {
+    count = 2
+
+    SnsTopics = {
+      principal = "sns.amazonaws.com"
+
+      source_arn = "arn:aws:sns:${var.aws_region}:${data.aws_caller_identity.current.account_id}:*"
     }
-
-    actions = ["sts:AssumeRole"]
   }
 }
 
-resource "aws_iam_role" "slack_integration-lambda_function-execution_role" {
-  name = "SlackIntegrationLambdaExecutionRole"
+# data "aws_iam_policy_document" "lambda-assume_role" {
+#   statement {
+#     effect = "Allow"
 
-  assume_role_policy = data.aws_iam_policy_document.lambda-assume_role.json
-}
+#     # Why principal is defined this way? https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document#principals
+#     principals {
+#       type        = "Service"
+#       identifiers = ["lambda.amazonaws.com"]
+#     }
 
-data "aws_iam_policy_document" "slack_integration-lambda-policies" {
-  version = "2012-10-17"
+#     actions = ["sts:AssumeRole"]
+#   }
+# }
 
-  # permission policies
-  statement {
-    sid    = "LambdaAccessSsmParam"
-    effect = "Allow"
+# resource "aws_iam_role" "slack_integration-lambda_function-execution_role" {
+#   name = "SlackIntegrationLambdaExecutionRole"
 
-    actions = ["ssm:GetParameter"]
+#   assume_role_policy = data.aws_iam_policy_document.lambda-assume_role.json
+# }
 
-    resources = [aws_ssm_parameter.slack_webhook_url.arn]
-  }
+# data "aws_iam_policy_document" "slack_integration-lambda-policies" {
+#   version = "2012-10-17"
 
-  statement {
-    sid    = "LambdaAccessSsmParamDecryptKey"
-    effect = "Allow"
+#   # permission policies
+#   statement {
+#     sid    = "LambdaAccessSsmParam"
+#     effect = "Allow"
 
-    actions = ["kms:Decrypt"]
+#     actions = ["ssm:GetParameter"]
 
-    resources = [data.aws_kms_alias.default_ssm_key.arn]
-  }
+#     resources = [aws_ssm_parameter.slack_webhook_url.arn]
+#   }
 
-}
+#   statement {
+#     sid    = "LambdaAccessSsmParamDecryptKey"
+#     effect = "Allow"
 
-resource "aws_iam_policy" "lambda-execution_policy" {
-  policy = data.aws_iam_policy_document.slack_integration-lambda-policies.json
-}
+#     actions = ["kms:Decrypt"]
 
-resource "aws_iam_role_policy_attachment" "lambda-execution_policy_attach" {
-  role = aws_iam_role.slack_integration-lambda_function-execution_role.name
+#     resources = [data.aws_kms_alias.default_ssm_key.arn]
+#   }
 
-  policy_arn = aws_iam_policy.lambda-execution_policy.arn
-}
+# }
+
+# resource "aws_iam_policy" "lambda-execution_policy" {
+#   policy = data.aws_iam_policy_document.slack_integration-lambda-policies.json
+# }
+
+# resource "aws_iam_role_policy_attachment" "lambda-execution_policy_attach" {
+#   role = aws_iam_role.slack_integration-lambda_function-execution_role.name
+
+#   policy_arn = aws_iam_policy.lambda-execution_policy.arn
+# }
 
 # attach LambdaBasicExecutionRole so Lambda can log
-resource "aws_iam_role_policy_attachment" "aws_managed_policies" {
-  role       = aws_iam_role.slack_integration-lambda_function-execution_role.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-}
+# resource "aws_iam_role_policy_attachment" "aws_managed_policies" {
+#   role       = aws_iam_role.slack_integration-lambda_function-execution_role.name
+#   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+# }
 # END section

@@ -34,6 +34,12 @@ variable "lambda_function_name" {
   default = "VisitorCounterLambda"
 }
 
+variable "lambda_role_name" {
+  type = string
+  description = "Name for Lambda execution role"
+  default = "VisitorCounterLambdaExecutionRole"
+}
+
 variable "source_relative_path" {
   description = "Path to local file or directory containing your Lambda source code, relative to where 'terraform apply' is run"
   type = string

@@ -73,15 +73,15 @@ resource "aws_apigatewayv2_route" "visitor_counter-api_invoke_route" {
   target             = "integrations/${aws_apigatewayv2_integration.visitor_counter-lambda.id}"
 }
 
-resource "aws_lambda_permission" "api_gw-lambda_access_permission" {
-  action        = "lambda:InvokeFunction"
-  # function_name = aws_lambda_function.visitor_counter.function_name
-  function_name = module.visitor_counter-lambda.lambda_function_arn
-  principal     = "apigateway.amazonaws.com"
+# resource "aws_lambda_permission" "api_gw-lambda_access_permission" {
+#   action        = "lambda:InvokeFunction"
+#   # function_name = aws_lambda_function.visitor_counter.function_name
+#   function_name = module.visitor_counter-lambda.lambda_function_arn
+#   principal     = "apigateway.amazonaws.com"
 
-  # allows all stages of API deployment (first *) to call the Lambda, and specifies exact method or route key defined for triggering of Lambda 
-  source_arn    = "${aws_apigatewayv2_api.visitor_counter-api.execution_arn}/*/${var.api_trigger_method}/${var.api_route_key != "" ? var.api_route_key : "*"}"
-}
+#   # allows all stages of API deployment (first *) to call the Lambda, and specifies exact method or route key defined for triggering of Lambda 
+#   source_arn    = "${aws_apigatewayv2_api.visitor_counter-api.execution_arn}/*/${var.api_trigger_method}/${var.api_route_key != "" ? var.api_route_key : "*"}"
+# }
 ### END section ###
 
 
@@ -137,8 +137,9 @@ module "visitor_counter-lambda" {
 
   function_name = var.lambda_function_name
 
-  create_role = false
-  role_name = aws_iam_role.visitor_counter-lambda_function-execution_role.name
+  # automatically create Lambda execution role
+  # create_role = false
+  role_name = var.lambda_role_name
 
   description = "Lambda backend code for visitor counter, handles HTTP POST requests to increase a website visitor counter"
 
@@ -161,68 +162,88 @@ module "visitor_counter-lambda" {
   logging_application_log_level = "INFO"
   logging_system_log_level = "INFO"
   logging_log_group = var.lambda-log_group-name
-}
 
-data "aws_iam_policy_document" "lambda-assume_role" {
-  statement {
-    effect = "Allow"
+  # lambda execution role
+  # ...for lambda to interact with other services
+  # attach_policy_json = true
+  # policy_json = data.aws_iam_policy_document.visitor_counter-lambda-policies.json
 
-    # Why principal is defined this way? https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document#principals
-    principals {
-      type        = "Service"
-      identifiers = ["lambda.amazonaws.com"]
+  # ...for lambda to log
+  # attach_policy = true
+  # policy = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+
+  # lambda service role
+  allowed_triggers = {
+    ApiGw = {
+      principal = "apigateway.amazonaws.com"
+
+      source_arn = "${aws_apigatewayv2_api.visitor_counter-api.execution_arn}/*/${var.api_trigger_method}/${var.api_route_key != "" ? var.api_route_key : "*"}"
     }
-
-    actions = ["sts:AssumeRole"]
   }
 }
 
-resource "aws_iam_role" "visitor_counter-lambda_function-execution_role" {
-  name = "VisitorCounterLambdaExecutionRole"
-
-  assume_role_policy = data.aws_iam_policy_document.lambda-assume_role.json
-}
 
 
-data "aws_iam_policy_document" "visitor_counter-lambda-policies" {
-  version = "2012-10-17"
+# data "aws_iam_policy_document" "lambda-assume_role" {
+#   statement {
+#     effect = "Allow"
 
-  # permission policies
-  statement {
-    sid    = "VisitorCounterDDBPermissions"
-    effect = "Allow"
-    actions = [
-      "dynamodb:DeleteItem",
-      "dynamodb:GetItem",
-      "dynamodb:PutItem",
-      "dynamodb:Scan",
-      "dynamodb:UpdateItem",
-      "dynamodb:DescribeTable"
-    ]
+#     # Why principal is defined this way? https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document#principals
+#     principals {
+#       type        = "Service"
+#       identifiers = ["lambda.amazonaws.com"]
+#     }
 
-    resources = [
-      "arn:aws:dynamodb:${var.aws_region}:${data.aws_caller_identity.current.account_id}:table/${aws_dynamodb_table.visitor_counter-table.id}",
-      "arn:aws:dynamodb:${var.aws_region}:${data.aws_caller_identity.current.account_id}:table/${aws_dynamodb_table.visitor_counter-table.id}/index/*"
-    ]
-  }
+#     actions = ["sts:AssumeRole"]
+#   }
+# }
 
-}
+# resource "aws_iam_role" "visitor_counter-lambda_function-execution_role" {
+  # name = "VisitorCounterLambdaExecutionRole"
 
-resource "aws_iam_policy" "lambda-execution_policy" {
-  policy = data.aws_iam_policy_document.visitor_counter-lambda-policies.json
-}
+  # assume_role_policy = data.aws_iam_policy_document.lambda-assume_role.json
+# }
 
-resource "aws_iam_role_policy_attachment" "lambda-execution_policy_attach" {
-  role = aws_iam_role.visitor_counter-lambda_function-execution_role.name
 
-  policy_arn = aws_iam_policy.lambda-execution_policy.arn
-}
+# data "aws_iam_policy_document" "visitor_counter-lambda-policies" {
+#   version = "2012-10-17"
+
+#   # permission policies
+#   statement {
+#     sid    = "VisitorCounterDDBPermissions"
+#     effect = "Allow"
+#     actions = [
+#       "dynamodb:DeleteItem",
+#       "dynamodb:GetItem",
+#       "dynamodb:PutItem",
+#       "dynamodb:Scan",
+#       "dynamodb:UpdateItem",
+#       "dynamodb:DescribeTable"
+#     ]
+
+#     resources = [
+#       "arn:aws:dynamodb:${var.aws_region}:${data.aws_caller_identity.current.account_id}:table/${aws_dynamodb_table.visitor_counter-table.id}",
+#       "arn:aws:dynamodb:${var.aws_region}:${data.aws_caller_identity.current.account_id}:table/${aws_dynamodb_table.visitor_counter-table.id}/index/*"
+#     ]
+#   }
+
+# }
+
+# resource "aws_iam_policy" "lambda-execution_policy" {
+#   policy = data.aws_iam_policy_document.visitor_counter-lambda-policies.json
+# }
+
+# resource "aws_iam_role_policy_attachment" "lambda-execution_policy_attach" {
+#   role = aws_iam_role.visitor_counter-lambda_function-execution_role.name
+
+#   policy_arn = aws_iam_policy.lambda-execution_policy.arn
+# }
 
 # attach LambdaBasicExecutionRole so Lambda can log
-resource "aws_iam_role_policy_attachment" "aws_managed_policies" {
-  role       = aws_iam_role.visitor_counter-lambda_function-execution_role.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-}
+# resource "aws_iam_role_policy_attachment" "aws_managed_policies" {
+#   role       = aws_iam_role.visitor_counter-lambda_function-execution_role.name
+#   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+# }
 
 # END section
 
