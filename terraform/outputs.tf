@@ -13,16 +13,6 @@ output "s3_frontend_bucket_region" {
   value       = var.aws_region
 }
 
-# output "SAM_stack_name" {
-#   description = "Name of SAM stack"
-#   value       = var.SAM_stack_name
-# }
-
-# output "SAM_bucket_name" {
-#   description = "Name of the created SAM bucket to store sam artifacts in, help w/ automation"
-#   value       = module.sam-visitor-counter-permission.SAM_bucket_name
-# }
-
 output "route53_hosted_zone_id" {
   description = "ID of AWS Route53 hosted zone for your domain"
   value       = var.route53_hosted_zone_id == "" ? aws_route53_zone.primary[0].id : var.route53_hosted_zone_id
@@ -33,12 +23,15 @@ output "cloudfront_distribution_id" {
   value       = module.sam-s3-cloudfront-static-site-hsts.cfdistro_id
 }
 
-# output "cloudformation_root_stack_id" {
-#   description = "ID of the AWS CloudFormation root stack"
-#   value       = "TODO !Ref AWS::StackId"
-# }
-
 output "visitor_counter-api_invoke_url" {
   description = "API endpoint URL to trigger visitor counter API"
   value = "${module.visitor_counter.visitor_counter-api_invoke_url}/${var.visitor_counter-api_route_key}"
+}
+
+output "visitor_counter-lambda_arn" {
+  value = module.visitor_counter.lambda_arn
+}
+
+output "slack_integration-lambda_arn" {
+  value = module.slack_integration.lambda_arn
 }

@@ -75,6 +75,7 @@ module "slack_integration-lambda" {
   logging_system_log_level = "INFO"
   logging_log_group = var.lambda-log_group-name
 
+  publish = true
   # lambda execution role
 
   # lambda triggers (creates lambda access role?)

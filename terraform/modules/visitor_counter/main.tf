@@ -163,6 +163,8 @@ module "visitor_counter-lambda" {
   logging_system_log_level = "INFO"
   logging_log_group = var.lambda-log_group-name
 
+  publish = true
+  
   # lambda execution role
   # ...for lambda to interact with other services
   # attach_policy_json = true
@@ -171,7 +173,7 @@ module "visitor_counter-lambda" {
   # ...for lambda to log
   # attach_policy = true
   # policy = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-
+  
   # lambda service role
   allowed_triggers = {
     ApiGw = {

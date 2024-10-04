@@ -97,5 +97,5 @@ variable "visitor_counter-api_route_key" {
 variable "lambda_placeholder-source_relative_path" {
   type = string
   description = "relative path to placeholder code for Lambda"
-  default = ""
+  default = "placeholder/lambda"
 }
