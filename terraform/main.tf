@@ -85,8 +85,8 @@ module "alarm-api_response_4xx" {
   source = "./modules/cloudwatch-alarm"
   
   notification_email = var.notification_email
-  need_lambda_integration = true
-  lambda_subscriber_arn         = module.slack_integration.slack_integration-lambda_arn
+  # need_lambda_integration = true
+  # lambda_subscriber_arn         = module.slack_integration.slack_integration-lambda_arn
 
   name              = "4xxApiResponse"
   measured_metric   = "4xx"
@@ -102,8 +102,8 @@ module "alarm-api_response_5xx" {
   source = "./modules/cloudwatch-alarm"
 
   notification_email = var.notification_email
-  need_lambda_integration = true
-  lambda_subscriber_arn         = module.slack_integration.slack_integration-lambda_arn
+  # need_lambda_integration = true
+  # lambda_subscriber_arn         = module.slack_integration.slack_integration-lambda_arn
 
   name              = "5xxApiResponse"
   measured_metric   = "5xx"
@@ -119,8 +119,8 @@ module "alarm-api_response_latency" {
   source = "./modules/cloudwatch-alarm"
 
   notification_email = var.notification_email
-  need_lambda_integration = true
-  lambda_subscriber_arn         = module.slack_integration.slack_integration-lambda_arn
+  # need_lambda_integration = true
+  # lambda_subscriber_arn         = module.slack_integration.slack_integration-lambda_arn
 
   name                         = "ApiResponseLatency"
   measured_metric              = "Latency"
@@ -138,8 +138,8 @@ module "alarm-api_call_exceed_expectation" {
   source = "./modules/cloudwatch-alarm"
 
   notification_email = var.notification_email
-  need_lambda_integration = true
-  lambda_subscriber_arn         = module.slack_integration.slack_integration-lambda_arn
+  # need_lambda_integration = true
+  # lambda_subscriber_arn         = module.slack_integration.slack_integration-lambda_arn
 
   name                         = "ApiCallExceedExpectation"
   measured_metric              = "Count"
@@ -155,6 +155,8 @@ module "alarm-api_call_exceed_expectation" {
 }
 # END devops-alarms
 
+
+##### SECTION - Slack integration #####
 module "slack_integration" {
   source = "./modules/slack_integration"
 
@@ -165,3 +167,25 @@ module "slack_integration" {
   # aws_profile = var.aws_profile
   # aws_role_arn = var.aws_role_arn
 }
+
+# gathers the ARN's of the SNS topics to register the lambda that will run Slack integration
+variable "sns_topic_arns" {
+  description = "Collection of SNS topics' ARN's to register the lambda that will run Slack integration"
+  type = list(string)
+  
+  default = [
+    module.alarm-api_call_exceed_expectation.sns_topic_arn,
+    module.alarm-api_response_latency.sns_topic_arn,
+    module.alarm-api_response_5xx.sns_topic_arn,
+    module.alarm-api_response_4xx.sns_topic_arn
+  ]
+}
+
+resource "aws_sns_topic_subscription" "lambda_subscription" {
+  count = length(var.sns_topic_arns)
+
+  endpoint  = module.slack_integration.slack_integration-lambda_arn
+  protocol  = "lambda"
+  topic_arn = var.sns_topic_arns[count.index]
+}
+##### END SECTION #####

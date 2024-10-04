@@ -79,8 +79,6 @@ module "slack_integration-lambda" {
 
   # lambda triggers (creates lambda access role?)
   allowed_triggers = {
-    count = 2
-
     SnsTopics = {
       principal = "sns.amazonaws.com"
 
