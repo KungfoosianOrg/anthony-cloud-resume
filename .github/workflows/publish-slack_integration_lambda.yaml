@@ -1,0 +1,21 @@
+name: Publish Slack integration Lambda
+
+on:
+    push:
+        # branches: ["main"]
+        branches: ["terraform"]
+        paths: ["aws/sendSlackMessage/**"]
+
+    # Allows you to run this workflow manually from the Actions tab
+    workflow_dispatch:
+
+jobs:
+    call-package-lambda-workflow:
+        uses: ./.github/workflows/package-lambda.yaml
+
+        with:
+            lambda_source_folder-name: sendSlackMessage
+
+            out-filename: sendSlackMessage.zip
+
+    # TODO: be able to call the workflow to create the pakcage and still be able to use it for the rest of this workflow

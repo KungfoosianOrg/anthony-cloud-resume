@@ -1,0 +1,43 @@
+# Package Lambda code into zip format, outputs the package in the /out folder
+name: Package Lambda code into a Zip file
+
+on:
+    workflow_call:
+        inputs:
+            lambda_source_folder-name:
+                required: true
+                type: string
+
+            out-filename:
+                required: true
+                type: string
+    # Allows you to run this workflow manually from the Actions tab
+    workflow_dispatch:
+
+
+env:
+    OUTFILE_FULL_PATH: ~/out/${{ inputs.out-filename }}
+
+
+jobs:
+    package-lambda:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: check out repo
+              uses: actions/checkout@v3
+
+            - name: creating zip package
+              run: |
+                cd aws/${{ inputs.lambda-source-folder-name }}
+                
+                mkdir package
+                
+                pip3 install --target ./package boto3
+
+                cd package
+                zip -r ${{ env.OUTFILE_FULL_PATH }} .
+
+                cd .. && rm -rf package
+                zip ${{ env.OUTFILE_FULL_PATH }} *
+
