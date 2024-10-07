@@ -18,7 +18,7 @@ on:
 
 
 env:
-    OUTFILE_FULL_PATH: "${{ github.workspace }}/out/${{ inputs.output-zipped_file_name }}" # put in an output folder to make packaging several lambda code files easier
+    OUTFILE_FULL_PATH: "${{ github.workspace }}/out/${{ inputs.output-zipped_file_name }}" # put in an output folder to make packaging several lambda files easier
 
 
 jobs:
@@ -29,21 +29,26 @@ jobs:
             - name: check out repo
               uses: actions/checkout@v3
 
+            # - name: creating zip package
+            #   run: |
+            #     cd ./aws/${{ inputs.lambda_source_folder-name }}
+                
+            #     mkdir package
+                
+            #     pip3 install --target ./package boto3
+
+            #     cd package
+            #     zip -r ${{ env.OUTFILE_FULL_PATH }} .
+
+            #     cd .. && rm -rf package
+            #     zip ${{ env.OUTFILE_FULL_PATH }} *
+            
             - name: creating zip package
               run: |
                 cd ./aws/${{ inputs.lambda_source_folder-name }}
-                
-                mkdir package
-                
-                pip3 install --target ./package boto3
+                zip -r ${{ inputs.output-zipped_file_name }} .
 
-                cd package
-                zip -r ${{ env.OUTFILE_FULL_PATH }} .
-
-                cd .. && rm -rf package
-                zip ${{ env.OUTFILE_FULL_PATH }} *
-
-            - name: upload zipped package as an artifact for other workflows to use
+            - name: upload zipped package as an artifact for the deploy workflow to use
               uses: actions/upload-artifact@v4
               with:
                 name: ${{ inputs.output-zipped_file_name }}
