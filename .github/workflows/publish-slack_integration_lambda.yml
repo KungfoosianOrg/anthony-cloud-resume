@@ -21,4 +21,5 @@ jobs:
 
         output-zipped_file_name: sendSlackMessage.zip
 
+    secrets:
         lambda_function_arn: ${{ secrets.SLACK_INTEGRATION_LAMBDA_ARN }}
