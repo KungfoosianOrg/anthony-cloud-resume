@@ -16,7 +16,7 @@ jobs:
     call-package-lambda-workflow:
         uses: ./.github/workflows/package-n-deploy-lambda.yml
 
-        secrets: inherit
+        # secrets: inherit
 
         # runs-on: ubuntu-latest
 
