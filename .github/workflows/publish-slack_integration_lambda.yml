@@ -14,13 +14,20 @@ permissions:
 
 jobs:
     call-package-lambda-workflow:
-        uses: ./.github/workflows/package-n-deploy-lambda.yaml
+        runs-on: ubuntu-latest
 
-        secrets: inherit
+        steps:
+            - name: check out repo
+              uses: actions/checkout@v3
 
-        with:
-            lambda_source_folder-name: sendSlackMessage
+            - name: zips Lambda code and upload to AWS
+              uses: ./.github/workflows/package-n-deploy-lambda.yaml
 
-            output-zipped_file_name: sendSlackMessage.zip
+            #   secrets: inherit
 
-            lambda_function_arn: ${{ secrets.SLACK_INTEGRATION_LAMBDA_ARN }}
+              with:
+                lambda_source_folder-name: sendSlackMessage
+
+                output-zipped_file_name: sendSlackMessage.zip
+
+                lambda_function_arn: ${{ secrets.SLACK_INTEGRATION_LAMBDA_ARN }}
