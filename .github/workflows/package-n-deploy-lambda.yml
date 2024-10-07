@@ -33,7 +33,7 @@ jobs:
 
             - name: creating zip package
               run: |
-                cd aws/${{ inputs.lambda_source_folder-name }}
+                cd ./aws/${{ inputs.lambda_source_folder-name }}
                 
                 mkdir package
                 

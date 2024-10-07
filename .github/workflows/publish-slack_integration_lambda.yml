@@ -20,8 +20,8 @@ jobs:
         secrets: inherit
 
         with:
-            lambda_source_folder-name: "sendSlackMessage"
+            lambda_source_folder-name: sendSlackMessage
 
-            output-zipped_file_name: "sendSlackMessage.zip"
+            output-zipped_file_name: sendSlackMessage.zip
 
             lambda_function_arn: ${{ secrets.SLACK_INTEGRATION_LAMBDA_ARN }}
