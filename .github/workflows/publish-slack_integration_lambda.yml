@@ -2,7 +2,6 @@ name: Publish Slack integration Lambda
 
 on:
     push:
-        # branches: ["main"]
         branches: ["terraform"]
         paths: ["aws/sendSlackMessage/**"]
 
