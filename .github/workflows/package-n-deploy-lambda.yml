@@ -1,19 +1,19 @@
 name: Package Lambda code into a Zip file & deploy to AWS
 
 on:
-    workflow_call:
-        inputs:
-            lambda_source_folder-name:
-                required: true
-                type: string
+  workflow_call:
+    inputs:
+      lambda_source_folder-name:
+        required: true
+        type: string
 
-            output-zipped_file_name:
-                required: true
-                type: string
+      output-zipped_file_name:
+        required: true
+        type: string
 
-            lambda_function_arn:
-                required: true
-                type: string
+      lambda_function_arn:
+        required: true
+        type: string
 
 
 
