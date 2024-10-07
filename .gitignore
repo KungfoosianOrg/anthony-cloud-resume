@@ -6,10 +6,10 @@ my_deployment_pkg.zip
 .aws-sam
 samconfig-test.toml
 
-# ignores everything in the out folder
-out/*
-# but not the out folder
-!out/
+# # ignores everything in the out folder
+# out/*
+# # but not the out folder
+# !out/
 
 # Local .terraform directories
 **/.terraform/*
