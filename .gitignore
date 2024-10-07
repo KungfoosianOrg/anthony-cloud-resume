@@ -8,6 +8,8 @@ samconfig-test.toml
 
 # ignores everything in the out folder
 out/*
+# but not the out folder
+!out/
 
 # Local .terraform directories
 **/.terraform/*
