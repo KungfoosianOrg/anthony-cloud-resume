@@ -20,6 +20,9 @@ jobs:
             - name: check out repo
               uses: actions/checkout@v3
 
+            - name: test
+              run: ls -al .
+
             - name: zips Lambda code and upload to AWS
               uses: ./.github/workflows/package-n-deploy-lambda.yml
 
