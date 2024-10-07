@@ -14,7 +14,7 @@ permissions:
 
 jobs:
   call-package-lambda-workflow:
-    uses: KungfoosianOrg/anthony-cloud-resume/.github/workflows/package-n-deploy-lambda.yml@terraform
+    uses: ./.github/workflows/package-n-deploy-lambda.yml
 
     with:
         lambda_source_folder-name: sendSlackMessage

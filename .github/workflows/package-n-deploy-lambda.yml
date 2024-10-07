@@ -18,7 +18,7 @@ on:
 
 
 env:
-    OUTFILE_FULL_PATH: "~/out/${{ inputs.output-zipped_file_name }}" # put in an output folder to make packaging several lambda code files easier
+    OUTFILE_FULL_PATH: "${{ github.workspace }}/out/${{ inputs.output-zipped_file_name }}" # put in an output folder to make packaging several lambda code files easier
 
 
 jobs:
