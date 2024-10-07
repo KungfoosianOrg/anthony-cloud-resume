@@ -21,7 +21,7 @@ jobs:
               uses: actions/checkout@v3
 
             - name: zips Lambda code and upload to AWS
-              uses: ~/.github/workflows/package-n-deploy-lambda.yml
+              uses: ./.github/workflows/package-n-deploy-lambda.yml
 
             #   secrets: inherit
 
