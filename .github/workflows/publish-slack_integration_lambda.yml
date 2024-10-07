@@ -15,7 +15,7 @@ permissions:
 
 jobs:
     call-package-lambda-workflow:
-        uses: ./.github/workflows/package-lambda.yaml
+        uses: ./.github/workflows/package-n-deploy-lambda.yaml
 
         secrets: inherit
 
