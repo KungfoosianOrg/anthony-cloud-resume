@@ -35,7 +35,7 @@ jobs:
         run: |
           echo ${{ github.triggering_actor }}
 
-          echo ${{ github.event }}
+          echo ${{ github.event.sender }}
 
       - name: attempt to open event.json
         run: |
