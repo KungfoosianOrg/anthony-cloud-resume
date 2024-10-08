@@ -60,7 +60,7 @@ jobs:
 
         steps:
           - name: check out repo
-              uses: actions/checkout@v3
+            uses: actions/checkout@v3
 
           - name: download zipped package from previous job
             uses: actions/download-artifact@v4
