@@ -11,14 +11,16 @@ on:
         required: true
         type: string
     
-    secrets:
-      lambda_function_arn:
+      repo_secret_variable_name:
+        description: Name of GitHub repo secret that stores the Lambda function's ARN
         required: true
+        type: string
 
 
 
 env:
-    OUTFILE_FULL_PATH: "${{ github.workspace }}/out/${{ inputs.output-zipped_file_name }}" # put in an output folder to make packaging several lambda files easier
+  # this puts the zipped package in an output folder to make packaging several lambda files easier
+  OUTFILE_FULL_PATH: "${{ github.workspace }}/out/${{ inputs.output-zipped_file_name }}" 
 
 
 jobs:
@@ -76,7 +78,7 @@ jobs:
             - name: upload new code to Lambda
               run: |
                 aws lambda update-function-code \
-                            --function-name ${{ inputs.lambda_function_arn }} \
+                            --function-name ${{ secrets[format('{0}', github.event.inputs.repo_secret_variable_name)] }} \
                             --region ${{ secrets.AWS_STACK_REGION }}
 
 
