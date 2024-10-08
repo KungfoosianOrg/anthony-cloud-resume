@@ -33,7 +33,14 @@ jobs:
     steps:
       - name: print caller context
         run: |
-          echo ${{ github.event_path }}
+          echo ${{ github.triggering_actor }}
+
+          echo ${{ github.workflow}}
+
+      - name: attempt to open event.json
+        run: |
+          cat /home/runner/work/_temp/_github_workflow/event.json
+
 
     # package:
     #     runs-on: ubuntu-latest
