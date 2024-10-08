@@ -13,7 +13,7 @@ permissions:
   contents: read
 
 
-# EDIT AS NEEDED 
+# EDIT AS NEEDED
 env:
   lambda_source_folder-name: sendSlackMessage
   ghrepo_secret_variable_name: SLACK_INTEGRATION_LAMBDA_ARN
@@ -32,7 +32,7 @@ jobs:
 
       - name: run Python unittest
         run: |
-          python3 -m unittest aws/${{ env.lambda_source_folder-name }}/test_*.py
+          python3 -m unittest aws/${{ env.lambda_source_folder-name }}/tests/test_*.py
 
   
   pass-variable:
