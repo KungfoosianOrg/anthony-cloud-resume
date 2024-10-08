@@ -23,10 +23,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: print caller context
-        run: |
-          echo ${{ github }}
-
       - name: check out repo
         uses: actions/checkout@v3
 
