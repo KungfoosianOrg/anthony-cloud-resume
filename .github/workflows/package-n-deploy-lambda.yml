@@ -78,7 +78,7 @@ jobs:
           - name: upload new code to Lambda
             run: |
               aws lambda update-function-code \
-                          --function-name ${{ secrets[format('${0}_A', inputs.repo_secret_variable_name)] }} \
+                          --function-name ${{ secrets[inputs.repo_secret_variable_name] }} \
                           --region ${{ secrets.AWS_STACK_REGION }}
 
 
