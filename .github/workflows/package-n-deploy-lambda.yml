@@ -59,9 +59,6 @@ jobs:
         runs-on: ubuntu-latest
 
         steps:
-          - name: check out repo
-            uses: actions/checkout@v3
-
           - name: download zipped package from previous job
             uses: actions/download-artifact@v4
             with:
@@ -79,13 +76,9 @@ jobs:
               output-credentials: true  
 
           - name: upload new code to Lambda
-            env:  
-              GH_TOKEN: ${{ secrets.MY_GH_PERSONAL_ACCESS_TOKEN }}
             run: |
-              lambda_arn_secret=$(gh variable get ${{ inputs.repo_secret_variable_name }})
-
               aws lambda update-function-code \
-                          --function-name "$lambda_arn_secret" \
+                          --function-name ${{ secrets[format('${0}_A', inputs.repo_secret_variable_name)] }} \
                           --region ${{ secrets.AWS_STACK_REGION }}
 
 
