@@ -76,9 +76,13 @@ jobs:
                 output-credentials: true  
 
             - name: upload new code to Lambda
+              env:  
+                GH_TOKEN: ${{ secrets.MY_GH_PERSONAL_ACCESS_TOKEN }}
               run: |
+                lambda_arn_secret=$(gh variable get ${{ inputs.repo_secret_variable_name }})
+
                 aws lambda update-function-code \
-                            --function-name ${{ secrets[format('{0}', github.event.inputs.repo_secret_variable_name)] }} \
+                            --function-name "$lambda_arn_secret" \
                             --region ${{ secrets.AWS_STACK_REGION }}
 
 
