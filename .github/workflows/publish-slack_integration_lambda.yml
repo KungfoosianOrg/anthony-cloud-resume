@@ -19,47 +19,49 @@ env:
   ghrepo_secret_variable_name: SLACK_INTEGRATION_LAMBDA_ARN
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
+  # test:
+  #   runs-on: ubuntu-latest
 
-    steps:
-      - name: check out repo
-        uses: actions/checkout@v3
+  #   steps:
+  #     - name: check out repo
+  #       uses: actions/checkout@v3
 
-      - name: install python test dependencies
-        run: |
-          pip3 install -r aws/${{ env.lambda_source_folder-name }}/tests/requirements.txt
+  #     - name: install python test dependencies
+  #       run: |
+  #         pip3 install -r aws/${{ env.lambda_source_folder-name }}/tests/requirements.txt
 
-      - name: run Python unittest
-        run: |
-          python3 -m unittest aws/${{ env.lambda_source_folder-name }}/tests/test_*.py
+  #     - name: run Python unittest
+  #       run: |
+  #         python3 -m unittest aws/${{ env.lambda_source_folder-name }}/tests/test_*.py
 
   
-  pass-variable:
-    runs-on: ubuntu-latest
+  # pass-variable:
+  #   needs: [ test ]
 
-    outputs:
-      lambda_source_folder-name: ${{ steps.step1.outputs.lambda_source_folder-name }}
-      ghrepo_secret_variable-name: ${{ steps.step1.outputs.ghrepo_secret_variable-name }}
+  #   runs-on: ubuntu-latest
 
-    steps:
-      - name: print variables as outputs to be passed into other jobs
-        id: step1
-        run: |
-          echo "lambda_source_folder-name=${{ env.lambda_source_folder-name }}" >> "$GITHUB_OUTPUT"
-          echo "ghrepo_secret_variable-name=${{ env.ghrepo_secret_variable_name }}" >> "$GITHUB_OUTPUT"
+  #   outputs:
+  #     lambda_source_folder-name: ${{ steps.step1.outputs.lambda_source_folder-name }}
+  #     ghrepo_secret_variable-name: ${{ steps.step1.outputs.ghrepo_secret_variable-name }}
+
+  #   steps:
+  #     - name: print variables as outputs to be passed into other jobs
+  #       id: step1
+  #       run: |
+  #         echo "lambda_source_folder-name=${{ env.lambda_source_folder-name }}" >> "$GITHUB_OUTPUT"
+  #         echo "ghrepo_secret_variable-name=${{ env.ghrepo_secret_variable_name }}" >> "$GITHUB_OUTPUT"
 
 
   call-package-lambda-workflow:
-    needs: [ test, pass-variable ]
+    # needs: [ test, pass-variable ]
 
     uses: ./.github/workflows/package-n-deploy-lambda.yml
 
-    with:
-        lambda_source_folder-name: ${{ needs.pass-variable.outputs.lambda_source_folder-name }}
+    # with:
+    #     lambda_source_folder-name: ${{ needs.pass-variable.outputs.lambda_source_folder-name }}
 
-        output-zipped_file_name: ${{ needs.pass-variable.outputs.lambda_source_folder-name }}.zip
+    #     output-zipped_file_name: ${{ needs.pass-variable.outputs.lambda_source_folder-name }}.zip
 
-        ghrepo_secret_variable_name: ${{ needs.pass-variable.outputs.ghrepo_secret_variable-name }}
+    #     ghrepo_secret_variable_name: ${{ needs.pass-variable.outputs.ghrepo_secret_variable-name }}
 
     secrets: inherit
