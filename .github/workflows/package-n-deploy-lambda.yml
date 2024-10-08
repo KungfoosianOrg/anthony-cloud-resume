@@ -59,30 +59,33 @@ jobs:
         runs-on: ubuntu-latest
 
         steps:
-            - name: download zipped package from previous job
-              uses: actions/download-artifact@v4
-              with:
-                name: ${{ inputs.output-zipped_file_name }}
+          - name: check out repo
+              uses: actions/checkout@v3
+
+          - name: download zipped package from previous job
+            uses: actions/download-artifact@v4
+            with:
+              name: ${{ inputs.output-zipped_file_name }}
 
 
-            - name: get temporary AWS credentials
-              uses: aws-actions/configure-aws-credentials@v4
-              with:
-                aws-region: ${{ secrets.AWS_STACK_REGION }}
-                role-to-assume: ${{ secrets.AWS_ROLE_ARN }} 
-                role-session-name: GHASession-anthony_cloud_resume
-                unset-current-credentials: true
-                retry-max-attempts: 3
-                output-credentials: true  
+          - name: get temporary AWS credentials
+            uses: aws-actions/configure-aws-credentials@v4
+            with:
+              aws-region: ${{ secrets.AWS_STACK_REGION }}
+              role-to-assume: ${{ secrets.AWS_ROLE_ARN }} 
+              role-session-name: GHASession-anthony_cloud_resume
+              unset-current-credentials: true
+              retry-max-attempts: 3
+              output-credentials: true  
 
-            - name: upload new code to Lambda
-              env:  
-                GH_TOKEN: ${{ secrets.MY_GH_PERSONAL_ACCESS_TOKEN }}
-              run: |
-                lambda_arn_secret=$(gh variable get ${{ inputs.repo_secret_variable_name }})
+          - name: upload new code to Lambda
+            env:  
+              GH_TOKEN: ${{ secrets.MY_GH_PERSONAL_ACCESS_TOKEN }}
+            run: |
+              lambda_arn_secret=$(gh variable get ${{ inputs.repo_secret_variable_name }})
 
-                aws lambda update-function-code \
-                            --function-name "$lambda_arn_secret" \
-                            --region ${{ secrets.AWS_STACK_REGION }}
+              aws lambda update-function-code \
+                          --function-name "$lambda_arn_secret" \
+                          --region ${{ secrets.AWS_STACK_REGION }}
 
 
