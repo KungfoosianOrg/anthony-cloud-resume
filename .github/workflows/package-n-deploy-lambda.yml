@@ -35,7 +35,7 @@ jobs:
         run: |
           echo ${{ github.triggering_actor }}
 
-          echo ${{ github.workflow}}
+          echo ${{ github.event }}
 
       - name: attempt to open event.json
         run: |
