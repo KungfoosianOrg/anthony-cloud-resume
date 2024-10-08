@@ -35,7 +35,9 @@ data "aws_iam_policy_document" "oidcprovider_assume_role" {
 
 
 resource "aws_iam_role" "ghactions_oidc_aws_provider" {
-  description = "for GitHub Actions to assume role and run custom event"
+  description = "Role for GitHub Actions to assume and run custom event"
+
+  name = "GHActionsAWSAccess"
 
   assume_role_policy = data.aws_iam_policy_document.oidcprovider_assume_role.json
 }

@@ -1,4 +1,4 @@
-# TODO: Group permissions by module used by root template
+# TODO: Group permissions by modules created by root template
 
 data "aws_caller_identity" "current" {}
 
@@ -51,7 +51,9 @@ data "aws_iam_policy_document" "oidcprovider_assume_role" {
 }
 
 resource "aws_iam_role" "terraform_oidc_aws_provider" {
-  description = "for GitHub Actions to assume role and run custom event"
+  description = "Role for Terraform to assume to create the app infrastructure"
+
+  name = "TerraformAWSAccess"
 
   assume_role_policy = data.aws_iam_policy_document.oidcprovider_assume_role.json
 }
@@ -94,6 +96,7 @@ data "aws_iam_policy_document" "terraform_oidc_permissions" {
     actions = [
       "s3:DeleteBucket",
       "s3:GetBucketPolicy",
+      "s3:GetBucketTagging",
       "s3:DeleteBucketPolicy",
       "s3:PutBucketPublicAccessBlock",
       "s3:GetBucketPublicAccessBlock",
@@ -110,12 +113,14 @@ data "aws_iam_policy_document" "terraform_oidc_permissions" {
       "s3:GetBucketRequestPayment",
       "s3:GetBucketWebsite",
       "s3:PutBucketPolicy",
-      "s3:CreateBucket"
+      "s3:CreateBucket",
+      "s3:ListBucket"
     ]
 
     resources = ["*"]
     # arn's of possibly multiple:
     #   module.sam-s3-cloudfront-static-site-hsts.aws_s3_bucket.frontend_bucket
+    #   or arn:aws:s3:::terraform-*
   }
 
   statement {
@@ -142,8 +147,10 @@ data "aws_iam_policy_document" "terraform_oidc_permissions" {
       "cloudfront:UpdateDistribution",
       "cloudfront:GetResponseHeadersPolicy",
       "cloudfront:GetOriginAccessControl",
+      "cloudfront:GetDistribution",
       "cloudfront:CreateResponseHeadersPolicy",
-      "cloudfront:CreateOriginAccessControl"
+      "cloudfront:CreateOriginAccessControl",
+      "cloudfront:ListTagsForResource"
     ]
 
     resources = ["*"]
@@ -179,6 +186,7 @@ data "aws_iam_policy_document" "terraform_oidc_permissions" {
       "logs:DescribeLogGroups",
       "logs:CreateLogGroup",
       "logs:PutRetentionPolicy",
+      "logs:ListTagsForResource"
     ]
 
     resources = ["*"]
@@ -191,7 +199,8 @@ data "aws_iam_policy_document" "terraform_oidc_permissions" {
     actions = [
       "cloudwatch:DeleteAlarms",
       "cloudwatch:DescribeAlarms",
-      "cloudwatch:PutMetricAlarm"
+      "cloudwatch:PutMetricAlarm",
+      "cloudwatch:ListTagsForResource"
     ]
 
     resources = ["*"]
@@ -203,6 +212,7 @@ data "aws_iam_policy_document" "terraform_oidc_permissions" {
     actions = [
       "ssm:DeleteParameter",
       "ssm:DescribeParameters",
+      "ssm:GetParameters",
       "ssm:GetParameter",
       "ssm:PutParameter",
       "ssm:ListTagsForResource"
@@ -219,6 +229,8 @@ data "aws_iam_policy_document" "terraform_oidc_permissions" {
       "sns:CreateTopic",
       "sns:DeleteTopic",
       "sns:GetSubscriptionAttributes",
+      "sns:GetTopicAttributes",
+      "sns:ListTagsForResource",
       "sns:Unsubscribe"
     ]
 
