@@ -297,7 +297,8 @@ data "aws_iam_policy_document" "terraform_oidc_permissions" {
       "iam:CreatePolicy",
       "iam:CreateRole",
       "iam:CreateOpenIDConnectProvider",
-      "iam:CreateServiceLinkedRole"
+      "iam:CreateServiceLinkedRole",
+      "iam:UpdateAssumeRolePolicy"
     ]
 
     resources = ["*"]

@@ -129,6 +129,8 @@ module "slack_integration" {
   source_relative_path = var.lambda_placeholder-source_relative_path
   aws_region  = var.aws_region
 
+  aws_cicd_role-name = module.github-ci-cd.ghactions_oidc_role_name
+
   slack_webhook_url = var.slack_webhook_url
 }
 

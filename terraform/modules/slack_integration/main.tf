@@ -148,3 +148,43 @@ module "slack_integration-lambda" {
 #   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 # }
 # END section
+
+# SECTION - AWS permissions for GitHub Actions to update this module
+data "aws_iam_policy_document" "cicd-permissions" {
+  version = "2012-10-17"
+
+  statement {
+    sid = "LambdaCodeAccess"
+
+    effect = "Allow"
+
+    actions = [ 
+      "lambda:UpdateFunctionCode",
+      "lambda:GetFunction",
+      "lambda:CreateFunction",
+      "lambda:DeleteFunction",
+      "lambda:TagResource",
+      "lambda:AddPermission",
+      "lambda:RemovePermission",
+      "lambda:GetRuntimeManagementConfig",
+      "lambda:GetFunctionCodeSigningConfig"
+    ]
+
+    resources = [ 
+      module.slack_integration-lambda.lambda_function_arn
+    ]
+  }
+}
+
+resource "aws_iam_policy" "cicd-permissions" {
+  name = "CICDVisitorCounterAccess"
+
+  policy = data.aws_iam_policy_document.cicd-permissions.json
+}
+
+resource "aws_iam_role_policy_attachment" "cicd-permissions" {
+  role = var.aws_cicd_role-name
+
+  policy_arn = aws_iam_policy.cicd-permissions.arn
+}
+# END section
