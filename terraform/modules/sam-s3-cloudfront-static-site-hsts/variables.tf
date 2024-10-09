@@ -25,7 +25,6 @@ variable "apigw_endpoint_url" {
 variable "ghactions_aws_role_name" {
   type        = string
   description = "Name of role for GitHub Actions"
-  default     = ""
 }
 
 variable "acm_certificate_arn" {
@@ -37,6 +36,11 @@ variable "acm_certificate_arn" {
 variable "aws_region" {
   type    = string
   default = ""
+}
+
+variable "aws_cicd_role-name" {
+  type = string
+  description = "Name of AWS IAM role for CI/CD process to assume for interacting with resources of this module"
 }
 
 # variable "aws_profile" {

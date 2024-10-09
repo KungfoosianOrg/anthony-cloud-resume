@@ -36,6 +36,8 @@ module "sam-s3-cloudfront-static-site-hsts" {
   ghactions_aws_role_name = module.github-ci-cd.ghactions_oidc_role_name
   acm_certificate_arn    = module.route53-cloudfront-alias-w-ssl-validation.acm_certificate_arn
 
+  aws_cicd_role-name = module.github-ci-cd.ghactions_oidc_role_name
+
   aws_region  = var.aws_region
 }
 
@@ -56,6 +58,8 @@ module "visitor_counter" {
 
   aws_region  = var.aws_region
   source_relative_path = var.lambda_placeholder-source_relative_path
+
+  aws_cicd_role-name = module.github-ci-cd.ghactions_oidc_role_name
 }
 
 # devops-alarms

@@ -45,6 +45,11 @@ variable "source_relative_path" {
   type = string
 }
 
+variable "aws_cicd_role-name" {
+  description = "Name of AWS role for CI/CD process to assume to interact with this module"
+  type = string
+}
+
 
 ###################
 # Visitor Counter #

@@ -106,7 +106,7 @@ jobs:
   #                                           KmsDecryptKeyArnParam=${{ secrets.SLACK_KMS_DECRYPT_KEY_ARN }}'
 
 
-  call-package-lambda-workflow:
+  package-n-deploy-lambda:
     needs: [ test, pass-variable ]
 
     uses: ./.github/workflows/package-n-deploy-lambda.yml
