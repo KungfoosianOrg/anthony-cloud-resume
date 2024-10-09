@@ -81,9 +81,10 @@ jobs:
 
       - name: upload new code to Lambda
         run: |
+          ls -al ${{ github.workspace }}
           aws lambda update-function-code \
                       --function-name ${{ secrets[inputs.ghrepo_secret_variable_name] }} \
                       --region ${{ secrets.AWS_STACK_REGION }}
-                      --zip-file $GITHUB_WORKSPACE/${{ inputs.output-zipped_file_name }}
+                      --zip-file ${{ github.workspace }}/${{ inputs.output-zipped_file_name }}
 
 
