@@ -177,7 +177,7 @@ data "aws_iam_policy_document" "cicd-permissions" {
 }
 
 resource "aws_iam_policy" "cicd-permissions" {
-  name = "CICDVisitorCounterAccess"
+  name = "CICDSlackIntegrationLambdaAccess"
 
   policy = data.aws_iam_policy_document.cicd-permissions.json
 }

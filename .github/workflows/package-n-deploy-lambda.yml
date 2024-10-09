@@ -28,10 +28,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: print caller context
-        run: |
-          echo ${{ github }}
-      
       - name: check out repo
         uses: actions/checkout@v3
 
@@ -88,5 +84,6 @@ jobs:
           aws lambda update-function-code \
                       --function-name ${{ secrets[inputs.ghrepo_secret_variable_name] }} \
                       --region ${{ secrets.AWS_STACK_REGION }}
+                      --zip-file ./${{ inputs.output-zipped_file_name }}
 
 
