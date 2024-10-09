@@ -84,6 +84,6 @@ jobs:
           aws lambda update-function-code \
                       --function-name ${{ secrets[inputs.ghrepo_secret_variable_name] }} \
                       --region ${{ secrets.AWS_STACK_REGION }}
-                      --zip-file ./${{ inputs.output-zipped_file_name }}
+                      --zip-file $GITHUB_WORKSPACE/${{ inputs.output-zipped_file_name }}
 
 
