@@ -231,7 +231,8 @@ data "aws_iam_policy_document" "terraform_oidc_permissions" {
       "sns:GetSubscriptionAttributes",
       "sns:GetTopicAttributes",
       "sns:ListTagsForResource",
-      "sns:Unsubscribe"
+      "sns:Unsubscribe",
+      "sns:Subscribe"
     ]
 
     resources = [
