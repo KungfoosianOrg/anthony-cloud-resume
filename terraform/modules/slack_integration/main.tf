@@ -64,8 +64,9 @@ module "slack_integration-lambda" {
 
   source_path = var.source_relative_path
 
-  # create_role = false
-  role_name = var.lambda_role_name
+  create_role = false
+  # role_name = var.lambda_role_name
+  lambda_role = aws_iam_role.slack_integration-lambda_function-execution_role.arn
 
   cloudwatch_logs_retention_in_days = 3
   cloudwatch_logs_log_group_class = "STANDARD"
