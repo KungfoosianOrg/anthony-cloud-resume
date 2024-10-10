@@ -186,7 +186,9 @@ data "aws_iam_policy_document" "terraform_oidc_permissions" {
       "logs:DescribeLogGroups",
       "logs:CreateLogGroup",
       "logs:PutRetentionPolicy",
-      "logs:ListTagsForResource"
+      "logs:ListTagsForResource",
+      "logs:ListLogDeliveries",
+      "logs:DeleteLogDelivery"
     ]
 
     resources = ["*"]
