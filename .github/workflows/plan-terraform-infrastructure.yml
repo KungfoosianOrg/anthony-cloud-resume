@@ -1,14 +1,16 @@
 name: Deploy app infrastructure using Terraform, with manual approval
 
 on:
-    # push:
-    #     branches: ["terraform"]
-    #     paths: ["terraform/**"]
-    #     paths-ignore: ["terraform/modules/terraform-ci-cd/**"]
+    push:
+        branches: ["terraform"]
+        paths: ["terraform/**"]
+        paths-ignore: ["terraform/modules/terraform-ci-cd/**"]
 
     # Allows you to run this workflow manually from the Actions tab
     workflow_dispatch:
 
+permissions:
+  issues: write
 
 jobs:
     terraform:
@@ -53,6 +55,14 @@ jobs:
             - name: Get manual approval
               uses: trstringer/manual-approval@v1
               with:
-                secret: ${{ }}
+                secret: ${{ secrets.MY_GH_PERSONAL_ACCESS_TOKEN }}
                 timeout-minutes: 5
+                approvers: anthonyvovo123
+                issue-title: New Terraform infrastructure deployment requires manual approval
+
+            - name: Terraform apply
+              run: |
+                cd ${{ github.workspace }}/terraform
+
+                terraform apply -input=false plan.tfplan
 
