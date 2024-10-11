@@ -25,7 +25,7 @@ output "cloudfront_distribution_id" {
 
 output "visitor_counter-api_invoke_url" {
   description = "API endpoint URL to trigger visitor counter API"
-  value = "${module.visitor_counter.visitor_counter-api_invoke_url}/${var.visitor_counter-api_route_key}"
+  value       = "${module.visitor_counter.visitor_counter-api_invoke_url}/${var.visitor_counter-api_route_key}"
 }
 
 output "visitor_counter-lambda_arn" {

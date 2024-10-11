@@ -1,0 +1,56 @@
+name: Deploy app infrastructure using Terraform, with manual approval
+
+on:
+    # push:
+    #     branches: ["terraform"]
+    #     paths: ["terraform/**"]
+    #     paths-ignore: ["terraform/modules/terraform-ci-cd/**"]
+
+    # Allows you to run this workflow manually from the Actions tab
+    workflow_dispatch:
+
+env:
+    TF_VAR_subdomains: 
+    TF_VAR_github_repo_name_full:
+    TF_VAR_route53_hosted_zone_id:
+    TF_VAR_notification_email:
+    TF_VAR_slack_webhook_url:
+    visitor_counter-api_trigger_method:
+    TF_VAR_visitor_counter-api_route_key:
+
+jobs:
+    terraform:
+        runs-on: ubuntu-latest
+        
+        steps:
+            - name: Install Terraform CLI
+              uses: hashicorp/setup-terraform@v3
+              with:
+                cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+
+            - name: Checkout repo
+              uses: actions/checkout@v3
+
+            - name: Sets up provider, inject production Terraform variables
+              run: |
+                cd ${{ github.workspace }}/terraform
+                
+                echo Copying example.terraform.tf, uncomment lines, and inject production values
+                cp example.terraform.tf terraform.tf
+                sed -i 's/#//' ./terraform.tf
+                sed -i 's/.*organization.*/organization = "${{ secrets.TF_ORGANIZATION }}"/' ./terraform.tf
+                sed -i 's/.*name.*/name = "${{ secrets.TF_DEPLOY_WORKSPACE }}"/' ./terraform.tf
+
+                echo Copying example.tfvars and inject production values
+                cp example.tfvars prod.tfvars
+                sed -i 's/.*registered_domain_name.*/registered_domain_name = "${{ secrets.REGISTERED_DOMAIN_NAME }}"/' ./prod.tfvars
+                sed -i 's/.*route53_hosted_zone_id.*/route53_hosted_zone_id = "${{ secrets.ROUTE53_ZONE_ID }}"/' ./prod.tfvars
+                sed -i 's/.*notification_subscriber_email.*/notification_subscriber_email = "${{ secrets.SNS_ALERT_EMAIL }}"/' ./prod.tfvars
+                sed -i 's/.*slack_webhook_url.*/slack_webhook_url = "${{ secrets.SLACK_WEBHOOK_URL }}"/' ./prod.tfvars
+                sed -i 's/.*visitor_counter-api_trigger_method.*/visitor_counter-api_trigger_method = "POST"/' ./prod.tfvars
+                sed -i 's/.*visitor_counter-api_route_key.*/visitor_counter-api_route_key = "visitor-counter"/' ./prod.tfvars
+
+                terraform fmt
+
+            
+

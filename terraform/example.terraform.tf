@@ -1,5 +1,3 @@
-# Copy to your own terraform.tf, un-comment, and edit as neccesary
-
 # terraform {
 #     cloud {
 #       organization = "test-terraform-org"
@@ -17,13 +15,6 @@
 #   }
 # }
 
-# Configure the AWS Provider
-# provider "aws" {
-#   region  = var.aws_region
-#   profile = var.aws_profile
-# }
-
-# or OIDC
 # provider "aws" {
 #   region = var.aws_region
 # }

@@ -24,21 +24,21 @@ module "route53-cloudfront-alias-w-ssl-validation" {
   route53_hosted_zone_id       = var.route53_hosted_zone_id == "" ? aws_route53_zone.primary[0].id : var.route53_hosted_zone_id
   cloudfront_distribution_fqdn = module.sam-s3-cloudfront-static-site-hsts.cloudfront_distribution_domain_name
 
-  aws_region  = var.aws_region
+  aws_region = var.aws_region
 }
 
 module "sam-s3-cloudfront-static-site-hsts" {
   source = "./modules/sam-s3-cloudfront-static-site-hsts"
 
-  registered_domain_name = var.registered_domain_name
-  subdomains             = var.subdomains
-  route53_hosted_zone_id = var.route53_hosted_zone_id == "" ? aws_route53_zone.primary[0].id : var.route53_hosted_zone_id
+  registered_domain_name  = var.registered_domain_name
+  subdomains              = var.subdomains
+  route53_hosted_zone_id  = var.route53_hosted_zone_id == "" ? aws_route53_zone.primary[0].id : var.route53_hosted_zone_id
   ghactions_aws_role_name = module.github-ci-cd.ghactions_oidc_role_name
-  acm_certificate_arn    = module.route53-cloudfront-alias-w-ssl-validation.acm_certificate_arn
+  acm_certificate_arn     = module.route53-cloudfront-alias-w-ssl-validation.acm_certificate_arn
 
   aws_cicd_role-name = module.github-ci-cd.ghactions_oidc_role_name
 
-  aws_region  = var.aws_region
+  aws_region = var.aws_region
 }
 
 module "github-ci-cd" {
@@ -46,7 +46,7 @@ module "github-ci-cd" {
 
   github_repo_full_name = var.github_repo_name_full
 
-  aws_region  = var.aws_region
+  aws_region = var.aws_region
 }
 
 module "visitor_counter" {
@@ -54,9 +54,9 @@ module "visitor_counter" {
 
   # triggers API for HTTP POST requests to /visitor-counter
   api_trigger_method = "POST"
-  api_route_key = "visitor-counter"
+  api_route_key      = "visitor-counter"
 
-  aws_region  = var.aws_region
+  aws_region           = var.aws_region
   source_relative_path = var.lambda_placeholder-source_relative_path
 
   aws_cicd_role-name = module.github-ci-cd.ghactions_oidc_role_name
@@ -65,7 +65,7 @@ module "visitor_counter" {
 # devops-alarms
 module "alarm-api_response_4xx" {
   source = "./modules/cloudwatch-alarm"
-  
+
   notification_email = var.notification_email
 
   name              = "4xxApiResponse"
@@ -73,7 +73,7 @@ module "alarm-api_response_4xx" {
   api_gw_id         = module.visitor_counter.apigw_id
   alarm_description = "alarms when api gateway HTTP response is 4xx"
 
-  aws_region  = var.aws_region
+  aws_region = var.aws_region
 }
 
 module "alarm-api_response_5xx" {
@@ -86,7 +86,7 @@ module "alarm-api_response_5xx" {
   api_gw_id         = module.visitor_counter.apigw_id
   alarm_description = "alarms when api gateway HTTP response is 4xx"
 
-  aws_region  = var.aws_region
+  aws_region = var.aws_region
 }
 
 module "alarm-api_response_latency" {
@@ -101,7 +101,7 @@ module "alarm-api_response_latency" {
   statistic_calculation_method = "Maximum"
   alarm_threshold              = 2000 // in ms
 
-  aws_region  = var.aws_region
+  aws_region = var.aws_region
 }
 
 module "alarm-api_call_exceed_expectation" {
@@ -117,7 +117,7 @@ module "alarm-api_call_exceed_expectation" {
   alarm_threshold              = 100
   measuring_period             = 60 // seconds
 
-  aws_region  = var.aws_region
+  aws_region = var.aws_region
 }
 # END devops-alarms
 
@@ -127,7 +127,7 @@ module "slack_integration" {
   source = "./modules/slack_integration"
 
   source_relative_path = var.lambda_placeholder-source_relative_path
-  aws_region  = var.aws_region
+  aws_region           = var.aws_region
 
   aws_cicd_role-name = module.github-ci-cd.ghactions_oidc_role_name
 
@@ -136,16 +136,16 @@ module "slack_integration" {
 
 # gathers the ARN's of the SNS topics to register the lambda that will run Slack integration
 locals {
-cw_alarm-modules = {
-  alarm-api_call_exceed_expectation = module.alarm-api_call_exceed_expectation
-  alarm-api_response_latency = module.alarm-api_response_latency
-  alarm-api_response_5xx = module.alarm-api_response_5xx
-  alarm-api_response_4xx = module.alarm-api_response_4xx
-}
-  
+  cw_alarm-modules = {
+    alarm-api_call_exceed_expectation = module.alarm-api_call_exceed_expectation
+    alarm-api_response_latency        = module.alarm-api_response_latency
+    alarm-api_response_5xx            = module.alarm-api_response_5xx
+    alarm-api_response_4xx            = module.alarm-api_response_4xx
+  }
+
   sns_topic_arn_list = [
-    for module_name in local.cw_alarm-modules:
-      module_name.sns_topic_arn
+    for module_name in local.cw_alarm-modules :
+    module_name.sns_topic_arn
   ]
 }
 
