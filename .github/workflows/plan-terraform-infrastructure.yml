@@ -9,14 +9,6 @@ on:
     # Allows you to run this workflow manually from the Actions tab
     workflow_dispatch:
 
-env:
-    TF_VAR_subdomains: 
-    TF_VAR_github_repo_name_full:
-    TF_VAR_route53_hosted_zone_id:
-    TF_VAR_notification_email:
-    TF_VAR_slack_webhook_url:
-    visitor_counter-api_trigger_method:
-    TF_VAR_visitor_counter-api_route_key:
 
 jobs:
     terraform:
@@ -52,5 +44,15 @@ jobs:
 
                 terraform fmt
 
-            
+            - name: Terraform plan
+              run: |
+                cd ${{ github.workspace }}/terraform
+
+                terraform plan -out=plan.tfplan
+
+            - name: Get manual approval
+              uses: trstringer/manual-approval@v1
+              with:
+                secret: ${{ }}
+                timeout-minutes: 5
 
