@@ -74,6 +74,7 @@ jobs:
                 exclude-workflow-initiator-as-approver: false
 
             - name: Apply Terraform infrastructure (after manual approval)
+              timeout-minutes: 30
               run: |
                 cd ${{ github.workspace }}/terraform
 
