@@ -37,15 +37,15 @@ jobs:
                 sed -i 's/.*organization.*/organization = "${{ secrets.TF_ORGANIZATION }}"/' ./terraform.tf
                 sed -i 's/.*name.*/name = "${{ secrets.TF_DEPLOY_WORKSPACE }}"/' ./terraform.tf
 
-                echo Copying example.tfvars and inject production values
+                echo Copying example.tfvars and inject production values with ~ delimiter to avoid interfering with passed in values
                 cp example.tfvars prod.tfvars
-                sed -i 's/.*registered_domain_name.*/registered_domain_name = "${{ secrets.REGISTERED_DOMAIN_NAME }}"/' ./prod.tfvars
-                sed -i 's/.*github_repo_name_full.*/github_repo_name_full = "${{ github.repository }}"/' ./prod.tfvars
-                sed -i 's/.*route53_hosted_zone_id.*/route53_hosted_zone_id = "${{ secrets.ROUTE53_ZONE_ID }}"/' ./prod.tfvars
-                sed -i 's/.*notification_subscriber_email.*/notification_subscriber_email = "${{ secrets.SNS_ALERT_EMAIL }}"/' ./prod.tfvars
-                sed -i 's/.*slack_webhook_url.*/slack_webhook_url = "${{ secrets.SLACK_WEBHOOK_URL }}"/' ./prod.tfvars
-                sed -i 's/.*visitor_counter-api_trigger_method.*/visitor_counter-api_trigger_method = "POST"/' ./prod.tfvars
-                sed -i 's/.*visitor_counter-api_route_key.*/visitor_counter-api_route_key = "visitor-counter"/' ./prod.tfvars
+                sed -i 's~.*registered_domain_name.*~registered_domain_name = "${{ secrets.REGISTERED_DOMAIN_NAME }}"~' ./prod.tfvars
+                sed -i 's~.*github_repo_name_full.*~github_repo_name_full = "${{ github.repository }}"~' ./prod.tfvars
+                sed -i 's~.*route53_hosted_zone_id.*~route53_hosted_zone_id = "${{ secrets.ROUTE53_ZONE_ID }}"~' ./prod.tfvars
+                sed -i 's~.*notification_subscriber_email.*~notification_subscriber_email = "${{ secrets.SNS_ALERT_EMAIL }}"~' ./prod.tfvars
+                sed -i 's~.*slack_webhook_url.*~slack_webhook_url = "${{ secrets.SLACK_WEBHOOK_URL }}"~' ./prod.tfvars
+                sed -i 's~.*visitor_counter-api_trigger_method.*~visitor_counter-api_trigger_method = "POST"~' ./prod.tfvars
+                sed -i 's~.*visitor_counter-api_route_key.*~visitor_counter-api_route_key = "visitor-counter"~' ./prod.tfvars
 
                 terraform fmt
 
