@@ -67,7 +67,7 @@ jobs:
               with:
                 secret: ${{ secrets.MY_GH_PERSONAL_ACCESS_TOKEN }}
                 timeout-minutes: 5
-                # approvers: Kungfoosian
+                approvers: anthony-cloud-resume
                 minimum-approvals: 1
                 issue-title: New Terraform infrastructure deployment requires manual approval
                 exclude-workflow-initiator-as-approver: true
