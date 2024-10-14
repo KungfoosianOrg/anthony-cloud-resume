@@ -71,7 +71,7 @@ jobs:
                 minimum-approvals: 1
                 issue-title: New Terraform infrastructure deployment requires manual approval
                 issue-body: Pls approve
-                exclude-workflow-initiator-as-approver: true
+                exclude-workflow-initiator-as-approver: false
 
             - name: Apply Terraform infrastructure (after manual approval)
               run: |
