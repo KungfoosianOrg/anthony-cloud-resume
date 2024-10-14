@@ -3,8 +3,10 @@ name: Deploy app infrastructure using Terraform, with manual approval
 on:
     push:
         branches: ["terraform"]
-        paths: ["terraform/**"]
-        paths-ignore: ["terraform/modules/terraform-ci-cd/**"]
+        paths: [
+          "terraform/**",
+          "!terraform/modules/terraform-ci-cd/**"
+        ]
 
     # Allows you to run this workflow manually from the Actions tab
     workflow_dispatch:
