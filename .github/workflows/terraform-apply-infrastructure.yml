@@ -62,14 +62,15 @@ jobs:
                 terraform plan -out=plan.tfplan -var-file="prod.tfvars"
 
             - name: Get manual approval
+              timeout-minutes: 5 # just in case the action's timeout doesn't work
               uses: trstringer/manual-approval@v1
               with:
                 secret: ${{ secrets.MY_GH_PERSONAL_ACCESS_TOKEN }}
                 timeout-minutes: 5
-                approvers: anthonyvovo123
+                approvers: Kungfoosian
                 minimum-approvals: 1
                 issue-title: New Terraform infrastructure deployment requires manual approval
-                exclude-workflow-initiator-as-approver: false
+                exclude-workflow-initiator-as-approver: true
 
             - name: Apply Terraform infrastructure (after manual approval)
               run: |
