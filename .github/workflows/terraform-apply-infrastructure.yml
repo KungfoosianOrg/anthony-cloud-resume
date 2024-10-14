@@ -47,9 +47,15 @@ jobs:
                 sed -i 's~.*visitor_counter-api_trigger_method.*~visitor_counter-api_trigger_method = "POST"~' ./prod.tfvars
                 sed -i 's~.*visitor_counter-api_route_key.*~visitor_counter-api_route_key = "visitor-counter"~' ./prod.tfvars
 
+            - name: Format Terraform code, initialize workspace
+              run: |
+                cd ${{ github.workspace }}/terraform
+
                 terraform fmt
 
-            - name: Terraform plan
+                terraform init
+
+            - name: Plan Terraform infrastructure
               run: |
                 cd ${{ github.workspace }}/terraform
 
@@ -63,7 +69,7 @@ jobs:
                 approvers: anthonyvovo123
                 issue-title: New Terraform infrastructure deployment requires manual approval
 
-            - name: Terraform apply
+            - name: Apply Terraform infrastructure (after manual approval)
               run: |
                 cd ${{ github.workspace }}/terraform
 
