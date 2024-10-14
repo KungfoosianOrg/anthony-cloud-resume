@@ -70,6 +70,7 @@ jobs:
                 approvers: me # can't add myself as approvers so this is a placeholder
                 minimum-approvals: 1
                 issue-title: New Terraform infrastructure deployment requires manual approval
+                issue-body: Pls approve
                 exclude-workflow-initiator-as-approver: true
 
             - name: Apply Terraform infrastructure (after manual approval)
