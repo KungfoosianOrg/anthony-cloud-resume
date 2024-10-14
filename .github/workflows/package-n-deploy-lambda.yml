@@ -85,5 +85,3 @@ jobs:
                       --function-name ${{ secrets[inputs.ghrepo_secret_variable_name] }} \
                       --region ${{ secrets.AWS_STACK_REGION }} \
                       --zip-file fileb://${{ github.workspace }}/${{ inputs.output-zipped_file_name }}
-
-
