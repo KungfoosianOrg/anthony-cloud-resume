@@ -40,6 +40,7 @@ jobs:
                 echo Copying example.tfvars and inject production values
                 cp example.tfvars prod.tfvars
                 sed -i 's/.*registered_domain_name.*/registered_domain_name = "${{ secrets.REGISTERED_DOMAIN_NAME }}"/' ./prod.tfvars
+                sed -i 's/.*github_repo_name_full.*/github_repo_name_full = "${{ github.repository }}"/' ./prod.tfvars
                 sed -i 's/.*route53_hosted_zone_id.*/route53_hosted_zone_id = "${{ secrets.ROUTE53_ZONE_ID }}"/' ./prod.tfvars
                 sed -i 's/.*notification_subscriber_email.*/notification_subscriber_email = "${{ secrets.SNS_ALERT_EMAIL }}"/' ./prod.tfvars
                 sed -i 's/.*slack_webhook_url.*/slack_webhook_url = "${{ secrets.SLACK_WEBHOOK_URL }}"/' ./prod.tfvars
@@ -52,7 +53,7 @@ jobs:
               run: |
                 cd ${{ github.workspace }}/terraform
 
-                terraform plan -out=plan.tfplan
+                terraform plan -out=plan.tfplan -var-file="prod.tfvars"
 
             - name: Get manual approval
               uses: trstringer/manual-approval@v1
