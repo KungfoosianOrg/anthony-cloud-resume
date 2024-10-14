@@ -150,6 +150,7 @@ data "aws_iam_policy_document" "terraform_oidc_permissions" {
       "cloudfront:GetDistribution",
       "cloudfront:CreateResponseHeadersPolicy",
       "cloudfront:CreateOriginAccessControl",
+      "cloudfront:CreateDistribution",
       "cloudfront:ListTagsForResource"
     ]
 
@@ -185,6 +186,7 @@ data "aws_iam_policy_document" "terraform_oidc_permissions" {
       "logs:DeleteLogGroup",
       "logs:DescribeLogGroups",
       "logs:CreateLogGroup",
+      "logs:CreateLogDelivery",
       "logs:PutRetentionPolicy",
       "logs:ListTagsForResource",
       "logs:ListLogDeliveries",
@@ -297,6 +299,7 @@ data "aws_iam_policy_document" "terraform_oidc_permissions" {
       "iam:GetRole",
       "iam:AttachRolePolicy",
       "iam:PutRolePolicy",
+      "iam:PassRole",
       "iam:CreatePolicy",
       "iam:CreateRole",
       "iam:CreateOpenIDConnectProvider",
