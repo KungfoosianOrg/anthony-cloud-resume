@@ -67,7 +67,9 @@ jobs:
                 secret: ${{ secrets.MY_GH_PERSONAL_ACCESS_TOKEN }}
                 timeout-minutes: 5
                 approvers: anthonyvovo123
+                minimum-approvals: 1
                 issue-title: New Terraform infrastructure deployment requires manual approval
+                exclude-workflow-initiator-as-approver: false
 
             - name: Apply Terraform infrastructure (after manual approval)
               run: |
