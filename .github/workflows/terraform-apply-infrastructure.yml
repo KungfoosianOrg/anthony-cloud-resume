@@ -1,4 +1,4 @@
-name: Terraform apply with manual approval
+name: Terraform apply w/ manual approval
 
 on:
     push:
@@ -67,7 +67,7 @@ jobs:
               with:
                 secret: ${{ secrets.MY_GH_PERSONAL_ACCESS_TOKEN }}
                 timeout-minutes: 5
-                approvers: anthony-cloud-resume
+                approvers: me # can't add myself as approvers so this is a placeholder
                 minimum-approvals: 1
                 issue-title: New Terraform infrastructure deployment requires manual approval
                 exclude-workflow-initiator-as-approver: true
