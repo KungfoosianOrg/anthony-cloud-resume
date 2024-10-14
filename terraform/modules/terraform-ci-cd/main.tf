@@ -231,6 +231,7 @@ data "aws_iam_policy_document" "terraform_oidc_permissions" {
       "sns:CreateTopic",
       "sns:DeleteTopic",
       "sns:GetSubscriptionAttributes",
+      "sns:SetTopicAttributes",
       "sns:GetTopicAttributes",
       "sns:ListTagsForResource",
       "sns:Unsubscribe",
