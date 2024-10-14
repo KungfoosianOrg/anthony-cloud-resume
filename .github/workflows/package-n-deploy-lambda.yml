@@ -1,83 +1,87 @@
 name: Package Lambda code into a Zip file & deploy to AWS
 
 on:
-    workflow_call:
-        inputs:
-            lambda_source_folder-name:
-                required: true
-                type: string
+  workflow_call:
+    inputs:
+      lambda_source_folder-name:
+        required: true
+        type: string
 
-            output-zipped_file_name:
-                required: true
-                type: string
+      output-zipped_file_name:
+        required: true
+        type: string
+    
+      ghrepo_secret_variable_name:
+        description: Name of GitHub repo secret that stores the Lambda function's ARN
+        required: true
+        type: string
 
-            lambda_function_arn:
-                required: true
-                type: string
-
-    # Allows you to run this workflow manually from the Actions tab
-    workflow_dispatch:
 
 
 env:
-    OUTFILE_FULL_PATH: ~/out/${{ inputs.output-zipped_file_name }} # put in an output folder to make packaging several lambda code files easier
+  # this puts the zipped package in an output folder to make packaging Lambda sources that contain several lambda files easier
+  OUTFILE_FULL_PATH: "${{ github.workspace }}/out/${{ inputs.output-zipped_file_name }}" 
 
 
 jobs:
-    package:
-        runs-on: ubuntu-latest
+  package:
+    runs-on: ubuntu-latest
 
-        steps:
-            - name: check out repo
-              uses: actions/checkout@v3
+    steps:
+      - name: check out repo
+        uses: actions/checkout@v3
 
-            - name: creating zip package
-              run: |
-                cd aws/${{ inputs.lambda_source_folder-name }}
-                
-                mkdir package
-                
-                pip3 install --target ./package boto3
+      - name: creating zip package
+        run: |
+          cd ./aws/${{ inputs.lambda_source_folder-name }}
+          
+          mkdir package
+          
+          pip3 install --target ./package boto3
 
-                cd package
-                zip -r ${{ env.OUTFILE_FULL_PATH }} .
+          cd package
+          zip -r ${{ env.OUTFILE_FULL_PATH }} .
 
-                cd .. && rm -rf package
-                zip ${{ env.OUTFILE_FULL_PATH }} *
-
-            - name: upload zipped package as an artifact for other workflows to use
-              uses: actions/upload-artifact@v4
-              with:
-                name: ${{ inputs.output-zipped_file_name }}
-                path: ${{ env.OUTFILE_FULL_PATH }}
+          cd .. && rm -rf package
+          zip ${{ env.OUTFILE_FULL_PATH }} *
 
 
-    deploy:
-        needs: [ package ]
-
-        runs-on: ubuntu-latest
-
-        steps:
-            - name: download zipped package from previous job
-              uses: actions/download-artifact@v4
-              with:
-                name: ${{ inputs.output-zipped_file_name }}
+      - name: upload zipped package as an artifact for the deploy workflow to use
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.output-zipped_file_name }}
+          path: ${{ env.OUTFILE_FULL_PATH }}
 
 
-            - name: get temporary AWS credentials
-              uses: aws-actions/configure-aws-credentials@v4
-              with:
-                aws-region: ${{ secrets.AWS_STACK_REGION }}
-                role-to-assume: ${{ secrets.AWS_ROLE_ARN }} 
-                role-session-name: GHASession-anthony_cloud_resume
-                unset-current-credentials: true
-                retry-max-attempts: 3
-                output-credentials: true  
+  deploy:
+    needs: [ package ]
 
-            - name: upload new code to Lambda
-              run: |
-                aws lambda update-function-code \
-                            --function-name ${{ inputs.lambda_function_arn }} \
-                            --region ${{ secrets.AWS_STACK_REGION }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: download zipped package from previous job
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.output-zipped_file_name }}
 
 
+      - name: get temporary AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ${{ secrets.AWS_STACK_REGION }}
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }} 
+          role-session-name: GHASession-anthony_cloud_resume
+          unset-current-credentials: true
+          retry-max-attempts: 3
+          output-credentials: true  
+
+      - name: verify temp credentials validity
+        run: |
+          aws sts get-caller-identity  
+
+      - name: upload new code to Lambda
+        run: |
+          aws lambda update-function-code \
+                      --function-name ${{ secrets[inputs.ghrepo_secret_variable_name] }} \
+                      --region ${{ secrets.AWS_STACK_REGION }} \
+                      --zip-file fileb://${{ github.workspace }}/${{ inputs.output-zipped_file_name }}
