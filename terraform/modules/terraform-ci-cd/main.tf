@@ -151,7 +151,8 @@ data "aws_iam_policy_document" "terraform_oidc_permissions" {
       "cloudfront:CreateResponseHeadersPolicy",
       "cloudfront:CreateOriginAccessControl",
       "cloudfront:CreateDistribution",
-      "cloudfront:ListTagsForResource"
+      "cloudfront:ListTagsForResource",
+      "cloudfront:TagResource"
     ]
 
     resources = ["*"]
@@ -258,7 +259,8 @@ data "aws_iam_policy_document" "terraform_oidc_permissions" {
       "lambda:GetFunctionCodeSigningConfig",
       "lambda:ListVersionsByFunction",
       "lambda:AddPermission",
-      "lambda:CreateFunction"
+      "lambda:CreateFunction",
+      "lambda:TagResource"
     ]
 
     resources = [
