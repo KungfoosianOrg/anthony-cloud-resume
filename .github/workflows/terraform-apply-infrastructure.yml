@@ -1,15 +1,15 @@
 name: Terraform apply w/ manual approval
 
 on:
-    push:
-        branches: ["terraform"]
-        paths: [
-          "terraform/**",
-          "!terraform/modules/terraform-ci-cd/**"
-        ]
+  push:
+      branches: ["terraform"]
+      paths: [
+        "terraform/**",
+        "!terraform/modules/terraform-ci-cd/**"
+      ]
 
-    # Allows you to run this workflow manually from the Actions tab
-    workflow_dispatch:
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
 
 permissions:
   issues: write
@@ -27,7 +27,7 @@ jobs:
             - name: Checkout repo
               uses: actions/checkout@v3
 
-            - name: Sets up provider, inject production Terraform variables
+            - name: Inject production Terraform variables
               run: |
                 cd ${{ github.workspace }}/terraform
                 
@@ -56,10 +56,13 @@ jobs:
                 terraform init
 
             - name: Plan Terraform infrastructure
+              id: terraform-plan
               run: |
                 cd ${{ github.workspace }}/terraform
 
-                terraform plan -out=plan.tfplan -var-file="prod.tfvars"
+                plan_output=$(terraform plan -out=plan.tfplan -var-file="prod.tfvars" | grep Plan:)
+                
+                echo "terraform_plan_output=$plan_output" >> "$GITHUB_OUTPUT"
 
             - name: Get manual approval
               timeout-minutes: 5 # just in case the action's timeout doesn't work
@@ -69,8 +72,8 @@ jobs:
                 timeout-minutes: 5
                 approvers: Kungfoosian
                 minimum-approvals: 1
-                issue-title: New Terraform infrastructure deployment requires manual approval
-                issue-body: Pls approve
+                issue-title: Terraform infrastructure deployment requires manual approval
+                issue-body: ${{steps.terraform-plan.outputs.terraform_plan_output}}
                 exclude-workflow-initiator-as-approver: false
 
             - name: Apply Terraform infrastructure (after manual approval)

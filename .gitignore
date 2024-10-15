@@ -24,6 +24,9 @@ test*.tf
 # and any prod terraform files
 prod*.tf
 
+# any terraform plans
+*.tfplan
+
 # Crash log files
 crash.log
 crash.*.log
