@@ -1,0 +1,95 @@
+name: Apply/Destroy Terraform infrastructure
+
+on:
+  workflow_call:
+
+jobs:
+  pass-variable-for-gha-jobs:
+    runs-on: ubuntu-latest
+
+    outputs:
+      tfvars_filename: ${{ steps.step1.outputs.tfvars_filename }}
+      terraform_folder_path: ${{ steps.step1.outputs.terraform_folder_path }}
+      terraform_filename: ${{ steps.step1.outputs.terraform_filename }}
+
+    steps:
+      - name: print variables as outputs to be passed into other jobs
+        id: step1
+        run: |
+          echo "tfvars_filename=${{ env.TFVARS_FILE_NAME }}" >> "$GITHUB_OUTPUT"
+          echo "terraform_folder_path=${{ env.TERRAFORM_FOLDER_PATH }}" >> "$GITHUB_OUTPUT"
+          echo "terraform_filename=${{ env.TERRAFORM_FILE_NAME }}" >> "$GITHUB_OUTPUT"
+
+
+  inject-variables:
+    needs: [ pass-variable-for-gha-jobs ]
+
+    uses: ./.github/workflows/inject-terraform-variables.yml
+
+    with:
+      tfvars_outfile_name: ${{ needs.pass-variable-for-gha-jobs.outputs.tfvars_filename }}
+      terraform_outfile_name: ${{ needs.pass-variable-for-gha-jobs.outputs.terraform_filename }}
+      terraform_folder_path: ${{ needs.pass-variable-for-gha-jobs.outputs.terraform_folder_path }}
+
+    secrets: inherit
+
+
+  terraform-apply:
+    needs: [ inject-variables ]
+
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Install Terraform CLI
+        uses: hashicorp/setup-terraform@v3
+        with:
+          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Download tfvars artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ env.TFVARS_FILE_NAME }}
+          path: ${{ env.TERRAFORM_FOLDER_PATH }}
+
+      - name: Download terraform provider artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ env.TERRAFORM_FILE_NAME }}
+          path: ${{ env.TERRAFORM_FOLDER_PATH }}
+
+      - name: Format Terraform code, initialize workspace
+        run: |
+          cd ${{ env.TERRAFORM_FOLDER_PATH }}
+
+          terraform init
+
+      - name: Plan Terraform infrastructure
+        id: terraform-plan
+        run: |
+          cd ${{ env.TERRAFORM_FOLDER_PATH }}
+
+          plan_output=$(terraform plan -out=${{ env.TFPLAN_FILE_NAME }} -var-file="${{ env.TFVARS_FILE_NAME }}" | grep Plan:)
+          
+          echo "terraform_plan_output=$plan_output" >> "$GITHUB_OUTPUT"
+
+      - name: Get manual approval
+        timeout-minutes: 5 # just in case the action's timeout doesn't work
+        uses: trstringer/manual-approval@v1
+        with:
+          secret: ${{ secrets.MY_GH_PERSONAL_ACCESS_TOKEN }}
+          timeout-minutes: 5
+          approvers: Kungfoosian
+          minimum-approvals: 1
+          issue-title: Terraform infrastructure deployment requires manual approval
+          issue-body: ${{steps.terraform-plan.outputs.terraform_plan_output}}
+          exclude-workflow-initiator-as-approver: false
+
+      - name: Apply Terraform infrastructure (after manual approval)
+        timeout-minutes: 10
+        run: |
+          cd ${{ env.TERRAFORM_FOLDER_PATH }}
+
+          terraform apply -input=false ${{ env.TFPLAN_FILE_NAME }}
