@@ -11,6 +11,12 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
+env:
+  TFVARS_FILE_NAME: prod.tfvars
+  TFPLAN_FILE_NAME: plan.tfplan
+  TERRAFORM_FOLDER_PATH: ${{ github.workspace }}/terraform
+
+
 permissions:
   issues: write
 
@@ -28,28 +34,40 @@ jobs:
               uses: actions/checkout@v3
 
             - name: Inject production Terraform variables
-              run: |
-                cd ${{ github.workspace }}/terraform
-                
-                echo Copying example.terraform.tf, uncomment lines, and inject production values
-                cp example.terraform.tf terraform.tf
-                sed -i 's/#//' ./terraform.tf
-                sed -i 's/.*organization.*/organization = "${{ secrets.TF_ORGANIZATION }}"/' ./terraform.tf
-                sed -i 's/.*name.*/name = "${{ secrets.TF_DEPLOY_WORKSPACE }}"/' ./terraform.tf
+              uses: ./.github/inject-terraform-variables.yml
+              with:
+                tfvars_outfile_name: ${{ env.TFVARS_FILE_NAME }}
+                terraform_folder_path: ${{ env.TERRAFORM_FOLDER_PATH }}
 
-                echo Copying example.tfvars and inject production values with ~ delimiter to avoid interfering with passed in values
-                cp example.tfvars prod.tfvars
-                sed -i 's~.*registered_domain_name.*~registered_domain_name = "${{ secrets.REGISTERED_DOMAIN_NAME }}"~' ./prod.tfvars
-                sed -i 's~.*github_repo_name_full.*~github_repo_name_full = "${{ github.repository }}"~' ./prod.tfvars
-                sed -i 's~.*route53_hosted_zone_id.*~route53_hosted_zone_id = "${{ secrets.ROUTE53_ZONE_ID }}"~' ./prod.tfvars
-                sed -i 's~.*notification_subscriber_email.*~notification_subscriber_email = "${{ secrets.SNS_ALERT_EMAIL }}"~' ./prod.tfvars
-                sed -i 's~.*slack_webhook_url.*~slack_webhook_url = "${{ secrets.SLACK_WEBHOOK_URL }}"~' ./prod.tfvars
-                sed -i 's~.*visitor_counter-api_trigger_method.*~visitor_counter-api_trigger_method = "POST"~' ./prod.tfvars
-                sed -i 's~.*visitor_counter-api_route_key.*~visitor_counter-api_route_key = "visitor-counter"~' ./prod.tfvars
+            - name: Download artifact
+              uses: actions/download-artifact@v4
+              with:
+                name: ${{ env.TFVARS_FILE_NAME }}
+                path: ${{ env.TERRAFORM_FOLDER_PATH }}
+
+            # - name: Inject production Terraform variables
+            #   run: |
+            #     cd ${{ env.TERRAFORM_FOLDER_PATH }}
+                
+            #     echo Copying example.terraform.tf, uncomment lines, and inject production values
+            #     cp example.terraform.tf terraform.tf
+            #     sed -i 's/#//' ./terraform.tf
+            #     sed -i 's/.*organization.*/organization = "${{ secrets.TF_ORGANIZATION }}"/' ./terraform.tf
+            #     sed -i 's/.*name.*/name = "${{ secrets.TF_DEPLOY_WORKSPACE }}"/' ./terraform.tf
+
+            #     echo Copying example.tfvars and inject production values with ~ delimiter to avoid interfering with passed in values
+            #     cp example.tfvars ${{ env.TFVARS_FILE_NAME }}
+            #     sed -i 's~.*registered_domain_name.*~registered_domain_name = "${{ secrets.REGISTERED_DOMAIN_NAME }}"~' ./${{ env.TFVARS_FILE_NAME }}
+            #     sed -i 's~.*github_repo_name_full.*~github_repo_name_full = "${{ github.repository }}"~' ./${{ env.TFVARS_FILE_NAME }}
+            #     sed -i 's~.*route53_hosted_zone_id.*~route53_hosted_zone_id = "${{ secrets.ROUTE53_ZONE_ID }}"~' ./${{ env.TFVARS_FILE_NAME }}
+            #     sed -i 's~.*notification_subscriber_email.*~notification_subscriber_email = "${{ secrets.SNS_ALERT_EMAIL }}"~' ./${{ env.TFVARS_FILE_NAME }}
+            #     sed -i 's~.*slack_webhook_url.*~slack_webhook_url = "${{ secrets.SLACK_WEBHOOK_URL }}"~' ./${{ env.TFVARS_FILE_NAME }}
+            #     sed -i 's~.*visitor_counter-api_trigger_method.*~visitor_counter-api_trigger_method = "POST"~' ./${{ env.TFVARS_FILE_NAME }}
+            #     sed -i 's~.*visitor_counter-api_route_key.*~visitor_counter-api_route_key = "visitor-counter"~' ./${{ env.TFVARS_FILE_NAME }}
 
             - name: Format Terraform code, initialize workspace
               run: |
-                cd ${{ github.workspace }}/terraform
+                cd ${{ env.TERRAFORM_FOLDER_PATH }}
 
                 terraform fmt
 
@@ -58,9 +76,9 @@ jobs:
             - name: Plan Terraform infrastructure
               id: terraform-plan
               run: |
-                cd ${{ github.workspace }}/terraform
+                cd ${{ env.TERRAFORM_FOLDER_PATH }}
 
-                plan_output=$(terraform plan -out=plan.tfplan -var-file="prod.tfvars" | grep Plan:)
+                plan_output=$(terraform plan -out=${{ env.TFPLAN_FILE_NAME }} -var-file="${{ env.TFVARS_FILE_NAME }}" | grep Plan:)
                 
                 echo "terraform_plan_output=$plan_output" >> "$GITHUB_OUTPUT"
 
@@ -79,7 +97,7 @@ jobs:
             - name: Apply Terraform infrastructure (after manual approval)
               timeout-minutes: 10
               run: |
-                cd ${{ github.workspace }}/terraform
+                cd ${{ env.TERRAFORM_FOLDER_PATH }}
 
-                terraform apply -input=false plan.tfplan
+                terraform apply -input=false ${{ env.TFPLAN_FILE_NAME }}
 

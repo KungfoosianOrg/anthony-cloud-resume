@@ -1,9 +1,52 @@
+name: Inject production values for Terraform
+
 on:
   workflow_call:
+    inputs:
+      tfvars_outfile_name:
+        required: true
+        type: string
+      
+      terraform_folder_path:
+        required: true
+        type: string
 
 jobs:
   inject-variables:
     runs-on: ubuntu-latest
 
     steps:
-      - run: echo CHANGE ME
+      - name: Install Terraform CLI
+        uses: hashicorp/setup-terraform@v3
+        with:
+          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+
+      - name: Inject production Terraform variables
+        run: |
+          cd ${{ inputs.terraform_folder_path }}
+          
+          echo Copying example.terraform.tf, uncomment lines, and inject production values
+          cp example.terraform.tf terraform.tf
+          sed -i 's/#//' ./terraform.tf
+          sed -i 's/.*organization.*/organization = "${{ secrets.TF_ORGANIZATION }}"/' ./terraform.tf
+          sed -i 's/.*name.*/name = "${{ secrets.TF_DEPLOY_WORKSPACE }}"/' ./terraform.tf
+
+          echo Copying example.tfvars and inject production values with ~ delimiter to avoid interfering with passed in values
+          cp example.tfvars ${{ inputs.tfvars_outfile_name }}
+          sed -i 's~.*registered_domain_name.*~registered_domain_name = "${{ secrets.REGISTERED_DOMAIN_NAME }}"~' ./${{ inputs.tfvars_outfile_name }}
+          sed -i 's~.*github_repo_name_full.*~github_repo_name_full = "${{ github.repository }}"~' ./${{ inputs.tfvars_outfile_name }}
+          sed -i 's~.*route53_hosted_zone_id.*~route53_hosted_zone_id = "${{ secrets.ROUTE53_ZONE_ID }}"~' ./${{ inputs.tfvars_outfile_name }}
+          sed -i 's~.*notification_subscriber_email.*~notification_subscriber_email = "${{ secrets.SNS_ALERT_EMAIL }}"~' ./${{ inputs.tfvars_outfile_name }}
+          sed -i 's~.*slack_webhook_url.*~slack_webhook_url = "${{ secrets.SLACK_WEBHOOK_URL }}"~' ./${{ inputs.tfvars_outfile_name }}
+          sed -i 's~.*visitor_counter-api_trigger_method.*~visitor_counter-api_trigger_method = "POST"~' ./${{ inputs.tfvars_outfile_name }}
+          sed -i 's~.*visitor_counter-api_route_key.*~visitor_counter-api_route_key = "visitor-counter"~' ./${{ inputs.tfvars_outfile_name }}
+
+      - name: Upload tfvars file as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.tfvars_outfile_name }}
+          path: ${{ inputs.terraform_folder_path }}/${{ inputs.tfvars_outfile_name }}
