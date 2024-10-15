@@ -13,6 +13,7 @@ on:
 
 env:
   TFVARS_FILE_NAME: prod.tfvars
+  TERRAFORM_FILE_NAME: terraform.tf
   TFPLAN_FILE_NAME: plan.tfplan
   TERRAFORM_FOLDER_PATH: ${{ github.workspace }}/terraform
 
@@ -27,6 +28,7 @@ jobs:
     outputs:
       tfvars_filename: ${{ steps.step1.outputs.tfvars_filename }}
       terraform_folder_path: ${{ steps.step1.outputs.terraform_folder_path }}
+      terraform_filename: ${{ steps.step1.outputs.terraform_filename }}
 
     steps:
       - name: print variables as outputs to be passed into other jobs
@@ -34,6 +36,7 @@ jobs:
         run: |
           echo "tfvars_filename=${{ env.TFVARS_FILE_NAME }}" >> "$GITHUB_OUTPUT"
           echo "terraform_folder_path=${{ env.TERRAFORM_FOLDER_PATH }}" >> "$GITHUB_OUTPUT"
+          echo "terraform_filename=${{ env.TERRAFORM_FILE_NAME }}" >> "$GITHUB_OUTPUT"
 
 
   inject-variables:
@@ -43,6 +46,7 @@ jobs:
 
     with:
       tfvars_outfile_name: ${{ needs.pass-variable-for-gha-jobs.outputs.tfvars_filename }}
+      terraform_outfile_name: ${{ needs.pass-variable-for-gha-jobs.outputs.terraform_filename }}
       terraform_folder_path: ${{ needs.pass-variable-for-gha-jobs.outputs.terraform_folder_path }}
 
 
@@ -60,10 +64,16 @@ jobs:
         - name: Checkout repo
           uses: actions/checkout@v3
 
-        - name: Download artifact
+        - name: Download tfvars artifact
           uses: actions/download-artifact@v4
           with:
             name: ${{ env.TFVARS_FILE_NAME }}
+            path: ${{ env.TERRAFORM_FOLDER_PATH }}
+
+        - name: Download terraform provider artifact
+          uses: actions/download-artifact@v4
+          with:
+            name: ${{ env.TERRAFORM_FILE_NAME }}
             path: ${{ env.TERRAFORM_FOLDER_PATH }}
 
         # - name: Inject production Terraform variables

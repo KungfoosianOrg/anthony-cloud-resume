@@ -6,6 +6,10 @@ on:
       tfvars_outfile_name:
         required: true
         type: string
+
+      terraform_outfile_name:
+        required: true
+        type: string
       
       terraform_folder_path:
         required: true
@@ -30,10 +34,10 @@ jobs:
           cd ${{ inputs.terraform_folder_path }}
           
           echo Copying example.terraform.tf, uncomment lines, and inject production values
-          cp example.terraform.tf terraform.tf
-          sed -i 's/#//' ./terraform.tf
-          sed -i 's/.*organization.*/organization = "${{ secrets.TF_ORGANIZATION }}"/' ./terraform.tf
-          sed -i 's/.*name.*/name = "${{ secrets.TF_DEPLOY_WORKSPACE }}"/' ./terraform.tf
+          cp example.terraform.tf ${{ inputs.terraform_outfile_name }}
+          sed -i 's/#//' ./${{ inputs.terraform_outfile_name }}
+          sed -i 's/.*organization.*/organization = "${{ secrets.TF_ORGANIZATION }}"/' ./${{ inputs.terraform_outfile_name }}
+          sed -i 's/.*name.*/name = "${{ secrets.TF_DEPLOY_WORKSPACE }}"/' ./${{ inputs.terraform_outfile_name }}
 
           echo Copying example.tfvars and inject production values with ~ delimiter to avoid interfering with passed in values
           cp example.tfvars ${{ inputs.tfvars_outfile_name }}
@@ -50,3 +54,9 @@ jobs:
         with:
           name: ${{ inputs.tfvars_outfile_name }}
           path: ${{ inputs.terraform_folder_path }}/${{ inputs.tfvars_outfile_name }}
+
+      - name: Upload terraform provider file as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.terraform_outfile_name }}
+          path: ${{ inputs.terraform_folder_path }}/${{ inputs.terraform_outfile_name }}
