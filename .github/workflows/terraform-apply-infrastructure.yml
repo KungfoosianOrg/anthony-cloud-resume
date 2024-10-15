@@ -18,8 +18,8 @@ on:
 #   TERRAFORM_FOLDER_PATH: ${{ github.workspace }}/terraform
 
 
-# permissions:
-#   issues: write
+permissions:
+  issues: write
 
 jobs:
   create-terraform-infrastructure:
