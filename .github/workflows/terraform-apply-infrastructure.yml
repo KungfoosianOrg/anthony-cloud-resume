@@ -49,6 +49,8 @@ jobs:
       terraform_outfile_name: ${{ needs.pass-variable-for-gha-jobs.outputs.terraform_filename }}
       terraform_folder_path: ${{ needs.pass-variable-for-gha-jobs.outputs.terraform_folder_path }}
 
+    secrets: inherit
+
 
   terraform-apply:
     needs: [ inject-variables ]
