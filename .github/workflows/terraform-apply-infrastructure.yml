@@ -21,83 +21,104 @@ permissions:
   issues: write
 
 jobs:
-    terraform:
-        runs-on: ubuntu-latest
-        
-        steps:
-            - name: Install Terraform CLI
-              uses: hashicorp/setup-terraform@v3
-              with:
-                cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+  pass-variable-for-gha-jobs:
+    runs-on: ubuntu-latest
 
-            - name: Checkout repo
-              uses: actions/checkout@v3
+    outputs:
+      tfvars_filename: ${{ steps.step1.outputs.tfvars_filename }}
+      terraform_folder_path: ${{ steps.step1.outputs.terraform_folder_path }}
 
-            - name: Inject production Terraform variables
-              uses: ./.github/workflows/inject-terraform-variables.yml
-              with:
-                tfvars_outfile_name: ${{ env.TFVARS_FILE_NAME }}
-                terraform_folder_path: ${{ env.TERRAFORM_FOLDER_PATH }}
+    steps:
+      - name: print variables as outputs to be passed into other jobs
+        id: step1
+        run: |
+          echo "tfvars_filename=${{ env.TFVARS_FILE_NAME }}" >> "$GITHUB_OUTPUT"
+          echo "terraform_folder_path=${{ env.TERRAFORM_FOLDER_PATH }}" >> "$GITHUB_OUTPUT"
 
-            - name: Download artifact
-              uses: actions/download-artifact@v4
-              with:
-                name: ${{ env.TFVARS_FILE_NAME }}
-                path: ${{ env.TERRAFORM_FOLDER_PATH }}
 
-            # - name: Inject production Terraform variables
-            #   run: |
-            #     cd ${{ env.TERRAFORM_FOLDER_PATH }}
-                
-            #     echo Copying example.terraform.tf, uncomment lines, and inject production values
-            #     cp example.terraform.tf terraform.tf
-            #     sed -i 's/#//' ./terraform.tf
-            #     sed -i 's/.*organization.*/organization = "${{ secrets.TF_ORGANIZATION }}"/' ./terraform.tf
-            #     sed -i 's/.*name.*/name = "${{ secrets.TF_DEPLOY_WORKSPACE }}"/' ./terraform.tf
+  inject-variables:
+    needs: [ pass-variable-for-gha-jobs ]
 
-            #     echo Copying example.tfvars and inject production values with ~ delimiter to avoid interfering with passed in values
-            #     cp example.tfvars ${{ env.TFVARS_FILE_NAME }}
-            #     sed -i 's~.*registered_domain_name.*~registered_domain_name = "${{ secrets.REGISTERED_DOMAIN_NAME }}"~' ./${{ env.TFVARS_FILE_NAME }}
-            #     sed -i 's~.*github_repo_name_full.*~github_repo_name_full = "${{ github.repository }}"~' ./${{ env.TFVARS_FILE_NAME }}
-            #     sed -i 's~.*route53_hosted_zone_id.*~route53_hosted_zone_id = "${{ secrets.ROUTE53_ZONE_ID }}"~' ./${{ env.TFVARS_FILE_NAME }}
-            #     sed -i 's~.*notification_subscriber_email.*~notification_subscriber_email = "${{ secrets.SNS_ALERT_EMAIL }}"~' ./${{ env.TFVARS_FILE_NAME }}
-            #     sed -i 's~.*slack_webhook_url.*~slack_webhook_url = "${{ secrets.SLACK_WEBHOOK_URL }}"~' ./${{ env.TFVARS_FILE_NAME }}
-            #     sed -i 's~.*visitor_counter-api_trigger_method.*~visitor_counter-api_trigger_method = "POST"~' ./${{ env.TFVARS_FILE_NAME }}
-            #     sed -i 's~.*visitor_counter-api_route_key.*~visitor_counter-api_route_key = "visitor-counter"~' ./${{ env.TFVARS_FILE_NAME }}
+    uses: ./.github/workflows/inject-terraform-variables.yml
 
-            - name: Format Terraform code, initialize workspace
-              run: |
-                cd ${{ env.TERRAFORM_FOLDER_PATH }}
+    with:
+      tfvars_outfile_name: ${{ needs.pass-variable-for-gha-jobs.outputs.tfvars_filename }}
+      terraform_folder_path: ${{ needs.pass-variable-for-gha-jobs.outputs.terraform_folder_path }}
 
-                terraform fmt
 
-                terraform init
+  terraform-apply:
+    needs: [ inject-variables ]
 
-            - name: Plan Terraform infrastructure
-              id: terraform-plan
-              run: |
-                cd ${{ env.TERRAFORM_FOLDER_PATH }}
+    runs-on: ubuntu-latest
+    
+    steps:
+        - name: Install Terraform CLI
+          uses: hashicorp/setup-terraform@v3
+          with:
+            cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
 
-                plan_output=$(terraform plan -out=${{ env.TFPLAN_FILE_NAME }} -var-file="${{ env.TFVARS_FILE_NAME }}" | grep Plan:)
-                
-                echo "terraform_plan_output=$plan_output" >> "$GITHUB_OUTPUT"
+        - name: Checkout repo
+          uses: actions/checkout@v3
 
-            - name: Get manual approval
-              timeout-minutes: 5 # just in case the action's timeout doesn't work
-              uses: trstringer/manual-approval@v1
-              with:
-                secret: ${{ secrets.MY_GH_PERSONAL_ACCESS_TOKEN }}
-                timeout-minutes: 5
-                approvers: Kungfoosian
-                minimum-approvals: 1
-                issue-title: Terraform infrastructure deployment requires manual approval
-                issue-body: ${{steps.terraform-plan.outputs.terraform_plan_output}}
-                exclude-workflow-initiator-as-approver: false
+        - name: Download artifact
+          uses: actions/download-artifact@v4
+          with:
+            name: ${{ env.TFVARS_FILE_NAME }}
+            path: ${{ env.TERRAFORM_FOLDER_PATH }}
 
-            - name: Apply Terraform infrastructure (after manual approval)
-              timeout-minutes: 10
-              run: |
-                cd ${{ env.TERRAFORM_FOLDER_PATH }}
+        # - name: Inject production Terraform variables
+        #   run: |
+        #     cd ${{ env.TERRAFORM_FOLDER_PATH }}
+            
+        #     echo Copying example.terraform.tf, uncomment lines, and inject production values
+        #     cp example.terraform.tf terraform.tf
+        #     sed -i 's/#//' ./terraform.tf
+        #     sed -i 's/.*organization.*/organization = "${{ secrets.TF_ORGANIZATION }}"/' ./terraform.tf
+        #     sed -i 's/.*name.*/name = "${{ secrets.TF_DEPLOY_WORKSPACE }}"/' ./terraform.tf
 
-                terraform apply -input=false ${{ env.TFPLAN_FILE_NAME }}
+        #     echo Copying example.tfvars and inject production values with ~ delimiter to avoid interfering with passed in values
+        #     cp example.tfvars ${{ env.TFVARS_FILE_NAME }}
+        #     sed -i 's~.*registered_domain_name.*~registered_domain_name = "${{ secrets.REGISTERED_DOMAIN_NAME }}"~' ./${{ env.TFVARS_FILE_NAME }}
+        #     sed -i 's~.*github_repo_name_full.*~github_repo_name_full = "${{ github.repository }}"~' ./${{ env.TFVARS_FILE_NAME }}
+        #     sed -i 's~.*route53_hosted_zone_id.*~route53_hosted_zone_id = "${{ secrets.ROUTE53_ZONE_ID }}"~' ./${{ env.TFVARS_FILE_NAME }}
+        #     sed -i 's~.*notification_subscriber_email.*~notification_subscriber_email = "${{ secrets.SNS_ALERT_EMAIL }}"~' ./${{ env.TFVARS_FILE_NAME }}
+        #     sed -i 's~.*slack_webhook_url.*~slack_webhook_url = "${{ secrets.SLACK_WEBHOOK_URL }}"~' ./${{ env.TFVARS_FILE_NAME }}
+        #     sed -i 's~.*visitor_counter-api_trigger_method.*~visitor_counter-api_trigger_method = "POST"~' ./${{ env.TFVARS_FILE_NAME }}
+        #     sed -i 's~.*visitor_counter-api_route_key.*~visitor_counter-api_route_key = "visitor-counter"~' ./${{ env.TFVARS_FILE_NAME }}
+
+        - name: Format Terraform code, initialize workspace
+          run: |
+            cd ${{ env.TERRAFORM_FOLDER_PATH }}
+
+            terraform fmt
+
+            terraform init
+
+        - name: Plan Terraform infrastructure
+          id: terraform-plan
+          run: |
+            cd ${{ env.TERRAFORM_FOLDER_PATH }}
+
+            plan_output=$(terraform plan -out=${{ env.TFPLAN_FILE_NAME }} -var-file="${{ env.TFVARS_FILE_NAME }}" | grep Plan:)
+            
+            echo "terraform_plan_output=$plan_output" >> "$GITHUB_OUTPUT"
+
+        - name: Get manual approval
+          timeout-minutes: 5 # just in case the action's timeout doesn't work
+          uses: trstringer/manual-approval@v1
+          with:
+            secret: ${{ secrets.MY_GH_PERSONAL_ACCESS_TOKEN }}
+            timeout-minutes: 5
+            approvers: Kungfoosian
+            minimum-approvals: 1
+            issue-title: Terraform infrastructure deployment requires manual approval
+            issue-body: ${{steps.terraform-plan.outputs.terraform_plan_output}}
+            exclude-workflow-initiator-as-approver: false
+
+        - name: Apply Terraform infrastructure (after manual approval)
+          timeout-minutes: 10
+          run: |
+            cd ${{ env.TERRAFORM_FOLDER_PATH }}
+
+            terraform apply -input=false ${{ env.TFPLAN_FILE_NAME }}
 
