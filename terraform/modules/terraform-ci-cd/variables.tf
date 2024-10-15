@@ -22,8 +22,8 @@ variable "terraform_permission_workspace" {
 
 variable "terraform_deploy_workspace" {
   description = "Name of Terraform workspace to deploy app"
-  type = string
-  default = "deploy"
+  type        = string
+  default     = "deploy"
 }
 
 variable "terraform_project_name" {

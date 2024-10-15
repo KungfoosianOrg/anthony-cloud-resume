@@ -10,5 +10,5 @@ output "terraform_oidc_role_arn" {
 
 output "terraform_deploy_workspace" {
   description = "Name of Terraform workspace for deploying app"
-  value = var.terraform_deploy_workspace
+  value       = var.terraform_deploy_workspace
 }

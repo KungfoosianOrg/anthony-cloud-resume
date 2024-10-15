@@ -31,7 +31,7 @@ resource "aws_cloudwatch_metric_alarm" "cloudwatch_alarm" {
   alarm_actions       = [aws_sns_topic.sns_topic.arn]
   alarm_description   = var.alarm_description
 
-  namespace           = "AWS/ApiGateway"
+  namespace = "AWS/ApiGateway"
   dimensions = {
     ApiId = var.api_gw_id
   }

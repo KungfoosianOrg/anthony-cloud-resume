@@ -7,14 +7,14 @@ data "aws_caller_identity" "current" {}
 data "tls_certificate" "provider" {
   url = "https://app.terraform.io"
 }
- 
+
 resource "aws_iam_openid_connect_provider" "hcp_terraform" {
   url = "https://app.terraform.io"
- 
+
   client_id_list = [
     "aws.workload.identity", # Default audience in HCP Terraform for AWS.
   ]
- 
+
   thumbprint_list = [
     data.tls_certificate.provider.certificates[0].sha1_fingerprint,
   ]
@@ -346,7 +346,7 @@ resource "tfe_variable" "tfc_aws_provider_auth" {
   category     = "env"
   workspace_id = tfe_workspace.my_workspace.id
 }
- 
+
 resource "tfe_variable" "tfc_example_role_arn" {
   sensitive    = true
   key          = "TFC_AWS_RUN_ROLE_ARN"
