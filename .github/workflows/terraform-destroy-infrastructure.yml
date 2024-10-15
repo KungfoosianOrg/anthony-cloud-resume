@@ -10,8 +10,11 @@ permissions:
 jobs:
   destroy:
     uses: ./.github/workflows/terraform-update-infrastructure.yml
+    
     with:
       destroy-terraform: true
+
+    secrets: inherit
         # runs-on: ubuntu-latest
         
         # steps:
