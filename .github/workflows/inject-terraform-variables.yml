@@ -1,0 +1,9 @@
+on:
+  workflow_call:
+
+jobs:
+  inject-variables:
+    runs-on: ubuntu-latest
+
+    steps:
+      - run: echo CHANGE ME
