@@ -7,9 +7,6 @@ on:
         type: boolean
         default: false
 
-# permissions:
-#   issues: write
-
 env:
   TFVARS_FILE_NAME: prod.tfvars
   TERRAFORM_FILE_NAME: terraform.tf
@@ -88,15 +85,6 @@ jobs:
           
           echo "terraform_plan_output=$plan_output" >> "$GITHUB_OUTPUT"
 
-      # - name: Plan Terraform infrastructure creation
-      #   if: ${{ inputs.destroy-terraform == true }}
-      #   id: terraform-plan-destroy
-      #   run: |
-      #     cd ${{ env.TERRAFORM_FOLDER_PATH }}
-
-      #     plan_output=$(terraform plan -destroy -out=${{ env.TFPLAN_FILE_NAME }} -var-file="${{ env.TFVARS_FILE_NAME }}" | grep Plan:)
-          
-      #     echo "terraform_plan_output=$plan_output" >> "$GITHUB_OUTPUT"
 
       - name: Get manual approval
         timeout-minutes: 5 # just in case the action's timeout doesn't work
