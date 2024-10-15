@@ -8,71 +8,74 @@ permissions:
   issues: write
 
 jobs:
-    destroy:
-        runs-on: ubuntu-latest
+  destroy:
+    uses: ./.github/workflows/terraform-update-infrastructure.yml
+    with:
+      destroy-terraform: true
+        # runs-on: ubuntu-latest
         
-        steps:
-            - name: Install Terraform CLI
-              uses: hashicorp/setup-terraform@v3
-              with:
-                cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+        # steps:
+        #     - name: Install Terraform CLI
+        #       uses: hashicorp/setup-terraform@v3
+        #       with:
+        #         cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
 
-            - name: Checkout repo
-              uses: actions/checkout@v3
+        #     - name: Checkout repo
+        #       uses: actions/checkout@v3
 
-            - name: Sets up provider, inject production Terraform variables
-              run: |
-                cd ${{ github.workspace }}/terraform
+        #     - name: Sets up provider, inject production Terraform variables
+        #       run: |
+        #         cd ${{ github.workspace }}/terraform
                 
-                echo Copying example.terraform.tf, uncomment lines, and inject production values
-                cp example.terraform.tf terraform.tf
-                sed -i 's/#//' ./terraform.tf
-                sed -i 's/.*organization.*/organization = "${{ secrets.TF_ORGANIZATION }}"/' ./terraform.tf
-                sed -i 's/.*name.*/name = "${{ secrets.TF_DEPLOY_WORKSPACE }}"/' ./terraform.tf
+        #         echo Copying example.terraform.tf, uncomment lines, and inject production values
+        #         cp example.terraform.tf terraform.tf
+        #         sed -i 's/#//' ./terraform.tf
+        #         sed -i 's/.*organization.*/organization = "${{ secrets.TF_ORGANIZATION }}"/' ./terraform.tf
+        #         sed -i 's/.*name.*/name = "${{ secrets.TF_DEPLOY_WORKSPACE }}"/' ./terraform.tf
 
-                echo Copying example.tfvars and inject production values with ~ delimiter to avoid interfering with passed in values
-                cp example.tfvars prod.tfvars
-                sed -i 's~.*registered_domain_name.*~registered_domain_name = "${{ secrets.REGISTERED_DOMAIN_NAME }}"~' ./prod.tfvars
-                sed -i 's~.*github_repo_name_full.*~github_repo_name_full = "${{ github.repository }}"~' ./prod.tfvars
-                sed -i 's~.*route53_hosted_zone_id.*~route53_hosted_zone_id = "${{ secrets.ROUTE53_ZONE_ID }}"~' ./prod.tfvars
-                sed -i 's~.*notification_subscriber_email.*~notification_subscriber_email = "${{ secrets.SNS_ALERT_EMAIL }}"~' ./prod.tfvars
-                sed -i 's~.*slack_webhook_url.*~slack_webhook_url = "${{ secrets.SLACK_WEBHOOK_URL }}"~' ./prod.tfvars
-                sed -i 's~.*visitor_counter-api_trigger_method.*~visitor_counter-api_trigger_method = "POST"~' ./prod.tfvars
-                sed -i 's~.*visitor_counter-api_route_key.*~visitor_counter-api_route_key = "visitor-counter"~' ./prod.tfvars
+        #         echo Copying example.tfvars and inject production values with ~ delimiter to avoid interfering with passed in values
+        #         cp example.tfvars prod.tfvars
+        #         sed -i 's~.*registered_domain_name.*~registered_domain_name = "${{ secrets.REGISTERED_DOMAIN_NAME }}"~' ./prod.tfvars
+        #         sed -i 's~.*github_repo_name_full.*~github_repo_name_full = "${{ github.repository }}"~' ./prod.tfvars
+        #         sed -i 's~.*route53_hosted_zone_id.*~route53_hosted_zone_id = "${{ secrets.ROUTE53_ZONE_ID }}"~' ./prod.tfvars
+        #         sed -i 's~.*notification_subscriber_email.*~notification_subscriber_email = "${{ secrets.SNS_ALERT_EMAIL }}"~' ./prod.tfvars
+        #         sed -i 's~.*slack_webhook_url.*~slack_webhook_url = "${{ secrets.SLACK_WEBHOOK_URL }}"~' ./prod.tfvars
+        #         sed -i 's~.*visitor_counter-api_trigger_method.*~visitor_counter-api_trigger_method = "POST"~' ./prod.tfvars
+        #         sed -i 's~.*visitor_counter-api_route_key.*~visitor_counter-api_route_key = "visitor-counter"~' ./prod.tfvars
 
-            - name: Format Terraform code, initialize workspace
-              run: |
-                cd ${{ github.workspace }}/terraform
+        #     - name: Format Terraform code, initialize workspace
+        #       run: |
+        #         cd ${{ github.workspace }}/terraform
 
-                terraform fmt
+        #         terraform fmt
 
-                terraform init
+        #         terraform init
 
-            - name: Plan Terraform infrastructure
-              id: terraform-plan
-              run: |
-                cd ${{ github.workspace }}/terraform
+        #     - name: Plan Terraform infrastructure
+        #       id: terraform-plan
+        #       run: |
+        #         cd ${{ github.workspace }}/terraform
 
-                plan_output=$(terraform plan -destroy -out=plan.tfplan -var-file="prod.tfvars" | grep Plan:)
+        #         plan_output=$(terraform plan -destroy -out=plan.tfplan -var-file="prod.tfvars" | grep Plan:)
                 
-                echo "terraform_plan_output=$plan_output" >> "$GITHUB_OUTPUT"
+        #         echo "terraform_plan_output=$plan_output" >> "$GITHUB_OUTPUT"
 
-            - name: Get manual approval
-              timeout-minutes: 5 # just in case the action's timeout doesn't work
-              uses: trstringer/manual-approval@v1
-              with:
-                secret: ${{ secrets.MY_GH_PERSONAL_ACCESS_TOKEN }}
-                timeout-minutes: 5
-                approvers: Kungfoosian
-                minimum-approvals: 1
-                issue-title: Terraform infrastructure destruction requires manual approval
-                issue-body: ${{steps.terraform-plan.outputs.terraform_plan_output}}
-                exclude-workflow-initiator-as-approver: false
+        #     - name: Get manual approval
+        #       timeout-minutes: 5 # just in case the action's timeout doesn't work
+        #       uses: trstringer/manual-approval@v1
+        #       with:
+        #         secret: ${{ secrets.MY_GH_PERSONAL_ACCESS_TOKEN }}
+        #         timeout-minutes: 5
+        #         approvers: Kungfoosian
+        #         minimum-approvals: 1
+        #         issue-title: Terraform infrastructure destruction requires manual approval
+        #         issue-body: ${{steps.terraform-plan.outputs.terraform_plan_output}}
+        #         exclude-workflow-initiator-as-approver: false
 
-            - name: Apply Terraform infrastructure (after manual approval)
-              timeout-minutes: 10
-              run: |
-                cd ${{ github.workspace }}/terraform
+        #     - name: Apply Terraform infrastructure (after manual approval)
+        #       timeout-minutes: 10
+        #       run: |
+        #         cd ${{ github.workspace }}/terraform
 
-                terraform apply -destroy -input=false plan.tfplan
+        #         terraform apply -destroy -input=false plan.tfplan
 

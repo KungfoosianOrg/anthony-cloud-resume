@@ -2,6 +2,19 @@ name: Apply/Destroy Terraform infrastructure
 
 on:
   workflow_call:
+    inputs:
+      destroy-terraform:
+        type: boolean
+        default: false
+
+permissions:
+  issues: write
+
+env:
+  TFVARS_FILE_NAME: prod.tfvars
+  TERRAFORM_FILE_NAME: terraform.tf
+  TFPLAN_FILE_NAME: plan.tfplan
+  TERRAFORM_FOLDER_PATH: ${{ github.workspace }}/terraform
 
 jobs:
   pass-variable-for-gha-jobs:
@@ -66,14 +79,24 @@ jobs:
 
           terraform init
 
-      - name: Plan Terraform infrastructure
+      - name: Plan Terraform infrastructure creation/destruction
         id: terraform-plan
         run: |
           cd ${{ env.TERRAFORM_FOLDER_PATH }}
 
-          plan_output=$(terraform plan -out=${{ env.TFPLAN_FILE_NAME }} -var-file="${{ env.TFVARS_FILE_NAME }}" | grep Plan:)
+          plan_output=$(terraform plan ${{ inputs.destroy-terraform == true && '-destroy' || '' }} -out=${{ env.TFPLAN_FILE_NAME }} -var-file="${{ env.TFVARS_FILE_NAME }}" | grep Plan:)
           
           echo "terraform_plan_output=$plan_output" >> "$GITHUB_OUTPUT"
+
+      # - name: Plan Terraform infrastructure creation
+      #   if: ${{ inputs.destroy-terraform == true }}
+      #   id: terraform-plan-destroy
+      #   run: |
+      #     cd ${{ env.TERRAFORM_FOLDER_PATH }}
+
+      #     plan_output=$(terraform plan -destroy -out=${{ env.TFPLAN_FILE_NAME }} -var-file="${{ env.TFVARS_FILE_NAME }}" | grep Plan:)
+          
+      #     echo "terraform_plan_output=$plan_output" >> "$GITHUB_OUTPUT"
 
       - name: Get manual approval
         timeout-minutes: 5 # just in case the action's timeout doesn't work
@@ -84,7 +107,7 @@ jobs:
           approvers: Kungfoosian
           minimum-approvals: 1
           issue-title: Terraform infrastructure deployment requires manual approval
-          issue-body: ${{steps.terraform-plan.outputs.terraform_plan_output}}
+          issue-body: ${{ steps.terraform-plan.outputs.terraform_plan_output }}
           exclude-workflow-initiator-as-approver: false
 
       - name: Apply Terraform infrastructure (after manual approval)
@@ -92,4 +115,4 @@ jobs:
         run: |
           cd ${{ env.TERRAFORM_FOLDER_PATH }}
 
-          terraform apply -input=false ${{ env.TFPLAN_FILE_NAME }}
+          terraform apply ${{ inputs.destroy-terraform == true && '-destroy' || '' }} -input=false ${{ env.TFPLAN_FILE_NAME }}
