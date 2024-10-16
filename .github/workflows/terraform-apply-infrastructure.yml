@@ -15,9 +15,45 @@ on:
 
 permissions:
   issues: write
+  contents: read
 
 jobs:
   create-terraform-infrastructure:
     uses: ./.github/workflows/terraform-update-infrastructure.yml
 
     secrets: inherit
+
+  get-output-and-compare:
+    needs: [ create-terraform-infrastructure ]
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Install Terraform CLI
+        uses: hashicorp/setup-terraform@v3
+        with:
+          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: get Terraform output for visitor counter invoke URL, then check if it needs to be updated on client side
+        env:
+          GH_TOKEN: ${{ secrets.MY_GH_PERSONAL_ACCESS_TOKEN }}
+
+        run: |
+          cd ${{ github.workspace }}/terraform
+          new_endpoint_url=$(terraform output -raw visitor_counter-api_invoke_url)
+
+          echo GH CLI of variable value before:
+          gh variable get VISITOR_COUNTER_API_INVOKE_URL
+
+          if [ "$new_endpoint_url" != "${{ vars.VISITOR_COUNTER_API_INVOKE_URL }}" ];
+          then
+            echo values different, updating environment variable 
+            echo "new endpoint id is $new_endpoint_url"
+
+            gh variable set VISITOR_COUNTER_API_INVOKE_URL --body "$new_endpoint_url" 
+
+            echo GH CLI of variable value after:
+            gh variable get VISITOR_COUNTER_API_INVOKE_URL
