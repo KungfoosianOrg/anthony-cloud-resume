@@ -11,7 +11,8 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-
+env:
+  VISITOR_COUNTER_MODULE_PATH: /scripts/visitorCounterModule.js
 
 permissions:
   issues: write
@@ -23,7 +24,7 @@ jobs:
 
     secrets: inherit
 
-  get-output-and-compare:
+  get-output-and-update-repo-secrets:
     needs: [ create-terraform-infrastructure ]
 
     runs-on: ubuntu-latest
@@ -37,7 +38,32 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
 
+      - name: Get Terraform outputs and update repo secrets
+        run: |
+          cfn_new_distro_id=$(terraform output -raw cloudfront_distribution_id)
+          # if different than the one stored, update secret 
+
+          # get client side s3 arn, if different, update secret and call workflow to upload site
+
+  get-visitorcounter-endpoint-and-compare:
+    needs: [ create-terraform-infrastructure ]
+
+    runs-on: ubuntu-latest
+
+    outputs:
+      isupdate_visitorcounter_endpoint: ${{ steps.getVisitorCounterInvokeUrl.outputs.isupdate_visitorcounter_endpoint }}
+
+    steps:
+      - name: Install Terraform CLI
+        uses: hashicorp/setup-terraform@v3
+        with:
+          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
       - name: get Terraform output for visitor counter invoke URL, then check if it needs to be updated on client side
+        id: getVisitorCounterInvokeUrl
         env:
           GH_TOKEN: ${{ secrets.MY_GH_PERSONAL_ACCESS_TOKEN }}
 
@@ -57,3 +83,44 @@ jobs:
 
             echo GH CLI of variable value after:
             gh variable get VISITOR_COUNTER_API_INVOKE_URL
+
+            echo "isupdate_visitorcounter_endpoint=true" >> "$GITHUB_OUTPUT"
+
+
+  update_website_visitorcounter_endpoint:
+    needs: [ get-visitorcounter-endpoint-and-compare ]
+
+    if: ${{ needs.get-visitorcounter-endpoint-and-compare.outputs.isupdate_visitorcounter_endpoint }} == 'true'
+
+    uses: ./.github/workflows/deploy-site-to-s3.yml
+
+    secrets: inherit
+
+
+  create-cloudfront-invalidation:
+    needs: [ update_website_visitorcounter_endpoint ]
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: get temporary AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ${{ secrets.AWS_STACK_REGION }}
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }} 
+          role-session-name: GHASession-anthony_cloud_resume
+          unset-current-credentials: true
+          retry-max-attempts: 3
+          output-credentials: true    
+              
+      - name: verify temp credentials validity
+        run: |
+          aws sts get-caller-identity    
+
+      - name: refresh_cloudfront_scripts_path
+        run: |
+          aws cloudfront create-invalidation \
+              --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
+              --region ${{ secrets.AWS_STACK_REGION }} \
+              --paths "${{ env.VISITOR_COUNTER_MODULE_PATH }}"
+
