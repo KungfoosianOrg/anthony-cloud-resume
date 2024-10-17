@@ -76,7 +76,7 @@ jobs:
 
             gh secret set S3_BUCKET_NAME --body "$s3_frontend_bucket_name"
 
-            $frontend_s3_need_upload=true
+            frontend_s3_need_upload=true
           fi
             
             
@@ -96,7 +96,7 @@ jobs:
             echo GH CLI of variable value after:
             gh variable get VISITOR_COUNTER_API_INVOKE_URL
 
-            $visitorcounter_endpoint_need_update=true
+            visitorcounter_endpoint_need_update=true
           fi
             
             
