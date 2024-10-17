@@ -11,8 +11,7 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-env:
-  VISITOR_COUNTER_MODULE_PATH: /scripts/visitorCounterModule.js
+
 
 permissions:
   issues: write
@@ -104,94 +103,30 @@ jobs:
           echo "visitorcounter_endpoint_need_update=$visitorcounter_endpoint_need_update" >> "$GITHUB_OUTPUT"
 
 
-  # get-visitorcounter-endpoint-and-compare:
-  #   needs: [ create-terraform-infrastructure ]
+          slack_integration_lambda_arn=$(terraform output -raw slack_integration-lambda_arn)
+          
+          if [ "$slack_integration_lambda_arn" != "${{ secrets.SLACK_INTEGRATION_LAMBDA_ARN }}" ];
+          then
+            echo Updating ARN of Lambda for Slack integration...
+            gh secret set SLACK_INTEGRATION_LAMBDA_ARN --body "$slack_integration_lambda_arn"
+          fi
 
-  #   runs-on: ubuntu-latest
 
-  #   outputs:
-  #     visitorcounter_endpoint_need_update: ${{ steps.getVisitorCounterInvokeUrl.outputs.visitorcounter_endpoint_need_update }}
+          slack_integration_lambda_arn=$(terraform output -raw slack_integration-lambda_arn)
+          
+          if [ "$slack_integration_lambda_arn" != "${{ secrets.SLACK_INTEGRATION_LAMBDA_ARN }}" ];
+          then
+            echo Updating ARN of Lambda for Slack integration...
+            gh secret set SLACK_INTEGRATION_LAMBDA_ARN --body "$slack_integration_lambda_arn"
+          fi
 
-  #   steps:
-  #     - name: Install Terraform CLI
-  #       uses: hashicorp/setup-terraform@v3
-  #       with:
-  #         cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
 
-  #     - name: Checkout repo
-  #       uses: actions/checkout@v3
-
-      # - name: get Terraform output for visitor counter invoke URL, then check if it needs to be updated on client side
-      #   id: getVisitorCounterInvokeUrl
-      #   env:
-      #     GH_TOKEN: ${{ secrets.MY_GH_PERSONAL_ACCESS_TOKEN }}
-
-      #   run: |
-      #     cd ${{ github.workspace }}/terraform
-      #     new_endpoint_url=$(terraform output -raw visitor_counter-api_invoke_url)
-
-      #     echo GH CLI of variable value before:
-      #     gh variable get VISITOR_COUNTER_API_INVOKE_URL
-
-      #     if [ "$new_endpoint_url" != "${{ vars.VISITOR_COUNTER_API_INVOKE_URL }}" ];
-      #     then
-      #       echo values different, updating environment variable 
-      #       echo "new endpoint id is $new_endpoint_url"
-
-      #       gh variable set VISITOR_COUNTER_API_INVOKE_URL --body "$new_endpoint_url" 
-
-      #       echo GH CLI of variable value after:
-      #       gh variable get VISITOR_COUNTER_API_INVOKE_URL
-
-      #       echo "visitorcounter_endpoint_need_update=true" >> "$GITHUB_OUTPUT"
-      #     fi
 
   upload_to_frontend_s3_bucket:
     needs: [ get-output-and-update-repo-secrets ]
 
-    if: ${{ needs.get-output-and-update-repo-secrets.outputs.frontend_s3_need_upload }} == 'true'
-
-    uses: ./.github/workflows/
-    with: something here
-
-    secrets: inherit
-
-  update_website_visitorcounter_endpoint:
-    needs: [ get-output-and-update-repo-secrets ]
-
-    if: ${{ (needs.get-output-and-update-repo-secrets.outputs.visitorcounter_endpoint_need_update == 'true' ) && (needs.get-output-and-update-repo-secrets.outputs.frontend_s3_need_upload == 'false')}}
+    if: ${{ (needs.get-output-and-update-repo-secrets.outputs.visitorcounter_endpoint_need_update == 'true' ) || (needs.get-output-and-update-repo-secrets.outputs.frontend_s3_need_upload == 'true')}}
 
     uses: ./.github/workflows/deploy-site-to-s3.yml
 
     secrets: inherit
-
-
-  create-cloudfront-invalidation:
-    needs: [ update_website_visitorcounter_endpoint, get-output-and-update-repo-secrets ]
-
-    if: ${{ needs.get-output-and-update-repo-secrets.outputs.visitorcounter_endpoint_need_update }} == 'true'
-
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: get temporary AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-region: ${{ secrets.AWS_STACK_REGION }}
-          role-to-assume: ${{ secrets.AWS_ROLE_ARN }} 
-          role-session-name: GHASession-anthony_cloud_resume
-          unset-current-credentials: true
-          retry-max-attempts: 3
-          output-credentials: true    
-              
-      - name: verify temp credentials validity
-        run: |
-          aws sts get-caller-identity    
-
-      - name: refresh_cloudfront_scripts_path
-        run: |
-          aws cloudfront create-invalidation \
-              --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
-              --region ${{ secrets.AWS_STACK_REGION }} \
-              --paths "${{ env.VISITOR_COUNTER_MODULE_PATH }}"
-
