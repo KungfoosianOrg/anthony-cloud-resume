@@ -16,6 +16,7 @@ on:
 permissions:
   issues: write
   contents: read
+  id-token: write
 
 jobs:
   create-terraform-infrastructure:
