@@ -1,3 +1,6 @@
+# TODO: https://github.com/terraform-aws-modules/terraform-aws-lambda/issues/139
+#  https://github.com/terraform-aws-modules/terraform-aws-lambda/issues/204
+
 name: Apply/Destroy Terraform infrastructure
 
 on:
