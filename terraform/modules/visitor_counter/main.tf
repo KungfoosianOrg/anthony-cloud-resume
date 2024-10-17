@@ -152,6 +152,9 @@ module "visitor_counter-lambda" {
 
   source_path = var.source_relative_path
 
+  # resolves issues with hash when multiple lambda use same source code
+  hash_extra = "visitorcounter"
+
   runtime = "python3.9"
 
   handler = "lambda_function.lambda_handler"
