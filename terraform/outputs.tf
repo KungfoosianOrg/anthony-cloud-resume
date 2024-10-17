@@ -8,10 +8,10 @@ output "s3_frontend_bucket_name" {
   value       = module.sam-s3-cloudfront-static-site-hsts.s3_frontend_bucket_name
 }
 
-output "s3_frontend_bucket_region" {
-  description = "Region of created S3 bucket for storing front end code"
-  value       = var.aws_region
-}
+# output "s3_frontend_bucket_region" {
+#   description = "Region of created S3 bucket for storing front end code"
+#   value       = var.aws_region
+# }
 
 output "route53_hosted_zone_id" {
   description = "ID of AWS Route53 hosted zone for your domain"
@@ -21,6 +21,7 @@ output "route53_hosted_zone_id" {
 output "cloudfront_distribution_id" {
   description = "AWS CloudFront distribution's id"
   value       = module.sam-s3-cloudfront-static-site-hsts.cfdistro_id
+  sensitive = true
 }
 
 output "visitor_counter-api_invoke_url" {

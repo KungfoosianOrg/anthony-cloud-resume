@@ -24,10 +24,15 @@ jobs:
 
     secrets: inherit
 
+
   get-output-and-update-repo-secrets:
     needs: [ create-terraform-infrastructure ]
 
     runs-on: ubuntu-latest
+
+    outputs:
+      visitorcounter_endpoint_need_update: ${{ steps.getTerraformOutputs.outputs.visitorcounter_endpoint_need_update }}
+      frontend_s3_need_upload: ${{ steps.getTerraformOutputs.frontend_s3_need_upload }}
 
     steps:
       - name: Install Terraform CLI
@@ -39,58 +44,122 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Get Terraform outputs and update repo secrets
-        run: |
-          cfn_new_distro_id=$(terraform output -raw cloudfront_distribution_id)
-          # if different than the one stored, update secret 
-
-          # get client side s3 arn, if different, update secret and call workflow to upload site
-
-  get-visitorcounter-endpoint-and-compare:
-    needs: [ create-terraform-infrastructure ]
-
-    runs-on: ubuntu-latest
-
-    outputs:
-      isupdate_visitorcounter_endpoint: ${{ steps.getVisitorCounterInvokeUrl.outputs.isupdate_visitorcounter_endpoint }}
-
-    steps:
-      - name: Install Terraform CLI
-        uses: hashicorp/setup-terraform@v3
-        with:
-          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
-
-      - name: Checkout repo
-        uses: actions/checkout@v3
-
-      - name: get Terraform output for visitor counter invoke URL, then check if it needs to be updated on client side
-        id: getVisitorCounterInvokeUrl
+        id: getTerraformOutputs
         env:
           GH_TOKEN: ${{ secrets.MY_GH_PERSONAL_ACCESS_TOKEN }}
 
         run: |
-          cd ${{ github.workspace }}/terraform
-          new_endpoint_url=$(terraform output -raw visitor_counter-api_invoke_url)
+          cfn_new_distro_id=$(terraform output -raw cloudfront_distribution_id)
 
+          if [ "$cfn_new_distro_id" != "${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}" ];
+          then
+            echo Updating CloudFront distribution ID...
+            gh secret set CLOUDFRONT_DISTRIBUTION_ID --body "$cfn_new_distro_id"
+          fi
+
+
+          ghactions_aws_role_arn=$(terraform output -raw ghactions_aws_role_arn)
+          
+          if [ "$ghactions_aws_role_arn" != "${{ secrets.AWS_ROLE_ARN }}" ];
+          then
+            echo Updating ARN of role for GitHub Actions...
+            gh secret set AWS_ROLE_ARN --body "$ghactions_aws_role_arn"
+          fi
+
+
+          s3_frontend_bucket_name=$(terraform output -raw s3_frontend_bucket_name)
+          frontend_s3_need_upload=false
+
+          if [ "$s3_frontend_bucket_name" != "${{ secrets.S3_BUCKET_NAME }}" ];
+          then
+            echo Updating front end s3 bucket name and uploads files...
+
+            gh secret set S3_BUCKET_NAME --body "$s3_frontend_bucket_name"
+
+            $frontend_s3_need_upload=true
+          fi
+            
+            
+          new_endpoint_url=$(terraform output -raw visitor_counter-api_invoke_url)
+          
           echo GH CLI of variable value before:
           gh variable get VISITOR_COUNTER_API_INVOKE_URL
 
+          visitorcounter_endpoint_need_update=false
           if [ "$new_endpoint_url" != "${{ vars.VISITOR_COUNTER_API_INVOKE_URL }}" ];
           then
             echo values different, updating environment variable 
             echo "new endpoint id is $new_endpoint_url"
-
+            
             gh variable set VISITOR_COUNTER_API_INVOKE_URL --body "$new_endpoint_url" 
-
+            
             echo GH CLI of variable value after:
             gh variable get VISITOR_COUNTER_API_INVOKE_URL
 
-            echo "isupdate_visitorcounter_endpoint=true" >> "$GITHUB_OUTPUT"
+            $visitorcounter_endpoint_need_update=true
+          fi
+            
+            
+          echo "frontend_s3_need_upload=$frontend_s3_need_upload" >> "$GITHUB_OUTPUT"
+          echo "visitorcounter_endpoint_need_update=$visitorcounter_endpoint_need_update" >> "$GITHUB_OUTPUT"
 
+
+  # get-visitorcounter-endpoint-and-compare:
+  #   needs: [ create-terraform-infrastructure ]
+
+  #   runs-on: ubuntu-latest
+
+  #   outputs:
+  #     visitorcounter_endpoint_need_update: ${{ steps.getVisitorCounterInvokeUrl.outputs.visitorcounter_endpoint_need_update }}
+
+  #   steps:
+  #     - name: Install Terraform CLI
+  #       uses: hashicorp/setup-terraform@v3
+  #       with:
+  #         cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+
+  #     - name: Checkout repo
+  #       uses: actions/checkout@v3
+
+      # - name: get Terraform output for visitor counter invoke URL, then check if it needs to be updated on client side
+      #   id: getVisitorCounterInvokeUrl
+      #   env:
+      #     GH_TOKEN: ${{ secrets.MY_GH_PERSONAL_ACCESS_TOKEN }}
+
+      #   run: |
+      #     cd ${{ github.workspace }}/terraform
+      #     new_endpoint_url=$(terraform output -raw visitor_counter-api_invoke_url)
+
+      #     echo GH CLI of variable value before:
+      #     gh variable get VISITOR_COUNTER_API_INVOKE_URL
+
+      #     if [ "$new_endpoint_url" != "${{ vars.VISITOR_COUNTER_API_INVOKE_URL }}" ];
+      #     then
+      #       echo values different, updating environment variable 
+      #       echo "new endpoint id is $new_endpoint_url"
+
+      #       gh variable set VISITOR_COUNTER_API_INVOKE_URL --body "$new_endpoint_url" 
+
+      #       echo GH CLI of variable value after:
+      #       gh variable get VISITOR_COUNTER_API_INVOKE_URL
+
+      #       echo "visitorcounter_endpoint_need_update=true" >> "$GITHUB_OUTPUT"
+      #     fi
+
+  upload_to_frontend_s3_bucket:
+    needs: [ get-output-and-update-repo-secrets ]
+
+    if: ${{ needs.get-output-and-update-repo-secrets.outputs.frontend_s3_need_upload }} == 'true'
+
+    uses: ./.github/workflows/
+    with: something here
+
+    secrets: inherit
 
   update_website_visitorcounter_endpoint:
-    needs: [ get-visitorcounter-endpoint-and-compare ]
+    needs: [ get-output-and-update-repo-secrets ]
 
-    if: ${{ needs.get-visitorcounter-endpoint-and-compare.outputs.isupdate_visitorcounter_endpoint }} == 'true'
+    if: ${{ (needs.get-output-and-update-repo-secrets.outputs.visitorcounter_endpoint_need_update == 'true' ) && (needs.get-output-and-update-repo-secrets.outputs.frontend_s3_need_upload == 'false')}}
 
     uses: ./.github/workflows/deploy-site-to-s3.yml
 
@@ -98,7 +167,9 @@ jobs:
 
 
   create-cloudfront-invalidation:
-    needs: [ update_website_visitorcounter_endpoint ]
+    needs: [ update_website_visitorcounter_endpoint, get-output-and-update-repo-secrets ]
+
+    if: ${{ needs.get-output-and-update-repo-secrets.outputs.visitorcounter_endpoint_need_update }} == 'true'
 
     runs-on: ubuntu-latest
 
