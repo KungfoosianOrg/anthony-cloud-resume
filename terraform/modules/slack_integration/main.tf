@@ -63,6 +63,9 @@ module "slack_integration-lambda" {
   runtime = "python3.9"
 
   source_path = var.source_relative_path
+  
+  # resolves issues with hash when multiple lambda use same source code
+  hash_extra = "slackintegration"
 
   create_role = false
   # role_name = var.lambda_role_name
