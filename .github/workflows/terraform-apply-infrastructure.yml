@@ -19,10 +19,10 @@ permissions:
   id-token: write
 
 jobs:
-  create-terraform-infrastructure:
-    uses: ./.github/workflows/terraform-update-infrastructure.yml
+  # create-terraform-infrastructure:
+  #   uses: ./.github/workflows/terraform-update-infrastructure.yml
 
-    secrets: inherit
+  #   secrets: inherit
 
 
   get-output-and-update-repo-secrets:
