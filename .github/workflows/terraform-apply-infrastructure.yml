@@ -48,6 +48,8 @@ jobs:
         run: |
           cd ${{ github.workspace }}/terraform
 
+          terraform init
+
           terraform output
       
       - name: Update repo secrets
@@ -57,7 +59,7 @@ jobs:
         
         run: |
           cd ${{ github.workspace }}/terraform
-          
+
           terraform init
 
           echo ${{ steps.terraformOutput.outputs.stdout }}
