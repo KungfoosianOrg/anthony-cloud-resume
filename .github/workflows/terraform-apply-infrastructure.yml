@@ -41,7 +41,7 @@ jobs:
           cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
 
       - name: Checkout repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Get Terraform outputs and update repo secrets
         id: getTerraformOutputs
@@ -49,6 +49,8 @@ jobs:
           GH_TOKEN: ${{ secrets.MY_GH_PERSONAL_ACCESS_TOKEN }}
 
         run: |
+          cd ${{ github.workspace }}/terraform
+
           cfn_new_distro_id=$(terraform output -raw cloudfront_distribution_id)
 
           if [ "$cfn_new_distro_id" != "${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}" ];

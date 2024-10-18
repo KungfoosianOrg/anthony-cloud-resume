@@ -28,7 +28,7 @@ jobs:
 
     steps:
       - name: checks out this repo 
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: validates HTML
         uses: anishathalye/proof-html@v2

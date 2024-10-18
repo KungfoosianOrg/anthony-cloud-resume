@@ -26,7 +26,7 @@ jobs:
 
     steps:
       - name: check out repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: create default aws config for unit test
         run: |
@@ -68,7 +68,7 @@ jobs:
 
   #   steps:
   #     - name: check out repo
-  #       uses: actions/checkout@v3
+  #       uses: actions/checkout@v4
 
   #     - name: change samconfig.toml to prod values
   #       run: |
@@ -134,7 +134,7 @@ jobs:
 
   #   steps:
   #     - name: check out repo
-  #       uses: actions/checkout@v3
+  #       uses: actions/checkout@v4
 
   #     - name: get temporary AWS credentials
   #       uses: aws-actions/configure-aws-credentials@v4
@@ -201,7 +201,7 @@ jobs:
 
   #   steps:
   #     - name: check out repo
-  #       uses: actions/checkout@v3
+  #       uses: actions/checkout@v4
 
   #     - name: get temporary AWS credentials
   #       uses: aws-actions/configure-aws-credentials@v4
