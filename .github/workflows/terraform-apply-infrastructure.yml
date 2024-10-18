@@ -31,8 +31,8 @@ jobs:
     runs-on: ubuntu-latest
 
     outputs:
-      visitorcounter_endpoint_need_update: ${{ steps.getTerraformOutputs.outputs.visitorcounter_endpoint_need_update }}
-      frontend_s3_need_upload: ${{ steps.getTerraformOutputs.frontend_s3_need_upload }}
+      visitorcounter_endpoint_need_update: ${{ steps.updateRepoSecrets.outputs.visitorcounter_endpoint_need_update }}
+      frontend_s3_need_upload: ${{ steps.updateRepoSecrets.frontend_s3_need_upload }}
 
     steps:
       - name: Install Terraform CLI
@@ -42,20 +42,23 @@ jobs:
 
       - name: Checkout repo
         uses: actions/checkout@v4
+      
+      - name: Get Terraform outputs
+        id: terraformOutput
+        run: |
+          cd ${{ github.workspace }}/terraform
 
-      - name: Get Terraform outputs and update repo secrets
-        id: getTerraformOutputs
+          terraform output
+      
+      - name: Update repo secrets
+        id: updateRepoSecrets
         env:
           GH_TOKEN: ${{ secrets.MY_GH_PERSONAL_ACCESS_TOKEN }}
         
         run: |
-          cd ${{ github.workspace }}/terraform
-
           terraform init
 
-          terraform output
-
-          terraform output -raw cloudfront_distribution_id
+          echo ${{ steps.terraformOutput.outputs.stdout }}
         # run: |
         #   cd ${{ github.workspace }}/terraform
 
