@@ -56,6 +56,8 @@ jobs:
           GH_TOKEN: ${{ secrets.MY_GH_PERSONAL_ACCESS_TOKEN }}
         
         run: |
+          cd ${{ github.workspace }}/terraform
+          
           terraform init
 
           echo ${{ steps.terraformOutput.outputs.stdout }}
