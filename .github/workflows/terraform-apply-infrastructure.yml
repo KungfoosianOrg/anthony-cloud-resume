@@ -19,14 +19,14 @@ permissions:
   id-token: write
 
 jobs:
-  # create-terraform-infrastructure:
-  #   uses: ./.github/workflows/terraform-update-infrastructure.yml
+  create-terraform-infrastructure:
+    uses: ./.github/workflows/terraform-update-infrastructure.yml
 
-  #   secrets: inherit
+    secrets: inherit
 
 
   get-output-and-update-repo-secrets:
-    # needs: [ create-terraform-infrastructure ]
+    needs: [ create-terraform-infrastructure ]
 
     runs-on: ubuntu-latest
 
@@ -51,18 +51,17 @@ jobs:
           terraform init
 
           terraform output
+
+          cfn_new_distro_id=$(terraform output -raw cloudfront_distribution_id)
+
+          echo $cfn_new_distro_id
       
-      - name: Update repo secrets
-        id: updateRepoSecrets
-        env:
-          GH_TOKEN: ${{ secrets.MY_GH_PERSONAL_ACCESS_TOKEN }}
+
+      # - name: Update repo secrets
+      #   id: updateRepoSecrets
+      #   env:
+      #     GH_TOKEN: ${{ secrets.MY_GH_PERSONAL_ACCESS_TOKEN }}
         
-        run: |
-          cd ${{ github.workspace }}/terraform
-
-          terraform init
-
-          echo ${{ steps.terraformOutput.outputs.stdout }}
         # run: |
         #   cd ${{ github.workspace }}/terraform
 
