@@ -260,7 +260,8 @@ data "aws_iam_policy_document" "terraform_oidc_permissions" {
       "lambda:ListVersionsByFunction",
       "lambda:AddPermission",
       "lambda:CreateFunction",
-      "lambda:TagResource"
+      "lambda:TagResource",
+      "lambda:UpdateFunctionCode"
     ]
 
     resources = [
