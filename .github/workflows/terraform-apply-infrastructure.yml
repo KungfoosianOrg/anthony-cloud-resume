@@ -12,6 +12,12 @@ on:
   workflow_dispatch:
 
 
+env:
+  TFVARS_FILE_NAME: prod.tfvars
+  TERRAFORM_FILE_NAME: terraform.tf
+  TFPLAN_FILE_NAME: plan.tfplan
+  TERRAFORM_FOLDER_PATH: ${{ github.workspace }}/terraform
+
 
 permissions:
   issues: write
@@ -42,13 +48,23 @@ jobs:
 
       - name: Checkout repo
         uses: actions/checkout@v4
+
+      - name: Download tfvars artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ env.TFVARS_FILE_NAME }}
+          path: ${{ env.TERRAFORM_FOLDER_PATH }}
+
+      - name: Download terraform provider artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ env.TERRAFORM_FILE_NAME }}
+          path: ${{ env.TERRAFORM_FOLDER_PATH }}
       
       - name: Get Terraform outputs
         id: terraformOutput
         run: |
-          cd ${{ github.workspace }}/terraform
-
-          terraform init
+          cd ${{ env.TERRAFORM_FOLDER_PATH }}
 
           terraform output
 
