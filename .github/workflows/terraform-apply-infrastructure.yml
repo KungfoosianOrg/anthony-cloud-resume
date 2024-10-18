@@ -47,83 +47,89 @@ jobs:
         id: getTerraformOutputs
         env:
           GH_TOKEN: ${{ secrets.MY_GH_PERSONAL_ACCESS_TOKEN }}
-
+        
         run: |
           cd ${{ github.workspace }}/terraform
 
           terraform init
 
-          cfn_new_distro_id=$(terraform output -raw cloudfront_distribution_id)
+          terraform output
+        # run: |
+        #   cd ${{ github.workspace }}/terraform
 
-          if [ "$cfn_new_distro_id" != "${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}" ];
-          then
-            echo Updating CloudFront distribution ID...
-            gh secret set CLOUDFRONT_DISTRIBUTION_ID --body "$cfn_new_distro_id"
-          fi
+        #   terraform init
+
+        #   cfn_new_distro_id=$(terraform output -raw cloudfront_distribution_id)
+
+        #   if [ "$cfn_new_distro_id" != "${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}" ];
+        #   then
+        #     echo Updating CloudFront distribution ID...
+        #     gh secret set CLOUDFRONT_DISTRIBUTION_ID --body "$cfn_new_distro_id"
+        #   fi
 
 
-          ghactions_aws_role_arn=$(terraform output -raw ghactions_aws_role_arn)
+        #   ghactions_aws_role_arn=$(terraform output -raw ghactions_aws_role_arn)
           
-          if [ "$ghactions_aws_role_arn" != "${{ secrets.AWS_ROLE_ARN }}" ];
-          then
-            echo Updating ARN of role for GitHub Actions...
-            gh secret set AWS_ROLE_ARN --body "$ghactions_aws_role_arn"
-          fi
+        #   if [ "$ghactions_aws_role_arn" != "${{ secrets.AWS_ROLE_ARN }}" ];
+        #   then
+        #     echo Updating ARN of role for GitHub Actions...
+        #     gh secret set AWS_ROLE_ARN --body "$ghactions_aws_role_arn"
+        #   fi
 
 
-          s3_frontend_bucket_name=$(terraform output -raw s3_frontend_bucket_name)
-          frontend_s3_need_upload=false
+        #   s3_frontend_bucket_name=$(terraform output -raw s3_frontend_bucket_name)
+        #   frontend_s3_need_upload=false
 
-          if [ "$s3_frontend_bucket_name" != "${{ secrets.S3_BUCKET_NAME }}" ];
-          then
-            echo Updating front end s3 bucket name and uploads files...
+        #   if [ "$s3_frontend_bucket_name" != "${{ secrets.S3_BUCKET_NAME }}" ];
+        #   then
+        #     echo Updating front end s3 bucket name and uploads files...
 
-            gh secret set S3_BUCKET_NAME --body "$s3_frontend_bucket_name"
+        #     gh secret set S3_BUCKET_NAME --body "$s3_frontend_bucket_name"
 
-            frontend_s3_need_upload=true
-          fi
+        #     frontend_s3_need_upload=true
+        #   fi
             
             
-          new_endpoint_url=$(terraform output -raw visitor_counter-api_invoke_url)
+        #   new_endpoint_url=$(terraform output -raw visitor_counter-api_invoke_url)
           
-          echo GH CLI of variable value before:
-          gh variable get VISITOR_COUNTER_API_INVOKE_URL
+        #   echo GH CLI of variable value before:
+        #   gh variable get VISITOR_COUNTER_API_INVOKE_URL
 
-          visitorcounter_endpoint_need_update=false
-          if [ "$new_endpoint_url" != "${{ vars.VISITOR_COUNTER_API_INVOKE_URL }}" ];
-          then
-            echo values different, updating environment variable 
-            echo "new endpoint id is $new_endpoint_url"
+        #   visitorcounter_endpoint_need_update=false
+        #   if [ "$new_endpoint_url" != "${{ vars.VISITOR_COUNTER_API_INVOKE_URL }}" ];
+        #   then
+        #     echo values different, updating environment variable 
+        #     echo "new endpoint id is $new_endpoint_url"
             
-            gh variable set VISITOR_COUNTER_API_INVOKE_URL --body "$new_endpoint_url" 
+        #     gh variable set VISITOR_COUNTER_API_INVOKE_URL --body "$new_endpoint_url" 
             
-            echo GH CLI of variable value after:
-            gh variable get VISITOR_COUNTER_API_INVOKE_URL
+        #     echo GH CLI of variable value after:
+        #     gh variable get VISITOR_COUNTER_API_INVOKE_URL
 
-            visitorcounter_endpoint_need_update=true
-          fi
+        #     visitorcounter_endpoint_need_update=true
+        #   fi
             
             
-          echo "frontend_s3_need_upload=$frontend_s3_need_upload" >> "$GITHUB_OUTPUT"
-          echo "visitorcounter_endpoint_need_update=$visitorcounter_endpoint_need_update" >> "$GITHUB_OUTPUT"
+        #   echo "frontend_s3_need_upload=$frontend_s3_need_upload" >> "$GITHUB_OUTPUT"
+        #   echo "visitorcounter_endpoint_need_update=$visitorcounter_endpoint_need_update" >> "$GITHUB_OUTPUT"
 
 
-          slack_integration_lambda_arn=$(terraform output -raw slack_integration-lambda_arn)
+        #   slack_integration_lambda_arn=$(terraform output -raw slack_integration-lambda_arn)
           
-          if [ "$slack_integration_lambda_arn" != "${{ secrets.SLACK_INTEGRATION_LAMBDA_ARN }}" ];
-          then
-            echo Updating ARN of Lambda for Slack integration...
-            gh secret set SLACK_INTEGRATION_LAMBDA_ARN --body "$slack_integration_lambda_arn"
-          fi
+        #   if [ "$slack_integration_lambda_arn" != "${{ secrets.SLACK_INTEGRATION_LAMBDA_ARN }}" ];
+        #   then
+        #     echo Updating ARN of Lambda for Slack integration...
+        #     gh secret set SLACK_INTEGRATION_LAMBDA_ARN --body "$slack_integration_lambda_arn"
+        #   fi
 
 
-          slack_integration_lambda_arn=$(terraform output -raw slack_integration-lambda_arn)
+        #   slack_integration_lambda_arn=$(terraform output -raw slack_integration-lambda_arn)
           
-          if [ "$slack_integration_lambda_arn" != "${{ secrets.SLACK_INTEGRATION_LAMBDA_ARN }}" ];
-          then
-            echo Updating ARN of Lambda for Slack integration...
-            gh secret set SLACK_INTEGRATION_LAMBDA_ARN --body "$slack_integration_lambda_arn"
-          fi
+        #   if [ "$slack_integration_lambda_arn" != "${{ secrets.SLACK_INTEGRATION_LAMBDA_ARN }}" ];
+        #   then
+        #     echo Updating ARN of Lambda for Slack integration...
+        #     gh secret set SLACK_INTEGRATION_LAMBDA_ARN --body "$slack_integration_lambda_arn"
+        #   fi
 
 
 
