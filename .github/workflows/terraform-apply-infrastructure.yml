@@ -84,11 +84,11 @@ jobs:
 
           echo $s3_frontend_bucket_name
 
-        #  if [ "$cfn_new_distro_id" != "${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}" ];
-        #  then
-        #    echo Updating CloudFront distribution ID...
-        #    gh secret set CLOUDFRONT_DISTRIBUTION_ID --body "$cfn_new_distro_id"
-        #  fi
+          if [ "$cfn_new_distro_id" != "${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}" ];
+          then
+           echo Updating CloudFront distribution ID...
+           gh secret set CLOUDFRONT_DISTRIBUTION_ID --body "$cfn_new_distro_id"
+          fi
 
         #  
         #  if [ "$ghactions_aws_role_arn" != "${{ secrets.AWS_ROLE_ARN }}" ];
@@ -142,11 +142,11 @@ jobs:
 
 
 
-  upload_to_frontend_s3_bucket:
-    needs: [ get-output-and-update-repo-secrets ]
+  # upload_to_frontend_s3_bucket:
+  #   needs: [ get-output-and-update-repo-secrets ]
 
-    if: ${{ (needs.get-output-and-update-repo-secrets.outputs.visitorcounter_endpoint_need_update == 'true' ) || (needs.get-output-and-update-repo-secrets.outputs.frontend_s3_need_upload == 'true')}}
+  #   if: ${{ (needs.get-output-and-update-repo-secrets.outputs.visitorcounter_endpoint_need_update == 'true' ) || (needs.get-output-and-update-repo-secrets.outputs.frontend_s3_need_upload == 'true')}}
 
-    uses: ./.github/workflows/deploy-site-to-s3.yml
+  #   uses: ./.github/workflows/deploy-site-to-s3.yml
 
-    secrets: inherit
+  #   secrets: inherit
