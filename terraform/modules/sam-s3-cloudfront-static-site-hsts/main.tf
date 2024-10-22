@@ -273,6 +273,18 @@ data "aws_iam_policy_document" "cicd-permissions" {
       "${aws_s3_bucket.frontend_bucket.arn}/*",
     ]
   }
+
+  statement {
+    sid = "CfnPermissions"
+
+    actions = [ 
+      "cloudfront:CreateInvalidation"
+    ]
+
+    resources = [
+      aws_cloudfront_distribution.prod.arn
+    ]
+  }
 }
 
 resource "aws_iam_policy" "cicd-permissions" {
