@@ -95,7 +95,7 @@ jobs:
           
           
           s3_frontend_bucket_name=$(terraform output -raw s3_frontend_bucket_name)
-          frontend_s3_need_upload=false
+          frontend_s3_need_upload="false"
           
           if [ "$s3_frontend_bucket_name" != "${{ secrets.S3_BUCKET_NAME }}" ];
           then
@@ -103,7 +103,7 @@ jobs:
             
             gh secret set S3_BUCKET_NAME --body "$s3_frontend_bucket_name"
             
-            frontend_s3_need_upload=true
+            frontend_s3_need_upload="true"
           fi
           
           
@@ -112,7 +112,7 @@ jobs:
           gh variable get VISITOR_COUNTER_API_INVOKE_URL
           
           new_endpoint_url=$(terraform output -raw visitor_counter-api_invoke_url)
-          visitorcounter_endpoint_need_update=false
+          visitorcounter_endpoint_need_update="false"
           
           if [ "$new_endpoint_url" != "${{ vars.VISITOR_COUNTER_API_INVOKE_URL }}" ];
           then
@@ -124,18 +124,18 @@ jobs:
             echo GH CLI of variable value after:
             gh variable get VISITOR_COUNTER_API_INVOKE_URL
             
-            visitorcounter_endpoint_need_update=true
+            visitorcounter_endpoint_need_update="true"
           fi
             
             
           echo "frontend_s3_need_upload=$frontend_s3_need_upload" >> "$GITHUB_OUTPUT"
           echo "visitorcounter_endpoint_need_update=$visitorcounter_endpoint_need_update" >> "$GITHUB_OUTPUT"
               
-          if [ "$frontend_s3_need_upload" = true ]; then
+          if [ "$frontend_s3_need_upload" = "true" ]; then
             echo Frontend S3 needs upload
           fi
 
-          if [ "$visitorcounter_endpoint_need_update" = true ]; then
+          if [ "$visitorcounter_endpoint_need_update" = "true" ]; then
             echo visitor counter endpoint need update
           fi
 
@@ -159,7 +159,7 @@ jobs:
   upload_to_frontend_s3_bucket:
     needs: [ get-output-and-update-repo-secrets ]
 
-    if: ${{ (needs.get-output-and-update-repo-secrets.outputs.visitorcounter_endpoint_need_update == true ) || (needs.get-output-and-update-repo-secrets.outputs.frontend_s3_need_upload == true)}}
+    if: ${{ (needs.get-output-and-update-repo-secrets.outputs.visitorcounter_endpoint_need_update == 'true' ) || (needs.get-output-and-update-repo-secrets.outputs.frontend_s3_need_upload == 'true')}}
 
     uses: ./.github/workflows/deploy-site-to-s3.yml
 
