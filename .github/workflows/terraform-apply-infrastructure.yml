@@ -39,8 +39,8 @@ jobs:
     runs-on: ubuntu-latest
 
     outputs:
-      visitorcounter_endpoint_need_update: ${{ steps.updateRepoSecrets.outputs.visitorcounter_endpoint_need_update }}
-      frontend_s3_need_upload: ${{ steps.updateRepoSecrets.frontend_s3_need_upload }}
+      visitorcounter_endpoint_need_update: ${{ steps.terraformOutput.outputs.visitorcounter_endpoint_need_update }}
+      frontend_s3_need_upload: ${{ steps.terraformOutput.frontend_s3_need_upload }}
 
     steps:
       - name: Install Terraform CLI
