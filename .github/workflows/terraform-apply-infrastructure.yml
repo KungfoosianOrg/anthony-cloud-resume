@@ -131,8 +131,15 @@ jobs:
           echo "frontend_s3_need_upload=$frontend_s3_need_upload" >> "$GITHUB_OUTPUT"
           echo "visitorcounter_endpoint_need_update=$visitorcounter_endpoint_need_update" >> "$GITHUB_OUTPUT"
               
-              
-              
+          if [ "$frontend_s3_need_upload" = true ]; then
+            echo Frontend S3 needs upload
+          fi
+
+          if [ "$visitorcounter_endpoint_need_update" = true ]; then
+            echo visitor counter endpoint need update
+          fi
+
+
           slack_integration_lambda_arn=$(terraform output -raw slack_integration-lambda_arn)
           if [ "$slack_integration_lambda_arn" != "${{ secrets.SLACK_INTEGRATION_LAMBDA_ARN }}" ];
           then
