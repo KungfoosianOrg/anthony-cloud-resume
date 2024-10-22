@@ -41,6 +41,8 @@ jobs:
     outputs:
       visitorcounter_endpoint_need_update: ${{ steps.terraformOutput.outputs.visitorcounter_endpoint_need_update }}
       frontend_s3_need_upload: ${{ steps.terraformOutput.frontend_s3_need_upload }}
+      visitorcounter_lambda_need_upload: ${{ steps.terraformOutput.visitorcounter_lambda_need_upload }}
+      slack_integration_lambda_need_upload: ${{ steps.terraformOutput.slack_integration_lambda_need_upload }}
 
     steps:
       - name: Install Terraform CLI
@@ -145,6 +147,10 @@ jobs:
           then
             echo Updating ARN of Lambda for Slack integration...
             gh secret set SLACK_INTEGRATION_LAMBDA_ARN --body "$slack_integration_lambda_arn"
+
+            slack_integration_lambda_need_upload="true"
+
+            echo "slack_integration_lambda_need_upload=$slack_integration_lambda_need_upload" >> "$GITHUB_OUTPUT"
           fi
 
           visitor_counter_lambda_arn=$(terraform output -raw visitor_counter-lambda_arn)
@@ -152,6 +158,10 @@ jobs:
           then
             echo Updating ARN of Lambda for Slack integration...
             gh secret set VISITOR_COUNTER_LAMBDA_ARN --body "$visitor_counter_lambda_arn"
+
+            visitorcounter_lambda_need_upload="true"
+
+            echo "visitorcounter_lambda_need_upload=$visitorcounter_lambda_need_upload" >> "$GITHUB_OUTPUT"
           fi
 
 
@@ -162,5 +172,26 @@ jobs:
     if: ${{ (needs.get-output-and-update-repo-secrets.outputs.visitorcounter_endpoint_need_update == 'true' ) || (needs.get-output-and-update-repo-secrets.outputs.frontend_s3_need_upload == 'true')}}
 
     uses: ./.github/workflows/deploy-site-to-s3.yml
+
+    secrets: inherit
+
+
+  upload_visitorcounter_lambda:
+    needs: [ get-output-and-update-repo-secrets ]
+
+    if: ${{ needs.get-output-and-update-repo-secrets.outputs.visitorcounter_lambda_need_upload == 'true' }}
+
+    uses: ./.github/workflows/publish-visitorcounter_lambda.yml
+
+    secrets: inherit
+
+
+    
+  upload_slack_integration_lambda:
+    needs: [ get-output-and-update-repo-secrets ]
+
+    if: ${{ needs.get-output-and-update-repo-secrets.outputs.slack_integration_lambda_need_upload == 'true' }}
+
+    uses: ./.github/workflows/publish-slack_integration_lambda.yml
 
     secrets: inherit
