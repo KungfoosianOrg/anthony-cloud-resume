@@ -290,6 +290,7 @@ data "aws_iam_policy_document" "terraform_oidc_permissions" {
       "iam:DeleteRole",
       "iam:DeletePolicy",
       "iam:DeleteRolePolicy",
+      "iam:DeletePolicyVersion",
       "iam:ListAttachedRolePolicies",
       "iam:ListInstanceProfilesForRole",
       "iam:ListRolePolicies",
@@ -307,7 +308,8 @@ data "aws_iam_policy_document" "terraform_oidc_permissions" {
       "iam:CreateRole",
       "iam:CreateOpenIDConnectProvider",
       "iam:CreateServiceLinkedRole",
-      "iam:UpdateAssumeRolePolicy"
+      "iam:UpdateAssumeRolePolicy",
+      "iam:CreatePolicyVersion"
     ]
 
     resources = ["*"]
