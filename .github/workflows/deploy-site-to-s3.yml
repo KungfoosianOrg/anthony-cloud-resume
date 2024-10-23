@@ -73,6 +73,8 @@ jobs:
         run: |
           aws s3 ls
 
+          aws s3 ls s3://${{ secrets.S3_BUCKET_NAME }}
+
           aws s3 sync ./${{ env.GITHUB_SRC_FOLDER }}/ s3://${{ secrets.S3_BUCKET_NAME }} \
                                                     --follow-symlinks \
                                                     --delete \
