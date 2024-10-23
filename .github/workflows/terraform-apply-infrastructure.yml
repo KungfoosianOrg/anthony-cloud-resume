@@ -99,11 +99,11 @@ jobs:
           s3_frontend_bucket_name=$(terraform output -raw s3_frontend_bucket_name)
           frontend_s3_need_upload="false"
           
-          if [ "$s3_frontend_bucket_name" != "${{ secrets.S3_BUCKET_NAME }}" ];
+          if [ "$s3_frontend_bucket_name" != "${{ vars.S3_BUCKET_NAME }}" ];
           then
             echo Updating front end s3 bucket name and uploads files...
             
-            gh secret set S3_BUCKET_NAME --body "$s3_frontend_bucket_name"
+            gh variable set S3_BUCKET_NAME --body "$s3_frontend_bucket_name"
             
             frontend_s3_need_upload="true"
           fi
