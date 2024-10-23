@@ -190,22 +190,22 @@ jobs:
       CLOUDFRONT_DISTRIBUTION_ID: ${{ needs.get-output-and-update-repo-secrets.outputs.new_cloudfront_distribution_id }}
 
 
-  upload_visitorcounter_lambda:
-    needs: [ get-output-and-update-repo-secrets ]
+  # upload_visitorcounter_lambda:
+  #   needs: [ get-output-and-update-repo-secrets ]
 
-    if: ${{ needs.get-output-and-update-repo-secrets.outputs.visitorcounter_lambda_need_upload == 'true' }}
+  #   if: ${{ needs.get-output-and-update-repo-secrets.outputs.visitorcounter_lambda_need_upload == 'true' }}
 
-    uses: ./.github/workflows/publish-visitorcounter_lambda.yml
+  #   uses: ./.github/workflows/publish-visitorcounter_lambda.yml
 
-    secrets: inherit
+  #   secrets: inherit
 
 
     
-  upload_slack_integration_lambda:
-    needs: [ get-output-and-update-repo-secrets ]
+  # upload_slack_integration_lambda:
+  #   needs: [ get-output-and-update-repo-secrets ]
 
-    if: ${{ needs.get-output-and-update-repo-secrets.outputs.slack_integration_lambda_need_upload == 'true' }}
+  #   if: ${{ needs.get-output-and-update-repo-secrets.outputs.slack_integration_lambda_need_upload == 'true' }}
 
-    uses: ./.github/workflows/publish-slack_integration_lambda.yml
+  #   uses: ./.github/workflows/publish-slack_integration_lambda.yml
 
-    secrets: inherit
+  #   secrets: inherit
