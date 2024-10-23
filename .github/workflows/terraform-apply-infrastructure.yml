@@ -40,9 +40,12 @@ jobs:
 
     outputs:
       visitorcounter_endpoint_need_update: ${{ steps.terraformOutput.outputs.visitorcounter_endpoint_need_update }}
-      frontend_s3_need_upload: ${{ steps.terraformOutput.frontend_s3_need_upload }}
-      visitorcounter_lambda_need_upload: ${{ steps.terraformOutput.visitorcounter_lambda_need_upload }}
-      slack_integration_lambda_need_upload: ${{ steps.terraformOutput.slack_integration_lambda_need_upload }}
+      frontend_s3_need_upload: ${{ steps.terraformOutput.outputs.frontend_s3_need_upload }}
+      visitorcounter_lambda_need_upload: ${{ steps.terraformOutput.outputs.visitorcounter_lambda_need_upload }}
+      slack_integration_lambda_need_upload: ${{ steps.terraformOutput.outputs.slack_integration_lambda_need_upload }}
+      new_aws_role_arn: ${{ steps.terraformOutput.outputs.new_aws_role_arn }}
+      new_s3_bucket_name: ${{ steps.terraformOutput.outputs.new_s3_bucket_name }}
+      new_cloudfront_distribution_id: ${{ steps.terraformOutput.outputs.new_cloudfront_distribution_id }}
 
     steps:
       - name: Install Terraform CLI
@@ -82,6 +85,8 @@ jobs:
           then
             echo Updating CloudFront distribution ID...
             gh secret set CLOUDFRONT_DISTRIBUTION_ID --body "$cfn_new_distro_id"
+
+            echo "new_cloudfront_distribution_id=$cfn_new_distro_id" >> "$GITHUB_OUTPUT"
           fi
           
           
@@ -92,6 +97,8 @@ jobs:
           then
             echo Updating ARN of role for GitHub Actions...
             gh secret set AWS_ROLE_ARN --body "$ghactions_aws_role_arn"
+
+            echo "new_aws_role_arn=$ghactions_aws_role_arn" >> "$GITHUB_OUTPUT"
           fi
           
           
@@ -99,11 +106,13 @@ jobs:
           s3_frontend_bucket_name=$(terraform output -raw s3_frontend_bucket_name)
           frontend_s3_need_upload="false"
           
-          if [ "$s3_frontend_bucket_name" != "${{ vars.S3_BUCKET_NAME }}" ];
+          if [ "$s3_frontend_bucket_name" != "${{ secrets.S3_BUCKET_NAME }}" ];
           then
             echo Updating front end s3 bucket name and uploads files...
             
-            gh variable set S3_BUCKET_NAME --body "$s3_frontend_bucket_name"
+            gh secret set S3_BUCKET_NAME --body "$s3_frontend_bucket_name"
+
+            echo "new_s3_bucket_name=$s3_frontend_bucket_name" >> "$GITHUB_OUTPUT"
             
             frontend_s3_need_upload="true"
           fi
@@ -173,7 +182,12 @@ jobs:
 
     uses: ./.github/workflows/deploy-site-to-s3.yml
 
-    # secrets: inherit
+    secrets:
+      AWS_STACK_REGION: ${{ secrets.AWS_STACK_REGION }}
+      AWS_ROLE_ARN: ${{ needs.get-output-and-update-repo-secrets.outputs.new_aws_role_arn }}
+      MY_GH_PERSONAL_ACCESS_TOKEN: ${{ secrets.MY_GH_PERSONAL_ACCESS_TOKEN }}
+      S3_BUCKET_NAME: ${{ needs.get-output-and-update-repo-secrets.outputs.new_s3_bucket_name }}
+      CLOUDFRONT_DISTRIBUTION_ID: ${{ needs.get-output-and-update-repo-secrets.outputs.new_cloudfront_distribution_id }}
 
 
   upload_visitorcounter_lambda:
