@@ -71,7 +71,7 @@ jobs:
       - name: sync files to aws s3
         shell: bash
         run: |
-          aws s3 ls
+          aws s3 ls --region ${{ secrets.AWS_STACK_REGION }}
 
           aws s3 ls s3://${{ secrets.S3_BUCKET_NAME }}
 
@@ -80,7 +80,8 @@ jobs:
                                                     --delete \
                                                     --exclude '.git/*' \
                                                     --exclude 'README.md' \
-                                                    --exclude '.github/*'
+                                                    --exclude '.github/*' \
+                                                    --region ${{ secrets.AWS_STACK_REGION }}
 
   
   create-cloudfront-invalidation:
