@@ -81,22 +81,26 @@ jobs:
 
           cfn_new_distro_id=$(terraform output -raw cloudfront_distribution_id)
 
+          echo "new_cloudfront_distribution_id=$cfn_new_distro_id" >> "$GITHUB_OUTPUT"
+
           if [ "$cfn_new_distro_id" != "${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}" ];
           then
             echo Updating CloudFront distribution ID...
             gh secret set CLOUDFRONT_DISTRIBUTION_ID --body "$cfn_new_distro_id"
 
-            echo "new_cloudfront_distribution_id=$cfn_new_distro_id" >> "$GITHUB_OUTPUT"
+            
           fi
           
           
           
           ghactions_aws_role_arn=$(terraform output -raw ghactions_aws_role_arn)
+
+          echo "new_aws_role_arn=$ghactions_aws_role_arn" >> "$GITHUB_OUTPUT"
           
           if [ "$ghactions_aws_role_arn" != "${{ secrets.AWS_ROLE_ARN }}" ];
           then
             echo Updating ARN of role for GitHub Actions...
-            echo "new_aws_role_arn=$ghactions_aws_role_arn" >> "$GITHUB_OUTPUT"
+            
             
             gh secret set AWS_ROLE_ARN --body "$ghactions_aws_role_arn"
           fi
@@ -105,12 +109,14 @@ jobs:
           
           s3_frontend_bucket_name=$(terraform output -raw s3_frontend_bucket_name)
           frontend_s3_need_upload="false"
+
+          echo "new_s3_bucket_name=$s3_frontend_bucket_name" >> "$GITHUB_OUTPUT"
           
           if [ "$s3_frontend_bucket_name" != "${{ secrets.S3_BUCKET_NAME }}" ];
           then
             echo Updating front end s3 bucket name and uploads files...
             
-            echo "new_s3_bucket_name=$s3_frontend_bucket_name" >> "$GITHUB_OUTPUT"
+            
             
             gh secret set S3_BUCKET_NAME --body "$s3_frontend_bucket_name"
             
