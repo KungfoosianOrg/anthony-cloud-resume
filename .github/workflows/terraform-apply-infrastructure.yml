@@ -173,6 +173,14 @@ jobs:
             echo "visitorcounter_lambda_need_upload=$visitorcounter_lambda_need_upload" >> "$GITHUB_OUTPUT"
           fi
 
+          if [ "$slack_integration_lambda_need_upload" = "true" ]; then
+            echo slack integration lambda need upload
+          fi
+
+          if [ "$visitorcounter_lambda_need_upload" = "true" ]; then
+            echo visitor counter lambda need upload
+          fi
+
 
 
   upload_to_frontend_s3_bucket:
@@ -182,34 +190,34 @@ jobs:
 
     uses: ./.github/workflows/deploy-site-to-s3.yml
 
-    secrets:
-      AWS_STACK_REGION: ${{ secrets.AWS_STACK_REGION }}
+    with:
       AWS_ROLE_ARN: ${{ needs.get-output-and-update-repo-secrets.outputs.new_aws_role_arn }}
-      MY_GH_PERSONAL_ACCESS_TOKEN: ${{ secrets.MY_GH_PERSONAL_ACCESS_TOKEN }}
       S3_BUCKET_NAME: ${{ needs.get-output-and-update-repo-secrets.outputs.new_s3_bucket_name }}
       CLOUDFRONT_DISTRIBUTION_ID: ${{ needs.get-output-and-update-repo-secrets.outputs.new_cloudfront_distribution_id }}
 
+    secrets: inherit
 
-  upload_visitorcounter_lambda:
-    needs: [ get-output-and-update-repo-secrets ]
 
-    if: ${{ needs.get-output-and-update-repo-secrets.outputs.visitorcounter_lambda_need_upload == 'true' }}
+  # upload_visitorcounter_lambda:
+  #   needs: [ get-output-and-update-repo-secrets ]
 
-    uses: ./.github/workflows/publish-visitorcounter_lambda.yml
+  #   if: ${{ needs.get-output-and-update-repo-secrets.outputs.visitorcounter_lambda_need_upload == 'true' }}
 
-    secrets:
-      AWS_STACK_REGION: ${{ secrets.AWS_STACK_REGION }}
-      AWS_ROLE_ARN: ${{ needs.get-output-and-update-repo-secrets.outputs.new_aws_role_arn }}
+  #   uses: ./.github/workflows/publish-visitorcounter_lambda.yml
+
+  #   secrets:
+  #     AWS_STACK_REGION: ${{ secrets.AWS_STACK_REGION }}
+  #     AWS_ROLE_ARN: ${{ needs.get-output-and-update-repo-secrets.outputs.new_aws_role_arn }}
 
 
     
-  upload_slack_integration_lambda:
-    needs: [ get-output-and-update-repo-secrets ]
+  # upload_slack_integration_lambda:
+  #   needs: [ get-output-and-update-repo-secrets ]
 
-    if: ${{ needs.get-output-and-update-repo-secrets.outputs.slack_integration_lambda_need_upload == 'true' }}
+  #   if: ${{ needs.get-output-and-update-repo-secrets.outputs.slack_integration_lambda_need_upload == 'true' }}
 
-    uses: ./.github/workflows/publish-slack_integration_lambda.yml
+  #   uses: ./.github/workflows/publish-slack_integration_lambda.yml
 
-    secrets:
-      AWS_STACK_REGION: ${{ secrets.AWS_STACK_REGION }}
-      AWS_ROLE_ARN: ${{ needs.get-output-and-update-repo-secrets.outputs.new_aws_role_arn }}
+  #   secrets:
+  #     AWS_STACK_REGION: ${{ secrets.AWS_STACK_REGION }}
+  #     AWS_ROLE_ARN: ${{ needs.get-output-and-update-repo-secrets.outputs.new_aws_role_arn }}
