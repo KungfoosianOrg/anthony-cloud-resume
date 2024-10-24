@@ -157,9 +157,9 @@ jobs:
             echo Updating ARN of Lambda for Slack integration...
             gh secret set SLACK_INTEGRATION_LAMBDA_ARN --body "$slack_integration_lambda_arn"
 
-            echo "slack_integration_lambda_need_upload=$slack_integration_lambda_need_upload" >> "$GITHUB_OUTPUT"
-            
             slack_integration_lambda_need_upload="true"
+            
+            echo "slack_integration_lambda_need_upload=$slack_integration_lambda_need_upload" >> "$GITHUB_OUTPUT"
           fi
 
           visitor_counter_lambda_arn=$(terraform output -raw visitor_counter-lambda_arn)
@@ -168,9 +168,9 @@ jobs:
             echo Updating ARN of Lambda for Slack integration...
             gh secret set VISITOR_COUNTER_LAMBDA_ARN --body "$visitor_counter_lambda_arn"
 
-            echo "visitorcounter_lambda_need_upload=$visitorcounter_lambda_need_upload" >> "$GITHUB_OUTPUT"
-            
             visitorcounter_lambda_need_upload="true"
+            
+            echo "visitorcounter_lambda_need_upload=$visitorcounter_lambda_need_upload" >> "$GITHUB_OUTPUT"
           fi
 
 
