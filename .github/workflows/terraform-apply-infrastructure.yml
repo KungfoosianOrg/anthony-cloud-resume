@@ -96,9 +96,9 @@ jobs:
           if [ "$ghactions_aws_role_arn" != "${{ secrets.AWS_ROLE_ARN }}" ];
           then
             echo Updating ARN of role for GitHub Actions...
-            gh secret set AWS_ROLE_ARN --body "$ghactions_aws_role_arn"
-
             echo "new_aws_role_arn=$ghactions_aws_role_arn" >> "$GITHUB_OUTPUT"
+            
+            gh secret set AWS_ROLE_ARN --body "$ghactions_aws_role_arn"
           fi
           
           
@@ -110,9 +110,9 @@ jobs:
           then
             echo Updating front end s3 bucket name and uploads files...
             
-            gh secret set S3_BUCKET_NAME --body "$s3_frontend_bucket_name"
-
             echo "new_s3_bucket_name=$s3_frontend_bucket_name" >> "$GITHUB_OUTPUT"
+            
+            gh secret set S3_BUCKET_NAME --body "$s3_frontend_bucket_name"
             
             frontend_s3_need_upload="true"
           fi
@@ -157,9 +157,9 @@ jobs:
             echo Updating ARN of Lambda for Slack integration...
             gh secret set SLACK_INTEGRATION_LAMBDA_ARN --body "$slack_integration_lambda_arn"
 
-            slack_integration_lambda_need_upload="true"
-
             echo "slack_integration_lambda_need_upload=$slack_integration_lambda_need_upload" >> "$GITHUB_OUTPUT"
+            
+            slack_integration_lambda_need_upload="true"
           fi
 
           visitor_counter_lambda_arn=$(terraform output -raw visitor_counter-lambda_arn)
@@ -168,9 +168,9 @@ jobs:
             echo Updating ARN of Lambda for Slack integration...
             gh secret set VISITOR_COUNTER_LAMBDA_ARN --body "$visitor_counter_lambda_arn"
 
-            visitorcounter_lambda_need_upload="true"
-
             echo "visitorcounter_lambda_need_upload=$visitorcounter_lambda_need_upload" >> "$GITHUB_OUTPUT"
+            
+            visitorcounter_lambda_need_upload="true"
           fi
 
 
