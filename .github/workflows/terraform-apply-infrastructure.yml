@@ -150,7 +150,7 @@ jobs:
             echo visitor counter endpoint need update
           fi
 
-
+          slack_integration_lambda_need_upload="false"
           slack_integration_lambda_arn=$(terraform output -raw slack_integration-lambda_arn)
           if [ "$slack_integration_lambda_arn" != "${{ secrets.SLACK_INTEGRATION_LAMBDA_ARN }}" ];
           then
@@ -162,6 +162,8 @@ jobs:
             echo "slack_integration_lambda_need_upload=$slack_integration_lambda_need_upload" >> "$GITHUB_OUTPUT"
           fi
 
+
+          visitorcounter_lambda_need_upload="false"
           visitor_counter_lambda_arn=$(terraform output -raw visitor_counter-lambda_arn)
           if [ "$visitor_counter_lambda_arn" != "${{ secrets.VISITOR_COUNTER_LAMBDA_ARN }}" ];
           then
