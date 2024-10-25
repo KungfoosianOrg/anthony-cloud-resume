@@ -237,6 +237,6 @@ jobs:
 
     with:
       AWS_ROLE_ARN: ${{ needs.get-output-and-update-repo-secrets.outputs.new_aws_role_arn }}
-      SLACK_INTEGRATION_LAMBDA_ARN: ${{ needs.get-output-and-update-repo-secrets.outputs.slack_integration_lambda_need_upload }}
+      SLACK_INTEGRATION_LAMBDA_ARN: ${{ needs.get-output-and-update-repo-secrets.outputs.new_slack_integration_lambda_arn }}
     
     secrets: inherit
