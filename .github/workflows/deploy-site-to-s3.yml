@@ -42,7 +42,72 @@ env:
 
 
 jobs:
-  deploy-to-aws:
+  deploy-to-aws-manual-call:
+    if: ${{ inputs.called_manually == 'true' }}
+    
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: checks out this repo 
+        uses: actions/checkout@v4
+
+      - name: validates HTML
+        uses: anishathalye/proof-html@v2
+        with:
+          directory: ./${{ env.GITHUB_SRC_FOLDER }}
+
+      - name: runs script tests
+        run: |
+          npm install
+          npm test
+
+      - name: get temporary AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ${{ secrets.AWS_STACK_REGION }}
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }} 
+          role-session-name: GHASession-anthony_cloud_resume
+          unset-current-credentials: true
+          retry-max-attempts: 3
+          output-credentials: true
+
+      
+      - name: verify temp credentials validity
+        run: |
+          aws sts get-caller-identity
+
+
+      - name: update visitor counter API's invocation URL
+        env:
+          GH_TOKEN: ${{ secrets.MY_GH_PERSONAL_ACCESS_TOKEN }}
+          
+        run: |
+          API_ENDPOINT_URL=$(gh variable get VISITOR_COUNTER_API_INVOKE_URL)
+          echo api url endpoint from GH CLI: $API_ENDPOINT_URL
+
+          sed -i "s%.*const VISITOR_COUNTER_API_INVOKE_URL.*%const VISITOR_COUNTER_API_INVOKE_URL='$API_ENDPOINT_URL'%" ./${{ env.GITHUB_SRC_FOLDER }}/scripts/visitorCounterModule.js
+
+
+      - name: sync files to aws s3
+        shell: bash
+        run: |
+          aws s3 ls --region ${{ secrets.AWS_STACK_REGION }}
+
+          aws s3 ls s3://${{ secrets.S3_BUCKET_NAME }} --debug --region ${{ secrets.AWS_STACK_REGION }}
+
+          aws s3 sync ./${{ env.GITHUB_SRC_FOLDER }}/ s3://${{ secrets.S3_BUCKET_NAME }} \
+                                                    --follow-symlinks \
+                                                    --delete \
+                                                    --exclude '.git/*' \
+                                                    --exclude 'README.md' \
+                                                    --exclude '.github/*' \
+                                                    --region ${{ secrets.AWS_STACK_REGION }} \
+                                                    --debug
+
+
+  deploy-to-aws-workflow-call:
+    if: ${{ inputs.called_manually == 'false' }}
+
     runs-on: ubuntu-latest
 
     outputs:
@@ -64,8 +129,7 @@ jobs:
           npm install
           npm test
 
-      - name: decrypt inputs (called from workflow)
-        if: ${{ inputs.called_manually == 'false' }}
+      - name: decrypt inputs
         id: inputDecrypt
         run: |
           AWS_ROLE_ARN=$(echo -n ${{ inputs.AWS_ROLE_ARN }} | base64 -d | gpg --decrypt --quiet --batch --passphrase ${{ secrets.GPG_PASSWORD }} --output - )
@@ -83,28 +147,7 @@ jobs:
           echo "CLOUDFRONT_DISTRIBUTION_ID=$CLOUDFRONT_DISTRIBUTION_ID" >> "$GITHUB_OUTPUT"
 
 
-
-      # - name: print out inputs to see if it's passed in correctly (remove step in prod)
-      #   if: ${{ inputs.called_manually == 'false' }}
-      #   run: |
-      #     echo ${{ inputs.AWS_ROLE_ARN }}
-      #     echo ${{ inputs.S3_BUCKET_NAME }}
-      #     echo ${{ inputs.CLOUDFRONT_DISTRIBUTION_ID }}
-
-
-      - name: get temporary AWS credentials (called manually)
-        if: ${{ inputs.called_manually == 'true' }}
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-region: ${{ secrets.AWS_STACK_REGION }}
-          role-to-assume: ${{ secrets.AWS_ROLE_ARN }} 
-          role-session-name: GHASession-anthony_cloud_resume
-          unset-current-credentials: true
-          retry-max-attempts: 3
-          output-credentials: true
-
-      - name: get temporary AWS credentials (called from workflow)
-        if: ${{ inputs.called_manually == 'false' }}
+      - name: get temporary AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-region: ${{ secrets.AWS_STACK_REGION }}
@@ -120,101 +163,85 @@ jobs:
           aws sts get-caller-identity
 
 
-      # - name: update visitor counter API's invocation URL
-      #   env:
-      #     GH_TOKEN: ${{ secrets.MY_GH_PERSONAL_ACCESS_TOKEN }}
+      - name: update visitor counter API's invocation URL
+        env:
+          GH_TOKEN: ${{ secrets.MY_GH_PERSONAL_ACCESS_TOKEN }}
           
-      #   run: |
-      #     API_ENDPOINT_URL=$(gh variable get VISITOR_COUNTER_API_INVOKE_URL)
-      #     echo api url endpoint from GH CLI: $API_ENDPOINT_URL
+        run: |
+          API_ENDPOINT_URL=$(gh variable get VISITOR_COUNTER_API_INVOKE_URL)
+          echo api url endpoint from GH CLI: $API_ENDPOINT_URL
 
-      #     sed -i "s%.*const VISITOR_COUNTER_API_INVOKE_URL.*%const VISITOR_COUNTER_API_INVOKE_URL='$API_ENDPOINT_URL'%" ./${{ env.GITHUB_SRC_FOLDER }}/scripts/visitorCounterModule.js
-
-
-      # - name: sync files to aws s3 (called manually)
-      #   if: ${{ inputs.called_manually == 'true' }}
-      #   shell: bash
-      #   run: |
-      #     aws s3 ls --region ${{ secrets.AWS_STACK_REGION }}
-
-      #     aws s3 ls s3://${{ secrets.S3_BUCKET_NAME }} --debug --region ${{ secrets.AWS_STACK_REGION }}
-
-      #     aws s3 sync ./${{ env.GITHUB_SRC_FOLDER }}/ s3://${{ secrets.S3_BUCKET_NAME }} \
-      #                                               --follow-symlinks \
-      #                                               --delete \
-      #                                               --exclude '.git/*' \
-      #                                               --exclude 'README.md' \
-      #                                               --exclude '.github/*' \
-      #                                               --region ${{ secrets.AWS_STACK_REGION }} \
-      #                                               --debug
+          sed -i "s%.*const VISITOR_COUNTER_API_INVOKE_URL.*%const VISITOR_COUNTER_API_INVOKE_URL='$API_ENDPOINT_URL'%" ./${{ env.GITHUB_SRC_FOLDER }}/scripts/visitorCounterModule.js
 
 
-      # - name: sync files to aws s3 (called from workflow)
-      #   if: ${{ inputs.called_manually == 'false' }}
-      #   shell: bash
-      #   run: |
-      #     aws s3 ls --region ${{ secrets.AWS_STACK_REGION }}
+      - name: sync files to aws s3
+        shell: bash
+        run: |
+          aws s3 ls --region ${{ secrets.AWS_STACK_REGION }}
 
-      #     aws s3 ls s3://${{ steps.inputDecrypt.outputs.S3_BUCKET_NAME }} --debug --region ${{ secrets.AWS_STACK_REGION }}
+          aws s3 ls s3://${{ steps.inputDecrypt.outputs.S3_BUCKET_NAME }} --debug --region ${{ secrets.AWS_STACK_REGION }}
 
-      #     aws s3 sync ./${{ env.GITHUB_SRC_FOLDER }}/ s3://${{ steps.inputDecrypt.outputs.S3_BUCKET_NAME }} \
-      #                                               --follow-symlinks \
-      #                                               --delete \
-      #                                               --exclude '.git/*' \
-      #                                               --exclude 'README.md' \
-      #                                               --exclude '.github/*' \
-      #                                               --region ${{ secrets.AWS_STACK_REGION }} \
-      #                                               --debug
+          aws s3 sync ./${{ env.GITHUB_SRC_FOLDER }}/ s3://${{ steps.inputDecrypt.outputs.S3_BUCKET_NAME }} \
+                                                    --follow-symlinks \
+                                                    --delete \
+                                                    --exclude '.git/*' \
+                                                    --exclude 'README.md' \
+                                                    --exclude '.github/*' \
+                                                    --region ${{ secrets.AWS_STACK_REGION }} \
+                                                    --debug
+
+
+  create-cloudfront-invalidation-manual-call:
+    needs: [ deploy-to-aws-manual-call ]
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: get temporary AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ${{ secrets.AWS_STACK_REGION }}
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }} 
+          role-session-name: GHASession-anthony_cloud_resume
+          unset-current-credentials: true
+          retry-max-attempts: 3
+          output-credentials: true
+              
+      - name: verify temp credentials validity
+        run: |
+          aws sts get-caller-identity    
+
+      - name: refresh_cloudfront_scripts_path
+        run: |
+          aws cloudfront create-invalidation \
+              --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
+              --region ${{ secrets.AWS_STACK_REGION }} \
+              --paths "${{ env.VISITOR_COUNTER_MODULE_PATH }}"
 
   
-  # create-cloudfront-invalidation:
-  #   needs: [ deploy-to-aws ]
+  create-cloudfront-invalidation-workflow-call:
+    needs: [ deploy-to-aws-workflow-call ]
 
-  #   runs-on: ubuntu-latest
+    runs-on: ubuntu-latest
 
-  #   steps:
-  #     - name: get temporary AWS credentials (called manually)
-  #       if: ${{ inputs.called_manually == 'true' }}
-  #       uses: aws-actions/configure-aws-credentials@v4
-  #       with:
-  #         aws-region: ${{ secrets.AWS_STACK_REGION }}
-  #         role-to-assume: ${{ secrets.AWS_ROLE_ARN }} 
-  #         role-session-name: GHASession-anthony_cloud_resume
-  #         unset-current-credentials: true
-  #         retry-max-attempts: 3
-  #         output-credentials: true
-
-  #     - name: get temporary AWS credentials (called from workflow)
-  #       if: ${{ inputs.called_manually == 'false' }}
-  #       uses: aws-actions/configure-aws-credentials@v4
-  #       with:
-  #         aws-region: ${{ secrets.AWS_STACK_REGION }}
-  #         role-to-assume: ${{ needs.deploy-to-aws.outputs.AWS_ROLE_ARN }} 
-  #         role-session-name: GHASession-anthony_cloud_resume
-  #         unset-current-credentials: true
-  #         retry-max-attempts: 3
-  #         output-credentials: true
+    steps:
+      - name: get temporary AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ${{ secrets.AWS_STACK_REGION }}
+          role-to-assume: ${{ needs.deploy-to-aws-workflow-call.outputs.AWS_ROLE_ARN }} 
+          role-session-name: GHASession-anthony_cloud_resume
+          unset-current-credentials: true
+          retry-max-attempts: 3
+          output-credentials: true
               
-  #     - name: verify temp credentials validity
-  #       run: |
-  #         aws sts get-caller-identity    
+      - name: verify temp credentials validity
+        run: |
+          aws sts get-caller-identity    
 
-  #     - name: refresh_cloudfront_scripts_path (called manually)
-  #       if: ${{ inputs.called_manually == 'true' }}
-  #       run: |
-  #         aws cloudfront create-invalidation \
-  #             --distribution-id ${{ needs.deploy-to-aws.outputs.CLOUDFRONT_DISTRIBUTION_ID }} \
-  #             --region ${{ secrets.AWS_STACK_REGION }} \
-  #             --paths "${{ env.VISITOR_COUNTER_MODULE_PATH }}"
-
-  #     - name: refresh_cloudfront_scripts_path (called from workflow)
-  #       if: ${{ inputs.called_manually == 'false' }}
-  #       run: |
-  #         aws cloudfront create-invalidation \
-  #             --distribution-id ${{ needs.deploy-to-aws.outputs.CLOUDFRONT_DISTRIBUTION_ID }} \
-  #             --region ${{ secrets.AWS_STACK_REGION }} \
-  #             --paths "${{ env.VISITOR_COUNTER_MODULE_PATH }}"
-
-                                                  
-
-        
+      - name: refresh_cloudfront_scripts_path
+        run: |
+          aws cloudfront create-invalidation \
+              --distribution-id ${{ needs.deploy-to-aws-workflow-call.outputs.CLOUDFRONT_DISTRIBUTION_ID }} \
+              --region ${{ secrets.AWS_STACK_REGION }} \
+              --paths "${{ env.VISITOR_COUNTER_MODULE_PATH }}"
