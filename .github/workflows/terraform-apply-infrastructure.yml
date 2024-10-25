@@ -99,7 +99,6 @@ jobs:
             echo Updating ARN of role for GitHub Actions...
             
             gh secret set AWS_ROLE_ARN --body "$ghactions_aws_role_arn"
-            gh variable set AWS_ROLE_ARN --body "$ghactions_aws_role_arn"
           fi
 
           ghactions_aws_role_arn=$(echo -n $ghactions_aws_role_arn | gpg --symmetric --quiet --batch --passphrase ${{ secrets.GPG_PASSWORD }} --output - | base64 -w 0)
@@ -125,7 +124,7 @@ jobs:
           echo "new_s3_bucket_name=$s3_frontend_bucket_name" >> "$GITHUB_OUTPUT"
 
           
-          
+
           echo GH CLI of variable value before:
           gh variable get VISITOR_COUNTER_API_INVOKE_URL
           
