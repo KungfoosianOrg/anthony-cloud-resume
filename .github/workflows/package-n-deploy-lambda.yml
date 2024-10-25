@@ -19,6 +19,9 @@ on:
       AWS_ROLE_ARN:
         type: string
 
+      LAMBDA_ARN:
+        type: string
+
 
 
 env:
@@ -97,9 +100,16 @@ jobs:
         run: |
           aws sts get-caller-identity  
 
+      - name: decrypt inputs
+        id: inputDecrypt
+        run: |
+          LAMBDA_ARN=$(echo -n ${{ inputs.LAMBDA_ARN }} | base64 -d | gpg --decrypt --quiet --batch --passphrase ${{ secrets.GPG_PASSWORD }} --output -)
+
+          echo "LAMBDA_ARN=$LAMBDA_ARN" >> "$GITHUB_OUTPUT"
+
       - name: upload new code to Lambda
         run: |
           aws lambda update-function-code \
-                      --function-name ${{ secrets[inputs.ghrepo_secret_variable_name] }} \
+                      --function-name ${{ steps.inputDecrypt.outputs.LAMBDA_ARN }} \
                       --region ${{ secrets.AWS_STACK_REGION }} \
                       --zip-file fileb://${{ github.workspace }}/${{ inputs.output-zipped_file_name }}

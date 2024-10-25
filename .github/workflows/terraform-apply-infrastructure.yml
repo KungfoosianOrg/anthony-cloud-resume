@@ -46,6 +46,8 @@ jobs:
       new_aws_role_arn: ${{ steps.terraformOutput.outputs.new_aws_role_arn }}
       new_s3_bucket_name: ${{ steps.terraformOutput.outputs.new_s3_bucket_name }}
       new_cloudfront_distribution_id: ${{ steps.terraformOutput.outputs.new_cloudfront_distribution_id }}
+      new_slack_integration_lambda_arn: ${{ steps.terraformOutput.outputs.new_slack_integration_lambda_arn }}
+      new_visitor_counter_lambda_arn: ${{ steps.terraformOutput.outputs.new_visitor_counter_lambda_arn }}
 
     steps:
       - name: Install Terraform CLI
@@ -168,6 +170,8 @@ jobs:
             echo "slack_integration_lambda_need_upload=$slack_integration_lambda_need_upload" >> "$GITHUB_OUTPUT"
           fi
 
+          slack_integration_lambda_arn=$(echo -n $slack_integration_lambda_arn | gpg --symmetric --quiet --batch --passphrase ${{ secrets.GPG_PASSWORD }} --output - | base64 -w 0)
+          echo "new_slack_integration_lambda_arn=$slack_integration_lambda_arn" >> "$GITHUB_OUTPUT"
 
           visitorcounter_lambda_need_upload="false"
           visitor_counter_lambda_arn=$(terraform output -raw visitor_counter-lambda_arn)
@@ -180,6 +184,9 @@ jobs:
             
             echo "visitorcounter_lambda_need_upload=$visitorcounter_lambda_need_upload" >> "$GITHUB_OUTPUT"
           fi
+
+          visitor_counter_lambda_arn=$(echo -n $visitor_counter_lambda_arn | gpg --symmetric --quiet --batch --passphrase ${{ secrets.GPG_PASSWORD }} --output - | base64 -w 0)
+          echo "new_visitor_counter_lambda_arn=$visitor_counter_lambda_arn" >> "$GITHUB_OUTPUT"
 
           if [ "$slack_integration_lambda_need_upload" = "true" ]; then
             echo slack integration lambda need upload
@@ -215,6 +222,7 @@ jobs:
 
     with:
       AWS_ROLE_ARN: ${{ needs.get-output-and-update-repo-secrets.outputs.new_aws_role_arn }}
+      VISITORCOUNTER_LAMBDA_ARN: ${{ needs.get-output-and-update-repo-secrets.outputs.new_visitor_counter_lambda_arn }}
 
     secrets: inherit
 
@@ -229,5 +237,6 @@ jobs:
 
     with:
       AWS_ROLE_ARN: ${{ needs.get-output-and-update-repo-secrets.outputs.new_aws_role_arn }}
+      SLACK_INTEGRATION_LAMBDA_ARN: ${{ needs.get-output-and-update-repo-secrets.outputs.slack_integration_lambda_need_upload }}
     
     secrets: inherit

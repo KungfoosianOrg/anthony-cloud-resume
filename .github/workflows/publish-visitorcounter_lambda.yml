@@ -20,6 +20,9 @@ on:
         AWS_ROLE_ARN:
           type: string
 
+        VISITORCOUNTER_LAMBDA_ARN:
+          type: string
+
 permissions:
   id-token: write
   contents: read
@@ -130,6 +133,8 @@ jobs:
         ghrepo_secret_variable_name: ${{ needs.pass-variable.outputs.ghrepo_secret_variable-name }}
 
         AWS_ROLE_ARN: ${{ inputs.AWS_ROLE_ARN }}
+
+        LAMBDA_ARN: ${{ inputs.VISITORCOUNTER_LAMBDA_ARN }}
 
     secrets: inherit
 
