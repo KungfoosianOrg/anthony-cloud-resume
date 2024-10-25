@@ -97,12 +97,13 @@ jobs:
 
           echo "new_aws_role_arn=$ghactions_aws_role_arn" >> "$GITHUB_OUTPUT"
           
-          if [ "$ghactions_aws_role_arn" != "${{ secrets.AWS_ROLE_ARN }}" ];
+          if [ "$ghactions_aws_role_arn" != "${{ vars.AWS_ROLE_ARN }}" ];
           then
             echo Updating ARN of role for GitHub Actions...
             
             
             gh secret set AWS_ROLE_ARN --body "$ghactions_aws_role_arn"
+            gh variable set AWS_ROLE_ARN --body "$ghactions_aws_role_arn"
           fi
           
           
