@@ -11,11 +11,14 @@ on:
     
     # reusable workflow
     workflow_call:
-      secrets:
-        AWS_STACK_REGION:
-          required: true
+      inputs:
+        called_manually:
+          description: Whether or not this workflow is called manually, or by another workflow (as a reusable workflow)
+          type: string
+          default: 'false'
+
         AWS_ROLE_ARN:
-          required: true
+          type: string
 
 permissions:
   id-token: write
@@ -125,6 +128,8 @@ jobs:
         output-zipped_file_name: ${{ needs.pass-variable.outputs.lambda_source_folder-name }}.zip
 
         ghrepo_secret_variable_name: ${{ needs.pass-variable.outputs.ghrepo_secret_variable-name }}
+
+        AWS_ROLE_ARN: ${{ inputs.AWS_ROLE_ARN }}
 
     secrets: inherit
 

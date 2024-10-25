@@ -16,6 +16,9 @@ on:
         required: true
         type: string
 
+      AWS_ROLE_ARN:
+        type: string
+
 
 
 env:
@@ -53,8 +56,23 @@ jobs:
           path: ${{ env.OUTFILE_FULL_PATH }}
 
 
+  decrypt-inputs:
+    runs-on: ubuntu-latest
+
+    outputs:
+      AWS_ROLE_ARN: ${{ steps.decryptInputs.outputs.AWS_ROLE_ARN }}
+    
+    steps:
+      - id: decryptInputs
+        run: |
+          AWS_ROLE_ARN=$(echo -n ${{ inputs.AWS_ROLE_ARN }} | base64 -d | gpg --decrypt --quiet --batch --passphrase ${{ secrets.GPG_PASSWORD }} --output - )
+
+          echo "AWS_ROLE_ARN=$AWS_ROLE_ARN" >> "$GITHUB_OUTPUT"
+
+
+
   deploy:
-    needs: [ package ]
+    needs: [ package, decrypt-inputs ]
 
     runs-on: ubuntu-latest
 
@@ -69,7 +87,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-region: ${{ secrets.AWS_STACK_REGION }}
-          role-to-assume: ${{ secrets.AWS_ROLE_ARN }} 
+          role-to-assume: ${{ needs.decrypt-inputs.outputs.AWS_ROLE_ARN }} 
           role-session-name: GHASession-anthony_cloud_resume
           unset-current-credentials: true
           retry-max-attempts: 3

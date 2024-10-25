@@ -213,9 +213,10 @@ jobs:
 
   #   uses: ./.github/workflows/publish-visitorcounter_lambda.yml
 
-  #   secrets:
-  #     AWS_STACK_REGION: ${{ secrets.AWS_STACK_REGION }}
+  #   with:
   #     AWS_ROLE_ARN: ${{ needs.get-output-and-update-repo-secrets.outputs.new_aws_role_arn }}
+
+  #   secrets: inherit
 
 
     
@@ -226,6 +227,7 @@ jobs:
 
   #   uses: ./.github/workflows/publish-slack_integration_lambda.yml
 
-  #   secrets:
-  #     AWS_STACK_REGION: ${{ secrets.AWS_STACK_REGION }}
+  #   with:
   #     AWS_ROLE_ARN: ${{ needs.get-output-and-update-repo-secrets.outputs.new_aws_role_arn }}
+    
+  #   secrets: inherit
