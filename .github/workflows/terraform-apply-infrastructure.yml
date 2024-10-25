@@ -80,50 +80,50 @@ jobs:
           terraform init
 
           cfn_new_distro_id=$(terraform output -raw cloudfront_distribution_id)
-
-          echo "new_cloudfront_distribution_id=$cfn_new_distro_id" >> "$GITHUB_OUTPUT"
-
+          
           if [ "$cfn_new_distro_id" != "${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}" ];
           then
             echo Updating CloudFront distribution ID...
             gh secret set CLOUDFRONT_DISTRIBUTION_ID --body "$cfn_new_distro_id"
-
-            
           fi
+
+          cfn_new_distro_id=$(echo -n $cfn_new_distro_id | gpg --symmetric --quiet --batch --passphrase ${{ secrets.GPG_PASSWORD }} --output - | base64 -w 0)
           
+          echo "new_cloudfront_distribution_id=$cfn_new_distro_id" >> "$GITHUB_OUTPUT"
           
           
           ghactions_aws_role_arn=$(terraform output -raw ghactions_aws_role_arn)
 
-          echo "new_aws_role_arn=$ghactions_aws_role_arn" >> "$GITHUB_OUTPUT"
-          
           if [ "$ghactions_aws_role_arn" != "${{ vars.AWS_ROLE_ARN }}" ];
           then
             echo Updating ARN of role for GitHub Actions...
             
-            
             gh secret set AWS_ROLE_ARN --body "$ghactions_aws_role_arn"
             gh variable set AWS_ROLE_ARN --body "$ghactions_aws_role_arn"
           fi
+
+          ghactions_aws_role_arn=$(echo -n $ghactions_aws_role_arn | gpg --symmetric --quiet --batch --passphrase ${{ secrets.GPG_PASSWORD }} --output - | base64 -w 0)
+          
+          echo "new_aws_role_arn=$ghactions_aws_role_arn" >> "$GITHUB_OUTPUT"
           
           
-          
+
           s3_frontend_bucket_name=$(terraform output -raw s3_frontend_bucket_name)
           frontend_s3_need_upload="false"
 
-          echo "new_s3_bucket_name=$s3_frontend_bucket_name" >> "$GITHUB_OUTPUT"
-          
           if [ "$s3_frontend_bucket_name" != "${{ secrets.S3_BUCKET_NAME }}" ];
           then
             echo Updating front end s3 bucket name and uploads files...
-            
-            
-            
+          
             gh secret set S3_BUCKET_NAME --body "$s3_frontend_bucket_name"
             
             frontend_s3_need_upload="true"
           fi
+
+          s3_frontend_bucket_name=$(echo -n $s3_frontend_bucket_name | gpg --symmetric --quiet --batch --passphrase ${{ secrets.GPG_PASSWORD }} --output - | base64 -w 0)
           
+          echo "new_s3_bucket_name=$s3_frontend_bucket_name" >> "$GITHUB_OUTPUT"
+
           
           
           echo GH CLI of variable value before:

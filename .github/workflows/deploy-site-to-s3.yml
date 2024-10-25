@@ -45,6 +45,11 @@ jobs:
   deploy-to-aws:
     runs-on: ubuntu-latest
 
+    outputs:
+      AWS_ROLE_ARN: ${{ steps.inputDecrypt.outputs.AWS_ROLE_ARN }}
+      S3_BUCKET_NAME: ${{ steps.inputDecrypt.outputs.S3_BUCKET_NAME }}
+      CLOUDFRONT_DISTRIBUTION_ID: ${{ steps.inputDecrypt.outputs.CLOUDFRONT_DISTRIBUTION_ID }}
+
     steps:
       - name: checks out this repo 
         uses: actions/checkout@v4
@@ -59,40 +64,60 @@ jobs:
           npm install
           npm test
 
-      - name: print out inputs to see if it's passed in correctly (remove step in prod)
+      - name: decrypt inputs (called from workflow)
         if: ${{ inputs.called_manually == 'false' }}
+        id: inputDecrypt
         run: |
-          echo ${{ inputs.AWS_ROLE_ARN }}
-          echo ${{ inputs.S3_BUCKET_NAME }}
-          echo ${{ inputs.CLOUDFRONT_DISTRIBUTION_ID }}
+          AWS_ROLE_ARN=$(echo -n ${{ inputs.AWS_ROLE_ARN }} | base64 -d | gpg --decrypt --quiet --batch --passphrase ${{ secrets.GPG_PASSWORD }} --output - )
+
+          echo "AWS_ROLE_ARN=$AWS_ROLE_ARN" >> "$GITHUB_OUTPUT"
 
 
-      # - name: get temporary AWS credentials (called manually)
-      #   if: ${{ inputs.called_manually == 'true' }}
-      #   uses: aws-actions/configure-aws-credentials@v4
-      #   with:
-      #     aws-region: ${{ secrets.AWS_STACK_REGION }}
-      #     role-to-assume: ${{ secrets.AWS_ROLE_ARN }} 
-      #     role-session-name: GHASession-anthony_cloud_resume
-      #     unset-current-credentials: true
-      #     retry-max-attempts: 3
-      #     output-credentials: true
+          S3_BUCKET_NAME=$(echo -n ${{ inputs.S3_BUCKET_NAME }} | base64 -d | gpg --decrypt --quiet --batch --passphrase ${{ secrets.GPG_PASSWORD }} --output - )
 
-      # - name: get temporary AWS credentials (called from workflow)
+          echo "S3_BUCKET_NAME=$S3_BUCKET_NAME" >> "$GITHUB_OUTPUT"
+
+
+          CLOUDFRONT_DISTRIBUTION_ID=$(echo -n ${{ inputs.CLOUDFRONT_DISTRIBUTION_ID }} | base64 -d | gpg --decrypt --quiet --batch --passphrase ${{ secrets.GPG_PASSWORD }} --output - )
+
+          echo "CLOUDFRONT_DISTRIBUTION_ID=$CLOUDFRONT_DISTRIBUTION_ID" >> "$GITHUB_OUTPUT"
+
+
+
+      # - name: print out inputs to see if it's passed in correctly (remove step in prod)
       #   if: ${{ inputs.called_manually == 'false' }}
-      #   uses: aws-actions/configure-aws-credentials@v4
-      #   with:
-      #     aws-region: ${{ secrets.AWS_STACK_REGION }}
-      #     role-to-assume: ${{ inputs.AWS_ROLE_ARN }} 
-      #     role-session-name: GHASession-anthony_cloud_resume
-      #     unset-current-credentials: true
-      #     retry-max-attempts: 3
-      #     output-credentials: true
+      #   run: |
+      #     echo ${{ inputs.AWS_ROLE_ARN }}
+      #     echo ${{ inputs.S3_BUCKET_NAME }}
+      #     echo ${{ inputs.CLOUDFRONT_DISTRIBUTION_ID }}
+
+
+      - name: get temporary AWS credentials (called manually)
+        if: ${{ inputs.called_manually == 'true' }}
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ${{ secrets.AWS_STACK_REGION }}
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }} 
+          role-session-name: GHASession-anthony_cloud_resume
+          unset-current-credentials: true
+          retry-max-attempts: 3
+          output-credentials: true
+
+      - name: get temporary AWS credentials (called from workflow)
+        if: ${{ inputs.called_manually == 'false' }}
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ${{ secrets.AWS_STACK_REGION }}
+          role-to-assume: ${{ steps.inputDecrypt.outputs.AWS_ROLE_ARN }} 
+          role-session-name: GHASession-anthony_cloud_resume
+          unset-current-credentials: true
+          retry-max-attempts: 3
+          output-credentials: true
 
       
-      # - name: verify temp credentials validity
-      #   run: |
-      #     aws sts get-caller-identity
+      - name: verify temp credentials validity
+        run: |
+          aws sts get-caller-identity
 
 
       # - name: update visitor counter API's invocation URL
@@ -130,9 +155,9 @@ jobs:
       #   run: |
       #     aws s3 ls --region ${{ secrets.AWS_STACK_REGION }}
 
-      #     aws s3 ls s3://${{ inputs.S3_BUCKET_NAME }} --debug --region ${{ secrets.AWS_STACK_REGION }}
+      #     aws s3 ls s3://${{ steps.inputDecrypt.outputs.S3_BUCKET_NAME }} --debug --region ${{ secrets.AWS_STACK_REGION }}
 
-      #     aws s3 sync ./${{ env.GITHUB_SRC_FOLDER }}/ s3://${{ inputs.S3_BUCKET_NAME }} \
+      #     aws s3 sync ./${{ env.GITHUB_SRC_FOLDER }}/ s3://${{ steps.inputDecrypt.outputs.S3_BUCKET_NAME }} \
       #                                               --follow-symlinks \
       #                                               --delete \
       #                                               --exclude '.git/*' \
@@ -164,7 +189,7 @@ jobs:
   #       uses: aws-actions/configure-aws-credentials@v4
   #       with:
   #         aws-region: ${{ secrets.AWS_STACK_REGION }}
-  #         role-to-assume: ${{ inputs.AWS_ROLE_ARN }} 
+  #         role-to-assume: ${{ needs.deploy-to-aws.outputs.AWS_ROLE_ARN }} 
   #         role-session-name: GHASession-anthony_cloud_resume
   #         unset-current-credentials: true
   #         retry-max-attempts: 3
@@ -178,7 +203,7 @@ jobs:
   #       if: ${{ inputs.called_manually == 'true' }}
   #       run: |
   #         aws cloudfront create-invalidation \
-  #             --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
+  #             --distribution-id ${{ needs.deploy-to-aws.outputs.CLOUDFRONT_DISTRIBUTION_ID }} \
   #             --region ${{ secrets.AWS_STACK_REGION }} \
   #             --paths "${{ env.VISITOR_COUNTER_MODULE_PATH }}"
 
@@ -186,7 +211,7 @@ jobs:
   #       if: ${{ inputs.called_manually == 'false' }}
   #       run: |
   #         aws cloudfront create-invalidation \
-  #             --distribution-id ${{ inputs.CLOUDFRONT_DISTRIBUTION_ID }} \
+  #             --distribution-id ${{ needs.deploy-to-aws.outputs.CLOUDFRONT_DISTRIBUTION_ID }} \
   #             --region ${{ secrets.AWS_STACK_REGION }} \
   #             --paths "${{ env.VISITOR_COUNTER_MODULE_PATH }}"
 
