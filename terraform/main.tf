@@ -35,6 +35,8 @@ module "sam-s3-cloudfront-static-site-hsts" {
   route53_hosted_zone_id  = var.route53_hosted_zone_id == "" ? aws_route53_zone.primary[0].id : var.route53_hosted_zone_id
   ghactions_aws_role_name = module.github-ci-cd.ghactions_oidc_role_name
   acm_certificate_arn     = module.route53-cloudfront-alias-w-ssl-validation.acm_certificate_arn
+  apigw_endpoint_url = "${module.visitor_counter.visitor_counter-api_invoke_url}/${var.visitor_counter-api_route_key}"
+
 
   aws_cicd_role-name = module.github-ci-cd.ghactions_oidc_role_name
 
