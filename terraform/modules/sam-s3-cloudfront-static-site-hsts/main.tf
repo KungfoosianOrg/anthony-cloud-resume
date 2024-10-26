@@ -274,19 +274,13 @@ data "aws_iam_policy_document" "cicd-permissions" {
     ]
   }
 
-  statement {
-    sid = "testS3ListAllBuckets"
-
-    actions = [ "s3:ListAllMyBuckets" ]
-
-    resources = [ "*" ]
-  }
 
   statement {
     sid = "CfnPermissions"
 
     actions = [ 
-      "cloudfront:CreateInvalidation"
+      "cloudfront:CreateInvalidation",
+      "cloudfront:UpdateResponseHeadersPolicy"
     ]
 
     resources = [
