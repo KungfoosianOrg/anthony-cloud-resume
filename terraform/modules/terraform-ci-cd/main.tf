@@ -145,6 +145,7 @@ data "aws_iam_policy_document" "terraform_oidc_permissions" {
       "cloudfront:DeleteResponseHeadersPolicy",
       "cloudfront:DeleteDistribution",
       "cloudfront:UpdateDistribution",
+      "cloudfront:UpdateResponseHeadersPolicy",
       "cloudfront:GetResponseHeadersPolicy",
       "cloudfront:GetOriginAccessControl",
       "cloudfront:GetDistribution",
