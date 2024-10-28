@@ -56,7 +56,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - env:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Reset repo secrets & variables
+        env:
           GH_TOKEN: ${{ secrets.MANUAL_GITHUB_PERSONAL_ACCESS_TOKEN }}
         run: |
           gh secret set AWS_CLOUDFRONT_DISTRIBUTION_ID --body "reset"
