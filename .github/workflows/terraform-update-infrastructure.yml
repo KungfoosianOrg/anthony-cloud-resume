@@ -56,7 +56,7 @@ jobs:
       - name: Install Terraform CLI
         uses: hashicorp/setup-terraform@v3
         with:
-          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+          cli_config_credentials_token: ${{ secrets.MANUAL_TF_API_TOKEN }}
 
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -93,7 +93,7 @@ jobs:
         timeout-minutes: 5 # just in case the action's timeout doesn't work
         uses: trstringer/manual-approval@v1
         with:
-          secret: ${{ secrets.MY_GH_PERSONAL_ACCESS_TOKEN }}
+          secret: ${{ secrets.MANUAL_GITHUB_PERSONAL_ACCESS_TOKEN }}
           timeout-minutes: 5
           approvers: Kungfoosian
           minimum-approvals: 1

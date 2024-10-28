@@ -15,8 +15,8 @@ jobs:
       - name: get temporary AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-region: ${{ secrets.AWS_STACK_REGION }}
-          role-to-assume: ${{ secrets.AWS_ROLE_ARN }} 
+          aws-region: ${{ secrets.MANUAL_AWS_DEPLOY_REGION }}
+          role-to-assume: ${{ secrets.AWS_GITHUB_ROLE_ARN }} 
           role-session-name: GHASession-anthony_cloud_resume
           unset-current-credentials: true
           retry-max-attempts: 3
@@ -29,7 +29,7 @@ jobs:
 
       - name: empty frontend S3 bucket
         run: |
-          aws s3 rm s3://${{ secrets.S3_BUCKET_NAME }} --recursive
+          aws s3 rm s3://${{ secrets.AWS_S3_BUCKET_NAME }} --recursive
 
 
 

@@ -31,7 +31,7 @@ env:
   # ENV_STACK_NAME: my-sam-stack
   VISITOR_COUNTER_MODULE_PATH: /scripts/visitorCounterModule.js
   lambda_source_folder-name: visitorCounter
-  ghrepo_secret_variable_name: VISITOR_COUNTER_LAMBDA_ARN
+  ghrepo_secret_variable_name: AWS_VISITOR_COUNTER_LAMBDA_ARN
 
 
 jobs:
@@ -92,13 +92,13 @@ jobs:
   #         echo Set App production name, region, and corresponding S3 bucket
   #         sed -i 's/.*stack_name.*/stack_name = "${{ secrets.AWS_SAM_STACK_NAME }}"/' ./samconfig.toml
   #         sed -i 's/.*s3_prefix.*/s3_prefix = "${{ secrets.AWS_SAM_STACK_NAME }}"/' ./samconfig.toml
-  #         sed -i 's/.*region.*/region = "${{ secrets.AWS_STACK_REGION }}"/' ./samconfig.toml
+  #         sed -i 's/.*region.*/region = "${{ secrets.MANUAL_AWS_DEPLOY_REGION }}"/' ./samconfig.toml
 
   #     - name: get temporary AWS credentials
   #       uses: aws-actions/configure-aws-credentials@v4
   #       with:
-  #         aws-region: ${{ secrets.AWS_STACK_REGION }}
-  #         role-to-assume: ${{ secrets.AWS_ROLE_ARN }} 
+  #         aws-region: ${{ secrets.MANUAL_AWS_DEPLOY_REGION }}
+  #         role-to-assume: ${{ secrets.AWS_GITHUB_ROLE_ARN }} 
   #         role-session-name: GHASession-anthony_cloud_resume
   #         unset-current-credentials: true
   #         retry-max-attempts: 3
@@ -115,7 +115,7 @@ jobs:
   #         echo "export SAM_CLI_TELEMETRY=0" >> ~/.profile
   #         source ~/.profile
           
-  #         sam deploy --parameter-overrides 'SubscriberEmailParam=${{ secrets.SNS_ALERT_EMAIL }} \
+  #         sam deploy --parameter-overrides 'SubscriberEmailParam=${{ secrets.MANUAL_AWS_SNS_ALERT_EMAIL }} \
   #                                           SlackWebhookSsmArnParam=${{ secrets.SLACK_WEBHOOK_URL_ARN }} \
   #                                           KmsDecryptKeyArnParam=${{ secrets.SLACK_KMS_DECRYPT_KEY_ARN }}'
 
@@ -157,8 +157,8 @@ jobs:
   #     - name: get temporary AWS credentials
   #       uses: aws-actions/configure-aws-credentials@v4
   #       with:
-  #         aws-region: ${{ secrets.AWS_STACK_REGION }}
-  #         role-to-assume: ${{ secrets.AWS_ROLE_ARN }} 
+  #         aws-region: ${{ secrets.MANUAL_AWS_DEPLOY_REGION }}
+  #         role-to-assume: ${{ secrets.AWS_GITHUB_ROLE_ARN }} 
   #         role-session-name: GHASession-anthony_cloud_resume
   #         unset-current-credentials: true
   #         retry-max-attempts: 3
@@ -171,7 +171,7 @@ jobs:
   #     - name: get SAM output for new API endpoint, see if update repo environment variable and cloudFormation stack is needed
   #       id: getSamIdStep
   #       env:
-  #         GH_TOKEN: ${{ secrets.MY_GH_PERSONAL_ACCESS_TOKEN }}
+  #         GH_TOKEN: ${{ secrets.MANUAL_GITHUB_PERSONAL_ACCESS_TOKEN }}
   #       run: |        
   #         echo STEP: get SAM stack output for API endpoint
             
@@ -180,14 +180,14 @@ jobs:
   #         echo "export SAM_CLI_TELEMETRY=0" >>~/.profile
   #         source ~/.profile
 
-  #         sam  list stack-outputs --output json --stack-name ${{ secrets.AWS_SAM_STACK_NAME }} --region ${{ secrets.AWS_STACK_REGION }}
+  #         sam  list stack-outputs --output json --stack-name ${{ secrets.AWS_SAM_STACK_NAME }} --region ${{ secrets.MANUAL_AWS_DEPLOY_REGION }}
 
   #         echo GH CLI of variable value before:
   #         gh variable get VISITOR_COUNTER_API_INVOKE_URL
 
-  #         api_id=$(sam list stack-outputs --output json --stack-name ${{ secrets.AWS_SAM_STACK_NAME }} --region ${{ secrets.AWS_STACK_REGION }} | jq -r '.[].OutputValue')
+  #         api_id=$(sam list stack-outputs --output json --stack-name ${{ secrets.AWS_SAM_STACK_NAME }} --region ${{ secrets.MANUAL_AWS_DEPLOY_REGION }} | jq -r '.[].OutputValue')
 
-  #         new_endpoint_url="https://$api_id.execute-api.${{ secrets.AWS_STACK_REGION }}.amazonaws.com/visitor-counter"
+  #         new_endpoint_url="https://$api_id.execute-api.${{ secrets.MANUAL_AWS_DEPLOY_REGION }}.amazonaws.com/visitor-counter"
         
   #         echo checking if new url and current repo environment variable are same
   #         if [ "$new_endpoint_url" != "${{ vars.VISITOR_COUNTER_API_INVOKE_URL }}" ];
@@ -224,8 +224,8 @@ jobs:
   #     - name: get temporary AWS credentials
   #       uses: aws-actions/configure-aws-credentials@v4
   #       with:
-  #         aws-region: ${{ secrets.AWS_STACK_REGION }}
-  #         role-to-assume: ${{ secrets.AWS_ROLE_ARN }} 
+  #         aws-region: ${{ secrets.MANUAL_AWS_DEPLOY_REGION }}
+  #         role-to-assume: ${{ secrets.AWS_GITHUB_ROLE_ARN }} 
   #         role-session-name: GHASession-anthony_cloud_resume
   #         unset-current-credentials: true
   #         retry-max-attempts: 3
@@ -238,7 +238,7 @@ jobs:
 
   #     - name: update root stack CSP with new endpoint URL
   #       env:
-  #         GH_TOKEN: ${{ secrets.MY_GH_PERSONAL_ACCESS_TOKEN }}
+  #         GH_TOKEN: ${{ secrets.MANUAL_GITHUB_PERSONAL_ACCESS_TOKEN }}
 
   #       run: |     
   #         API_ENDPOINT_URL=$(gh variable get VISITOR_COUNTER_API_INVOKE_URL)
@@ -246,14 +246,14 @@ jobs:
           
   #         aws cloudformation update-stack --stack-name ${{ secrets.AWS_ROOT_STACK_ID }} \
   #                                         --template-url "${{ secrets.SAM_TEMPLATE_URL }}" \
-  #                                         --region ${{ secrets.AWS_STACK_REGION }} \
+  #                                         --region ${{ secrets.MANUAL_AWS_DEPLOY_REGION }} \
   #                                         --parameters ParameterKey=GitHubRepositoryNameParam,ParameterValue="${{ github.repository }}" \
   #                                                     ParameterKey=OIDCProviderARNParameter,UsePreviousValue=true \
   #                                                     ParameterKey=RegisteredDomainNameParam,UsePreviousValue=true \
   #                                                     ParameterKey=FQDNsParam,UsePreviousValue=true \
   #                                                     ParameterKey=ApiEndpointUrlParam,ParameterValue="$API_ENDPOINT_URL" \
   #                                                     ParameterKey=SamStackNameParam,ParameterValue=${{ secrets.AWS_SAM_STACK_NAME }} \
-  #                                                     ParameterKey=Route53HostedZoneIdParam,ParameterValue=${{ secrets.ROUTE53_ZONE_ID }}
+  #                                                     ParameterKey=Route53HostedZoneIdParam,ParameterValue=${{ secrets.MANUAL_AWS_ROUTE53_ZONE_ID }}
       
 
   # update_client_side_w_new_API_endpoint:
@@ -279,8 +279,8 @@ jobs:
   #     - name: get temporary AWS credentials
   #       uses: aws-actions/configure-aws-credentials@v4
   #       with:
-  #         aws-region: ${{ secrets.AWS_STACK_REGION }}
-  #         role-to-assume: ${{ secrets.AWS_ROLE_ARN }} 
+  #         aws-region: ${{ secrets.MANUAL_AWS_DEPLOY_REGION }}
+  #         role-to-assume: ${{ secrets.AWS_GITHUB_ROLE_ARN }} 
   #         role-session-name: GHASession-anthony_cloud_resume
   #         unset-current-credentials: true
   #         retry-max-attempts: 3
@@ -293,6 +293,6 @@ jobs:
   #     - name: refresh_cloudfront_scripts_path
   #       run: |
   #         aws cloudfront create-invalidation \
-  #             --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
-  #             --region ${{ secrets.AWS_STACK_REGION }} \
+  #             --distribution-id ${{ secrets.AWS_CLOUDFRONT_DISTRIBUTION_ID }} \
+  #             --region ${{ secrets.MANUAL_AWS_DEPLOY_REGION }} \
   #             --paths "${{ env.VISITOR_COUNTER_MODULE_PATH }}"

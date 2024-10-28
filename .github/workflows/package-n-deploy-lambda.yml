@@ -69,11 +69,11 @@ jobs:
     steps:
       - id: decryptInputs
         run: |
-          AWS_ROLE_ARN=$(echo -n ${{ inputs.AWS_ROLE_ARN }} | base64 -d | gpg --decrypt --quiet --batch --passphrase ${{ secrets.GPG_PASSWORD }} --output - )
+          AWS_ROLE_ARN=$(echo -n ${{ inputs.AWS_ROLE_ARN }} | base64 -d | gpg --decrypt --quiet --batch --passphrase ${{ secrets.MANUAL_GITHUB_GPG_PASSWORD }} --output - )
 
           echo "AWS_ROLE_ARN=$AWS_ROLE_ARN" >> "$GITHUB_OUTPUT"
 
-          LAMBDA_ARN=$(echo -n ${{ inputs.LAMBDA_ARN }} | base64 -d | gpg --decrypt --quiet --batch --passphrase ${{ secrets.GPG_PASSWORD }} --output -)
+          LAMBDA_ARN=$(echo -n ${{ inputs.LAMBDA_ARN }} | base64 -d | gpg --decrypt --quiet --batch --passphrase ${{ secrets.MANUAL_GITHUB_GPG_PASSWORD }} --output -)
 
           echo "LAMBDA_ARN=$LAMBDA_ARN" >> "$GITHUB_OUTPUT"
 
@@ -94,7 +94,7 @@ jobs:
       - name: get temporary AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-region: ${{ secrets.AWS_STACK_REGION }}
+          aws-region: ${{ secrets.MANUAL_AWS_DEPLOY_REGION }}
           role-to-assume: ${{ needs.decrypt-inputs.outputs.AWS_ROLE_ARN }} 
           role-session-name: GHASession-anthony_cloud_resume
           unset-current-credentials: true
@@ -110,5 +110,5 @@ jobs:
         run: |
           aws lambda update-function-code \
                       --function-name ${{ needs.decrypt-inputs.outputs.LAMBDA_ARN }} \
-                      --region ${{ secrets.AWS_STACK_REGION }} \
+                      --region ${{ secrets.MANUAL_AWS_DEPLOY_REGION }} \
                       --zip-file fileb://${{ github.workspace }}/${{ inputs.output-zipped_file_name }}

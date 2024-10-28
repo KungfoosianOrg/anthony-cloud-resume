@@ -53,7 +53,7 @@ jobs:
       - name: Install Terraform CLI
         uses: hashicorp/setup-terraform@v3
         with:
-          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+          cli_config_credentials_token: ${{ secrets.MANUAL_TF_API_TOKEN }}
 
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -74,7 +74,7 @@ jobs:
         id: terraformOutput
         
         env:
-          GH_TOKEN: ${{ secrets.MY_GH_PERSONAL_ACCESS_TOKEN }}
+          GH_TOKEN: ${{ secrets.MANUAL_GITHUB_PERSONAL_ACCESS_TOKEN }}
 
         run: |
           cd ${{ env.TERRAFORM_FOLDER_PATH }}
@@ -83,27 +83,27 @@ jobs:
 
           cfn_new_distro_id=$(terraform output -raw cloudfront_distribution_id)
           
-          if [ "$cfn_new_distro_id" != "${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}" ];
+          if [ "$cfn_new_distro_id" != "${{ secrets.AWS_CLOUDFRONT_DISTRIBUTION_ID }}" ];
           then
             echo Updating CloudFront distribution ID...
-            gh secret set CLOUDFRONT_DISTRIBUTION_ID --body "$cfn_new_distro_id"
+            gh secret set AWS_CLOUDFRONT_DISTRIBUTION_ID --body "$cfn_new_distro_id"
           fi
 
-          cfn_new_distro_id=$(echo -n $cfn_new_distro_id | gpg --symmetric --quiet --batch --passphrase ${{ secrets.GPG_PASSWORD }} --output - | base64 -w 0)
+          cfn_new_distro_id=$(echo -n $cfn_new_distro_id | gpg --symmetric --quiet --batch --passphrase ${{ secrets.MANUAL_GITHUB_GPG_PASSWORD }} --output - | base64 -w 0)
           
           echo "new_cloudfront_distribution_id=$cfn_new_distro_id" >> "$GITHUB_OUTPUT"
           
           
           ghactions_aws_role_arn=$(terraform output -raw ghactions_aws_role_arn)
 
-          if [ "$ghactions_aws_role_arn" != "${{ vars.AWS_ROLE_ARN }}" ];
+          if [ "$ghactions_aws_role_arn" != "${{ secrets.AWS_GITHUB_ROLE_ARN }}" ];
           then
             echo Updating ARN of role for GitHub Actions...
             
-            gh secret set AWS_ROLE_ARN --body "$ghactions_aws_role_arn"
+            gh secret set AWS_GITHUB_ROLE_ARN --body "$ghactions_aws_role_arn"
           fi
 
-          ghactions_aws_role_arn=$(echo -n $ghactions_aws_role_arn | gpg --symmetric --quiet --batch --passphrase ${{ secrets.GPG_PASSWORD }} --output - | base64 -w 0)
+          ghactions_aws_role_arn=$(echo -n $ghactions_aws_role_arn | gpg --symmetric --quiet --batch --passphrase ${{ secrets.MANUAL_GITHUB_GPG_PASSWORD }} --output - | base64 -w 0)
           
           echo "new_aws_role_arn=$ghactions_aws_role_arn" >> "$GITHUB_OUTPUT"
           
@@ -112,16 +112,16 @@ jobs:
           s3_frontend_bucket_name=$(terraform output -raw s3_frontend_bucket_name)
           frontend_s3_need_upload="false"
 
-          if [ "$s3_frontend_bucket_name" != "${{ secrets.S3_BUCKET_NAME }}" ];
+          if [ "$s3_frontend_bucket_name" != "${{ secrets.AWS_S3_BUCKET_NAME }}" ];
           then
             echo Updating front end s3 bucket name and uploads files...
           
-            gh secret set S3_BUCKET_NAME --body "$s3_frontend_bucket_name"
+            gh secret set AWS_S3_BUCKET_NAME --body "$s3_frontend_bucket_name"
             
             frontend_s3_need_upload="true"
           fi
 
-          s3_frontend_bucket_name=$(echo -n $s3_frontend_bucket_name | gpg --symmetric --quiet --batch --passphrase ${{ secrets.GPG_PASSWORD }} --output - | base64 -w 0)
+          s3_frontend_bucket_name=$(echo -n $s3_frontend_bucket_name | gpg --symmetric --quiet --batch --passphrase ${{ secrets.MANUAL_GITHUB_GPG_PASSWORD }} --output - | base64 -w 0)
           
           echo "new_s3_bucket_name=$s3_frontend_bucket_name" >> "$GITHUB_OUTPUT"
 
@@ -160,32 +160,32 @@ jobs:
 
           slack_integration_lambda_need_upload="false"
           slack_integration_lambda_arn=$(terraform output -raw slack_integration-lambda_arn)
-          if [ "$slack_integration_lambda_arn" != "${{ secrets.SLACK_INTEGRATION_LAMBDA_ARN }}" ];
+          if [ "$slack_integration_lambda_arn" != "${{ secrets.AWS_SLACK_INTEGRATION_LAMBDA_ARN }}" ];
           then
             echo Updating ARN of Lambda for Slack integration...
-            gh secret set SLACK_INTEGRATION_LAMBDA_ARN --body "$slack_integration_lambda_arn"
+            gh secret set AWS_SLACK_INTEGRATION_LAMBDA_ARN --body "$slack_integration_lambda_arn"
 
             slack_integration_lambda_need_upload="true"
             
             echo "slack_integration_lambda_need_upload=$slack_integration_lambda_need_upload" >> "$GITHUB_OUTPUT"
           fi
 
-          slack_integration_lambda_arn=$(echo -n $slack_integration_lambda_arn | gpg --symmetric --quiet --batch --passphrase ${{ secrets.GPG_PASSWORD }} --output - | base64 -w 0)
+          slack_integration_lambda_arn=$(echo -n $slack_integration_lambda_arn | gpg --symmetric --quiet --batch --passphrase ${{ secrets.MANUAL_GITHUB_GPG_PASSWORD }} --output - | base64 -w 0)
           echo "new_slack_integration_lambda_arn=$slack_integration_lambda_arn" >> "$GITHUB_OUTPUT"
 
           visitorcounter_lambda_need_upload="false"
           visitor_counter_lambda_arn=$(terraform output -raw visitor_counter-lambda_arn)
-          if [ "$visitor_counter_lambda_arn" != "${{ secrets.VISITOR_COUNTER_LAMBDA_ARN }}" ];
+          if [ "$visitor_counter_lambda_arn" != "${{ secrets.AWS_VISITOR_COUNTER_LAMBDA_ARN }}" ];
           then
             echo Updating ARN of Lambda for Slack integration...
-            gh secret set VISITOR_COUNTER_LAMBDA_ARN --body "$visitor_counter_lambda_arn"
+            gh secret set AWS_VISITOR_COUNTER_LAMBDA_ARN --body "$visitor_counter_lambda_arn"
 
             visitorcounter_lambda_need_upload="true"
             
             echo "visitorcounter_lambda_need_upload=$visitorcounter_lambda_need_upload" >> "$GITHUB_OUTPUT"
           fi
 
-          visitor_counter_lambda_arn=$(echo -n $visitor_counter_lambda_arn | gpg --symmetric --quiet --batch --passphrase ${{ secrets.GPG_PASSWORD }} --output - | base64 -w 0)
+          visitor_counter_lambda_arn=$(echo -n $visitor_counter_lambda_arn | gpg --symmetric --quiet --batch --passphrase ${{ secrets.MANUAL_GITHUB_GPG_PASSWORD }} --output - | base64 -w 0)
           echo "new_visitor_counter_lambda_arn=$visitor_counter_lambda_arn" >> "$GITHUB_OUTPUT"
 
           if [ "$slack_integration_lambda_need_upload" = "true" ]; then
