@@ -94,7 +94,7 @@ jobs:
           timeout-minutes: 5
           approvers: Kungfoosian
           minimum-approvals: 1
-          issue-title: Terraform infrastructure deployment requires manual approval
+          issue-title: Terraform infrastructure ${{ inputs.destroy-terraform == true && 'destruction' || 'deployment' }} requires manual approval
           issue-body: ${{ steps.terraform-plan.outputs.terraform_plan_output }}
           exclude-workflow-initiator-as-approver: false
 

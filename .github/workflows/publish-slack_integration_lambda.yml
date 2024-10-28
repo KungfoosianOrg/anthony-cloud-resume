@@ -56,14 +56,12 @@ jobs:
 
     outputs:
       lambda_source_folder-name: ${{ steps.step1.outputs.lambda_source_folder-name }}
-      ghrepo_secret_variable-name: ${{ steps.step1.outputs.ghrepo_secret_variable-name }}
 
     steps:
       - name: print variables as outputs to be passed into other jobs
         id: step1
         run: |
           echo "lambda_source_folder-name=${{ env.lambda_source_folder-name }}" >> "$GITHUB_OUTPUT"
-          echo "ghrepo_secret_variable-name=${{ env.ghrepo_secret_variable_name }}" >> "$GITHUB_OUTPUT"
 
 
   package-n-deploy-lambda:
@@ -75,8 +73,6 @@ jobs:
         lambda_source_folder-name: ${{ needs.pass-variable.outputs.lambda_source_folder-name }}
 
         output-zipped_file_name: ${{ needs.pass-variable.outputs.lambda_source_folder-name }}.zip
-
-        ghrepo_secret_variable_name: ${{ needs.pass-variable.outputs.ghrepo_secret_variable-name }}
 
         AWS_ROLE_ARN: ${{ inputs.AWS_ROLE_ARN }}
 

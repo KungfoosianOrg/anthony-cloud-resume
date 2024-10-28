@@ -31,7 +31,12 @@ jobs:
 
       - name: empty frontend S3 bucket
         run: |
-          aws s3 rm s3://${{ secrets.AWS_S3_BUCKET_NAME }} --recursive
+          aws s3api delete-objects \
+                    --bucket ${{ secrets.AWS_S3_BUCKET_NAME }} \
+                    --delete "$(aws s3api list-object-versions \
+                                          --bucket "${{ secrets.AWS_S3_BUCKET_NAME }}" \
+                                          --output=json \
+                                          --query='{Objects: Versions[].{Key:Key,VersionId:VersionId}}')"
 
 
 
@@ -46,7 +51,7 @@ jobs:
 
   
   
-  reset-repo-secrets:
+  reset-repo-secrets-n-variables:
     needs: [ destroy-terraform-infrastructure ]
     runs-on: ubuntu-latest
 

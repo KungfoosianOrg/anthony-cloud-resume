@@ -10,11 +10,6 @@ on:
       output-zipped_file_name:
         required: true
         type: string
-    
-      ghrepo_secret_variable_name:
-        description: Name of GitHub repo secret that stores the Lambda function's ARN
-        required: true
-        type: string
 
       AWS_ROLE_ARN:
         type: string
