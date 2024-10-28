@@ -91,18 +91,12 @@ jobs:
       - name: sync files to aws s3
         shell: bash
         run: |
-          aws s3 ls --region ${{ secrets.AWS_STACK_REGION }}
-
-          aws s3 ls s3://${{ secrets.S3_BUCKET_NAME }} --debug --region ${{ secrets.AWS_STACK_REGION }}
-
           aws s3 sync ./${{ env.GITHUB_SRC_FOLDER }}/ s3://${{ secrets.S3_BUCKET_NAME }} \
                                                     --follow-symlinks \
                                                     --delete \
                                                     --exclude '.git/*' \
                                                     --exclude 'README.md' \
-                                                    --exclude '.github/*' \
-                                                    --region ${{ secrets.AWS_STACK_REGION }} \
-                                                    --debug
+                                                    --exclude '.github/*'
 
 
   deploy-to-aws-workflow-call:
