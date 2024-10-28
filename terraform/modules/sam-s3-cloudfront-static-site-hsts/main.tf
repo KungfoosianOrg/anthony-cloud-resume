@@ -171,64 +171,8 @@ data "aws_iam_policy_document" "allow_access_from_cloudfront" {
 }
 
 
-# resource "aws_iam_role_policy" "ghactions_permission_policy" {
-#   name = "PermPol_GHActions-S3"
-
-#   role = var.ghactions_aws_role_name
-
-#   policy = jsonencode({
-#     Version = "2012-10-17"
-
-#     Statement = [
-#       {
-#         Effect = "Allow"
-#         Resource = [
-#           "${aws_s3_bucket.frontend_bucket.arn}",
-#           "${aws_s3_bucket.frontend_bucket.arn}/*"
-#         ]
-
-#         Action = [
-#           "s3:PutObject",
-#           "s3:PutObjectAcl",
-#           "s3:ListBucket",
-#           "s3:DeleteObject",
-#           "s3:GetAccelerateConfiguration",
-#           "s3:GetObject",
-#           "s3:GetObjectAcl",
-#           "s3:GetBucketLogging",
-#           "s3:GetBucketOwnershipControls",
-#           "s3:GetBucketObjectLockConfiguration",
-#           "s3:GetBucketNotification",
-#           "s3:GetIntelligentTieringConfiguration",
-#           "s3:GetLifecycleConfiguration",
-#           "s3:GetInventoryConfiguration",
-#           "s3:GetEncryptionConfiguration",
-#           "s3:GetAnalyticsConfiguration",
-#           "s3:GetBucketCORS",
-#           "s3:GetMetricsConfiguration",
-#           "s3:GetReplicationConfiguration",
-#           "s3:GetBucketTagging",
-#           "s3:GetBucketWebsite",
-#           "s3:GetBucketPublicAccessBlock",
-#           "s3:GetBucketVersioning"
-#         ]
-#       },
-
-#       {
-#         Effect = "Allow"
-
-#         Resource = "arn:aws:route53:::hostedzone/${var.route53_hosted_zone_id}"
-
-#         Action = ["route53:getHostedZone"]
-#       }
-#     ]
-
-
-#   })
-# }
 
 data "aws_iam_policy_document" "cicd-permissions" {
-  # translate above
   version = "2012-10-17"
 
   statement {
@@ -248,6 +192,7 @@ data "aws_iam_policy_document" "cicd-permissions" {
       "s3:ListBucket",
       "s3:ListBucketVersions",
       "s3:DeleteObject",
+      "s3:DeleteObjectVersion",
       "s3:GetAccelerateConfiguration",
       "s3:GetObject",
       "s3:GetObjectAcl",
