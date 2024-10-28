@@ -31,8 +31,11 @@ jobs:
 
       - name: empty frontend S3 bucket
         run: |
-          aws s3api delete-objects --bucket ${{ secrets.AWS_S3_BUCKET_NAME }} --delete "$(aws s3api list-object-versions --bucket ${{ secrets.AWS_S3_BUCKET_NAME }} --output=json --query='{Objects: Versions[].{Key:Key,VersionId:VersionId}}')"
+          echo Deleting objects
+          aws s3api delete-objects --bucket ${{ secrets.AWS_S3_BUCKET_NAME }} --delete "$(aws s3api list-object-versions --bucket ${{ secrets.AWS_S3_BUCKET_NAME }} --query='{Objects: Versions[].{Key:Key,VersionId:VersionId}}')"
 
+          echo Deleting markers
+          aws s3api delete-objects --bucket ${{ secrets.AWS_S3_BUCKET_NAME }} --delete "$(aws s3api list-object-versions --bucket ${{ secrets.AWS_S3_BUCKET_NAME }} --query='{Objects: DeleteMarkers[].{Key:Key,VersionId:VersionId}}')"
 
 
   destroy-terraform-infrastructure:
