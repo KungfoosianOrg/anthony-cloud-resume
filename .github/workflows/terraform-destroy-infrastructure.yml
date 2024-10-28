@@ -6,6 +6,8 @@ on:
 
 permissions:
   issues: write
+  contents: read
+  id-token: write
 
 jobs:
   empty-s3-bucket:
@@ -41,3 +43,20 @@ jobs:
       destroy-terraform: true
 
     secrets: inherit
+
+  
+  
+  reset-repo-secrets:
+    needs: [ destroy-terraform-infrastructure ]
+    runs-on: ubuntu-latest
+
+    steps:
+      - env:
+          GH_TOKEN: ${{ secrets.MANUAL_GITHUB_PERSONAL_ACCESS_TOKEN }}
+        run: |
+          gh secret set AWS_CLOUDFRONT_DISTRIBUTION_ID --body "reset"
+          gh secret set AWS_GITHUB_ROLE_ARN --body "reset"
+          gh secret set AWS_S3_BUCKET_NAME --body "reset"
+          gh secret set AWS_SLACK_INTEGRATION_LAMBDA_ARN --body "reset"
+          gh secret set AWS_VISITOR_COUNTER_LAMBDA_ARN --body "reset"
+          gh variable set VISITOR_COUNTER_API_INVOKE_URL --body "reset" 
