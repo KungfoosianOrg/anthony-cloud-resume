@@ -22,13 +22,13 @@ module "route53-cloudfront-alias-w-ssl-validation" {
   registered_domain_name       = var.registered_domain_name
   subdomains                   = var.subdomains
   route53_hosted_zone_id       = var.route53_hosted_zone_id == "" ? aws_route53_zone.primary[0].id : var.route53_hosted_zone_id
-  cloudfront_distribution_fqdn = module.sam-s3-cloudfront-static-site-hsts.cloudfront_distribution_domain_name
+  cloudfront_distribution_fqdn = module.s3-cloudfront-static-site-hsts.cloudfront_distribution_domain_name
 
   aws_region = var.aws_region
 }
 
-module "sam-s3-cloudfront-static-site-hsts" {
-  source = "./modules/sam-s3-cloudfront-static-site-hsts"
+module "s3-cloudfront-static-site-hsts" {
+  source = "./modules/s3-cloudfront-static-site-hsts"
 
   registered_domain_name  = var.registered_domain_name
   subdomains              = var.subdomains

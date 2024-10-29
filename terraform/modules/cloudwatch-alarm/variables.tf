@@ -4,17 +4,6 @@ variable "aws_region" {
   default     = "us-east-1"
 }
 
-# variable "aws_profile" {
-#   type    = string
-#   default = ""
-# }
-
-# variable "aws_role_arn" {
-#   type = string
-#   description = "ARN of AWS IAM role for Terraform to assume in order to create the infrastructure"
-#   default = "aws:arn:change:me"
-# }
-
 variable "name" {
   description = "Name for cloudwatch alarm and SNS topic"
   type        = string
@@ -26,19 +15,6 @@ variable "notification_email" {
   type        = string
   default     = ""
 }
-
-# variable "need_lambda_integration" {
-#   description = "boolean, set to 'true' to set a Lambda function as the alarm target, must also define lambda_subscriber_arn. Default: false"
-#   type = bool
-#   default = false
-# }
-
-# variable "lambda_subscriber_arn" {
-#   description = "ARN of Lambda function for alarm to trigger. Must define if need_lambda_integration is true"
-#   type = string
-#   default = ""
-# }
-
 
 variable "measured_metric" {
   description = "Metric to create alarm on"

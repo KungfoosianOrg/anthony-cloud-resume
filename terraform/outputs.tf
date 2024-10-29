@@ -5,7 +5,7 @@ output "ghactions_aws_role_arn" {
 
 output "s3_frontend_bucket_name" {
   description = "Name of created S3 bucket for storing front end code"
-  value       = module.sam-s3-cloudfront-static-site-hsts.s3_frontend_bucket_name
+  value       = module.s3-cloudfront-static-site-hsts.s3_frontend_bucket_name
 }
 
 # output "s3_frontend_bucket_region" {
@@ -20,7 +20,7 @@ output "route53_hosted_zone_id" {
 
 output "cloudfront_distribution_id" {
   description = "AWS CloudFront distribution's id"
-  value       = module.sam-s3-cloudfront-static-site-hsts.cfdistro_id
+  value       = module.s3-cloudfront-static-site-hsts.cfdistro_id
   sensitive = true
 }
 

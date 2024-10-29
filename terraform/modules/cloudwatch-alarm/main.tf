@@ -12,14 +12,6 @@ resource "aws_sns_topic_subscription" "email_subscription" {
   topic_arn = aws_sns_topic.sns_topic.arn
 }
 
-# resource "aws_sns_topic_subscription" "lambda_subscription" {
-#   count = var.need_lambda_integration ? 1 : 0
-
-#   endpoint  = var.lambda_subscriber_arn
-#   protocol  = "lambda"
-#   topic_arn = aws_sns_topic.sns_topic.arn
-# }
-
 resource "aws_cloudwatch_metric_alarm" "cloudwatch_alarm" {
   alarm_name          = var.name
   comparison_operator = "GreaterThanThreshold"

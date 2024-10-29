@@ -119,7 +119,7 @@ data "aws_iam_policy_document" "terraform_oidc_permissions" {
 
     resources = ["*"]
     # arn's of possibly multiple:
-    #   module.sam-s3-cloudfront-static-site-hsts.aws_s3_bucket.frontend_bucket
+    #   module.s3-cloudfront-static-site-hsts.aws_s3_bucket.frontend_bucket
     #   or arn:aws:s3:::terraform-*
   }
 
