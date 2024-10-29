@@ -10,7 +10,7 @@
 
 #### PART 1 #####
 
-# Checks iif isi_prod_build defined:
+# Checks if is_prod_build defined:
 #   yes: ignore this resource creation
 #   no : create hosted zone
 # resource "aws_route53_zone" "primary" {

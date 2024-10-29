@@ -6,17 +6,34 @@ I will do my best to walk you through this repo
 
 
 
-## From top to  bottom, starting from root of repo (/):
+## Starting from root of repo (/):
 
 Folder **/__mocks__** contains Jest mocks for Jest JS unit testing
 
 Folder **/.github/workflows** contains GitHub Actions workflows, and within it:
 
+    - inject-terraform-variables.yml:
+      + (10/29/2024) Reusable workflow, for injecting values for terraform.tf and tfvars files
+
+    - package-n-deploy-lambda.yml:
+      + (10/29/2024) Reusable workflow, for packaging lambda source code and deploy to appropriate AWS Lambda ARN
+
+    - terraform-apply-infrastructure.yml:
+      + (10/29/2024) Manually called workflow with manual approval, creates the backend infrastructure on Terraform and calls other workflow to update S3 bucket, lambda source code, as needed
+
+    - terraform-destroy-infrastructure.yml:
+      + (10/19/2024) Manually called workflow with manual approval, cleans up frontend S3 bucket and Terraform infrastructure.
+    
+    - terraform-update-infrastructure.yml:
+      + (10/29/2024) Reusable workflow, for applying/destroying the Terraform infrastructure.
+
     - deploy-site-to-s3.yml:
+      + (10/29/2024) Added a trigger option to make this workflow into a reusable workflow, added jobs that are specific to whether the workflow was called manually, or from another workflow
       + (7/12/2024) Dynamically updates the API endpoint in the /github/scripts/visitorCounter.js using repo secrets
       + (before 7/12/2024, I was very lazy with documenting, still am...) validates HTML, run Jest unit testing, and sync all files in the /github folder to AWS S3
 
-    - publish_visitorcounter_lambda.yml:
+    - publish-slack_integration_lambda/publish-visitorcounter_lambda:
+      + (10/29/2024) Reusable workflows, can also be called upon push to appropriate Lambda source code folders in **/aws**
       + (7/17/2024) Added integration for Slack webhook, added repo secrets for the integration, updated workflow to override SAM template parameters without using the samconfig.toml file
       + (7/12/2024) Run Python unittest for Python Lambda code in the /aws folder, create SAM app on AWS with Lambda code, updates the repository secret for API endpoint and calls the deploy-site-to-s3.yml workflow if necessary
 
@@ -39,12 +56,7 @@ Folder **/terraform** contains TerraForm templates for this project, and within 
 
 Folder **/tests** contains all tests for code in this repo
 
-**/samconfig.toml** contains default parameters for when a SAM stack is deployed
-
 **/setupJest.js** sets up Jest testing
-
-**/template.yaml** AWS CloudFormation template for when a SAM stack is deployed
-
 
 
 ## Usage
