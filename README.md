@@ -1,3 +1,6 @@
+[![Terraform infrastructure apply](https://github.com/KungfoosianOrg/anthony-cloud-resume/actions/workflows/terraform-apply-infrastructure.yml/badge.svg)](https://github.com/KungfoosianOrg/anthony-cloud-resume/actions/workflows/terraform-apply-infrastructure.yml)
+
+
 # anthony-cloud-resume
 
 Hello and welcome to my AWS cloud resume repository, following the Cloud Resume Challenge!
