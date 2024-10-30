@@ -19,7 +19,7 @@ Folder **/.github/workflows** contains GitHub Actions workflows, and within it:
       + (10/29/2024) Reusable workflow, for packaging lambda source code and deploy to appropriate AWS Lambda ARN
 
     - terraform-apply-infrastructure.yml:
-      + (10/29/2024) Manually called workflow with manual approval, creates the backend infrastructure on Terraform and calls other workflow to update S3 bucket, lambda source code, as needed
+      + (10/29/2024) Manually called workflow with manual approval, or triggered upon a push to the **/terraform** folder  creates the backend infrastructure on Terraform and calls other workflow to update S3 bucket, lambda source code, as needed
 
     - terraform-destroy-infrastructure.yml:
       + (10/19/2024) Manually called workflow with manual approval, cleans up frontend S3 bucket and Terraform infrastructure.

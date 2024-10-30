@@ -5,7 +5,8 @@ on:
       branches: ["main"]
       paths: [
         "terraform/**",
-        "!terraform/modules/terraform-ci-cd/**"
+        "!terraform/modules/terraform-ci-cd/**",
+        "!terraform/original-terraform-permissions.txt"
       ]
 
   # Allows you to run this workflow manually from the Actions tab
