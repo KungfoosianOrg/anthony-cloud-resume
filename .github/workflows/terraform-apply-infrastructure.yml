@@ -2,7 +2,7 @@ name: Terraform apply w/ manual approval
 
 on:
   push:
-      branches: ["terraform"]
+      branches: ["main"]
       paths: [
         "terraform/**",
         "!terraform/modules/terraform-ci-cd/**"
