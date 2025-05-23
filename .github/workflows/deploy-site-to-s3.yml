@@ -82,7 +82,6 @@ jobs:
           GH_TOKEN: ${{ secrets.MANUAL_GITHUB_PERSONAL_ACCESS_TOKEN }}
           
         run: |
-          gh auth login --with-token
           API_ENDPOINT_URL=$(gh variable get VISITOR_COUNTER_API_INVOKE_URL)
           echo api url endpoint from GH CLI: $API_ENDPOINT_URL
 
